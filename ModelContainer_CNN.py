@@ -5,6 +5,7 @@ import torch.nn as nn
 import sys
 import numpy as np
 from MyPyTorchAPI.CustomLoss import MahalanobisLoss
+from tkinter import *
 
 class ModelContainer_CNN():
     def __init__(self, net_model):
@@ -17,6 +18,25 @@ class ModelContainer_CNN():
         self.wName = None
         self.current_val_loss = 10**5
         self.min_val_loss = 10**5
+
+        master = Tk()
+        Label(master, text="lRate").grid(row=0)
+        Label(master, text="wDecay").grid(row=1)
+
+        e1 = Entry(master)
+        e2 = Entry(master)
+
+        e1.grid(row=0, column=1)
+        e2.grid(row=1, column=1)
+
+        #Button(master, text='Quit', command=master.quit).grid(row=3, column=0, sticky=W, pady=4)
+        Button(master, text='Update', command=self.updateLearningRate).grid(row=3, column=1, sticky=W, pady=4)
+        mainloop()
+
+    def updateLearningRate(self):
+        lr = el.get()
+        self.optimizer = optim.RMSprop(self.model.parameters(), lr=lr, weight_decay=10 ** -4)
+        print('current lr = %f'%(lr))
 
     def compile(self, loss=None, optimizer=None):
         self.loss = MahalanobisLoss()#nn.modules.loss.L1Loss()
@@ -150,5 +170,26 @@ class ModelContainer_CNN():
             return pr_du, pr_dw, du_cov, dw_cov, dtrans, mae
 
 if __name__ == '__main__':
-    from Model_CNN_0 import Model_CNN_0
-    mc = ModelContainer_CNN(Model_CNN_0())
+    # from Model_CNN_0 import Model_CNN_0
+    # mc = ModelContainer_CNN(Model_CNN_0())
+    from tkinter import *
+
+
+    def show_entry_fields():
+        print("First Name: %s\nLast Name: %s" % (e1.get(), e2.get()))
+
+
+    master = Tk()
+    Label(master, text="First Name").grid(row=0)
+    Label(master, text="Last Name").grid(row=1)
+
+    e1 = Entry(master)
+    e2 = Entry(master)
+
+    e1.grid(row=0, column=1)
+    e2.grid(row=1, column=1)
+
+    Button(master, text='Quit', command=master.quit).grid(row=3, column=0, sticky=W, pady=4)
+    Button(master, text='Show', command=show_entry_fields).grid(row=3, column=1, sticky=W, pady=4)
+
+    mainloop()
