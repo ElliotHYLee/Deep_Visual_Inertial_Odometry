@@ -58,14 +58,6 @@ Cudnn: v7.1
 python main_cnn.py
 ```
 
-
-
-## Quick Overview of The Results
-
-<ul>
-<img src="https://github.com/ElliotHYLee/VisualOdometry/blob/master/Results/Images/seq_corr5.png" width="400">
-</ul>
-
 ## Traing Results
 description
 
