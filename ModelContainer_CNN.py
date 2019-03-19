@@ -132,7 +132,7 @@ class ModelContainer_CNN():
                     dw_list.append(pr_dw.cpu().data.numpy())
                     du_cov_list.append(pr_du_cov.cpu().data.numpy())
                     dw_cov_list.append(pr_dw_cov.cpu().data.numpy())
-                    dtrans_list.append(pr_dtrans.cpu().data.numpy())
+                    #dtrans_list.append(pr_dtrans.cpu().data.numpy())
                 if isTarget:
                     du = du.to(self.device)
                     batch_loss = self.loss(pr_du, du, pr_du_cov) + self.loss(pr_dw, dw, pr_dw_cov)
@@ -146,7 +146,7 @@ class ModelContainer_CNN():
             pr_dw = np.concatenate(dw_list, axis=0)
             du_cov = np.concatenate(du_cov_list, axis=0)
             dw_cov = np.concatenate(dw_cov_list, axis=0)
-            dtrans = np.concatenate(dtrans_list, axis=0)
+            dtrans =None#np.concatenate(dtrans_list, axis=0)
             return pr_du, pr_dw, du_cov, dw_cov, dtrans, mae
 
 if __name__ == '__main__':

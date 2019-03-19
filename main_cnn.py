@@ -15,7 +15,7 @@ def train():
     mc = ModelContainer_CNN(Model_CNN_0())
     wName = 'Weights/' + branchName() + '_' + dsName
     # mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=64, epochs=20,
+    mc.fit(train, val, batch_size=64, epochs=40,
            wName=wName, checkPointFreq=1)
 
 def testModel():
@@ -26,11 +26,8 @@ def testModel():
 
 def test():
     for seq in range(0,3):
-        if dsName == 'airsim':
-            commName = 'Results/' + branchName() + '_' + dsName + '_' + subType + str(seq)
-        else:
-            commName = 'Results/' + branchName() + '_' + dsName + '_' + str(seq)
-
+        commName = 'Results/Data/' + branchName() + '_' + dsName + '_'
+        commName += subType + str(seq) if dsName == 'airsim' else str(seq)
         dm = VODataSetManager_CNN(dsName=dsName, seq=[seq], isTrain=False)
         dataset = dm.testSet
 
@@ -42,7 +39,7 @@ def test():
             np.savetxt(commName + '_dw.txt', pr_dw)
             np.savetxt(commName + '_du_cov.txt', du_cov)
             np.savetxt(commName + '_dw_cov.txt', dw_cov)
-            np.savetxt(commName + '_dtrans.txt', pr_dtrans)
+            #np.savetxt(commName + '_dtrans.txt', pr_dtrans)
 
 if __name__ == '__main__':
     s = time.time()
