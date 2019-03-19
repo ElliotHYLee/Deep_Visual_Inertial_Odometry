@@ -4,10 +4,11 @@ from git_branch_param import *
 from sklearn.preprocessing import MinMaxScaler
 
 class ReadData():
-    def __init__(self, dsName='airsim', seq=0, isTrain=True):
+    def __init__(self, dsName='airsim', subType='mr', seq=0, isTrain=True):
         self.isTrain = isTrain
         self.dsName = dsName
-        self.path = getPath(dsName, seq=seq, subType='mr')
+        self.subType = subType
+        self.path = getPath(dsName, seq=seq, subType=subType)
         # non images
         if dsName == 'airsim':
             self.data = pd.read_csv(self.path + 'data.txt', sep=' ', header=None)

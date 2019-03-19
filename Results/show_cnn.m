@@ -5,7 +5,7 @@ seq = 2;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
-gt_dtName = strcat(gtPath, '\dt.txt');
+gt_dtName = strcat(gtPath, 'dt.txt')
 gt_duName = strcat(gtPath, '\du.txt');
 gt_dwName = strcat(gtPath, '\dw.txt');
 dt = importdata(gt_dtName);

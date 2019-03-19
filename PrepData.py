@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 import time
 
 class NNData():
-    def __init__(self, dsName='airsim', seq=[1,3,5], isTrain=True):
+    def __init__(self, dsName='airsim', subType='mr', seq=[1,3,5], isTrain=True):
         self.dsName = dsName
         self.isTrain = isTrain
+        self.subType = subType
         self.imgs = None
         self.img0 = None
         self.img1 = None
@@ -36,11 +37,12 @@ class NNData():
         return imgChunk
 
 class CNNData(NNData):
-    def __init__(self, dsName='airsim', seq=[1, 3, 5], isTrain=True):
-        super().__init__(dsName, seq, isTrain)
+    def __init__(self, dsName='airsim', subType='mr', seq=[1, 3, 5], isTrain=True):
+        super().__init__(dsName, subType, seq, isTrain)
         self.isTrain = isTrain
         self.dsName = dsName
-        dataObj = [ReadData(dsName, seq[i], isTrain) for i in range(0, len(seq))]
+        self.subType = subType
+        dataObj = [ReadData(dsName, subType, seq[i], isTrain) for i in range(0, len(seq))]
         self.imgs = [dataObj[i].imgs for i in range(0, len(seq))]
         self.img0 = np.concatenate([self.imgs[i][0:-1, :] for i in range(0, len(seq))], axis=0)
         self.img1 = np.concatenate([self.imgs[i][1:, :] for i in range(0, len(seq))], axis=0)
