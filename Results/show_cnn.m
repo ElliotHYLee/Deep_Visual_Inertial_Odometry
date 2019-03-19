@@ -145,6 +145,7 @@ xlabel(['\fontsize{14} Position_z, m'])
 
 
 err = abs(gt_du-pr_du);
+mae = mean(err)
 cov(err)
 
 figName = strcat('Figures\',getPRPath(dsName, subType, seq), '_results.png');
