@@ -6,7 +6,7 @@ from sklearn.preprocessing import MinMaxScaler
 class ReadData_CNN():
     def __init__(self, seq=0, isTrain=True):
         self.isTrain = isTrain
-        self.path = 'F:/Airsim/mrseg' + str(seq) + '/'
+        self.path = getPath('AirSim', seq=0, subType='mr')
         # non images
         self.data = pd.read_csv(self.path + 'data.txt', sep=' ', header=None)
         self.dt = pd.read_csv(self.path + 'dt.txt', sep=',', header=None).values.astype(np.float32)
@@ -147,7 +147,7 @@ class ReadData_RNN():
                 self.dw_input[i, :] = np.divide(self.dw_input[i, :] - dw_mean, dw_std)
 
 if __name__ == '__main__':
-    d = ReadData_RNN(0)
+    d = ReadData_CNN(0)
     # s = time.time()
     # dataObj = ReadData_CNN(0)
     # print(time.time() - s)

@@ -5,6 +5,18 @@ import cv2
 import time
 import sys
 
+def getPath(dsName = 'AirSim', seq = 0, subType='mr'):
+    path = None
+    dsName = dsName.lower()
+    if dsName == 'airsim':
+        path = 'D:/DLData/Airsim/' + subType + str(seq) + '/'
+    elif dsName == 'euroc':
+        path = 'D:/DLData/EuRoc/mh_' + str(seq)
+    elif dsName == 'kitti':
+        path = 'D:/DLData/KITTI/odom/dataset/sequences/'
+        path += '0'+str(seq) if seq<10 else str(seq)
+    return path
+
 def getEnd(start, N, totalN):
     end = start+N
     if end > totalN:
