@@ -15,7 +15,7 @@ def train():
     mc = ModelContainer_CNN(Model_CNN_0())
     wName = 'Weights/' + branchName() + '_' + dsName
     # mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=64, epochs=100,
+    mc.fit(train, val, batch_size=64, epochs=20,
            wName=wName, checkPointFreq=1)
 
 def testModel():
