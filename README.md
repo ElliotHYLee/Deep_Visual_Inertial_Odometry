@@ -30,13 +30,23 @@ pip install opencv-python opencv-contrib-python
 </pre>
 detail: https://github.com/ElliotHYLee/SystemReady
 
+
 ## Tested System
+- Hardware
+<pre>
+CPU: i9-7940x
+RAM: 128G, 3200Hz
+GPU: two Gefore 1080 ti
+MB: ROG STRIX x299-E Gaming
+</pre>
+
+- Software
 <pre>
 Windows10
 Python3 with native pip
-PyTorch: 1
-CUDA: 9.0
-Cudnn: 7.1
+PyTorch: v1
+CUDA: v9.0
+Cudnn: v7.1
 </pre>
 ## Run
 
