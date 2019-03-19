@@ -1,0 +1,3 @@
+[submodule "MyPyTorchAPI"]
+	path = MyPyTorchAPI
+	url = https://github.com/ElliotHYLee/MyPyTorchAPI
