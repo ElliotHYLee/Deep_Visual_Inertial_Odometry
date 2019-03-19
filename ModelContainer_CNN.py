@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import sys
 import numpy as np
-from Mahalanobis import MyCustomLoss
+from MyPyTorchAPI.CustomLoss import MahalanobisLoss
 
 class ModelContainer_CNN():
     def __init__(self, net_model):
@@ -19,9 +19,9 @@ class ModelContainer_CNN():
         self.min_val_loss = 10**5
 
     def compile(self, loss=None, optimizer=None):
-        self.loss = MyCustomLoss()#nn.modules.loss.L1Loss()
+        self.loss = MahalanobisLoss()#nn.modules.loss.L1Loss()
         # self.optimizer = optim.SGD(self.model.parameters(), lr=10**-2, weight_decay=0.01)
-        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-3)
+        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-4, weight_decay=10**-4)
 
     def fit(self, train, validation=None, batch_size=1, epochs=1, shuffle=True, wName='weight.pt', checkPointFreq = 1):
         self.checkPointFreq = checkPointFreq
@@ -74,14 +74,15 @@ class ModelContainer_CNN():
     def runEpoch(self, epoch):
         epoch_loss = 0
         self.model.train(True)
-        for batch_idx, (img0, img1, du, dw) in enumerate(self.train_loader):
+        for batch_idx, (img0, img1, du, dw, dtrans) in enumerate(self.train_loader):
             img0 = img0.to(self.device)
             img1 = img1.to(self.device)
             du = du.to(self.device)
             dw = dw.to(self.device)
+            dtrans = dtrans.to(self.device)
 
             # forward pass and calc loss
-            pr_du, pr_dw, pr_du_cov, pr_dw_cov = self.model(img0, img1)
+            pr_du, pr_dw, pr_du_cov, pr_dw_cov, pr_dtrans = self.model(img0, img1)
             batch_loss = self.loss(pr_du, du, pr_du_cov) + self.loss(pr_dw, dw, pr_dw_cov)
             epoch_loss += batch_loss.item()
 
@@ -115,21 +116,23 @@ class ModelContainer_CNN():
 
     def predict(self, data_incoming, isValidation=False, isTarget=True):
         data_loader = data_incoming if isValidation else DataLoader(dataset=data_incoming, batch_size=16, shuffle=False)
-        du_list, dw_list, du_cov_list, dw_cov_list = [], [], [], []
+        du_list, dw_list, du_cov_list, dw_cov_list, dtrans_list = [], [], [], [], []
         loss = 0
-        for batch_idx, (img0, img1, du, dw) in enumerate(data_loader):
+        for batch_idx, (img0, img1, du, dw, dtrans) in enumerate(data_loader):
             img0 = img0.to(self.device)
             img1 = img1.to(self.device)
             du = du.to(self.device)
             dw = dw.to(self.device)
+            dtrans = dtrans.to(self.device)
 
             with torch.no_grad():
-                pr_du, pr_dw, pr_du_cov, pr_dw_cov = self.model(img0, img1)
+                pr_du, pr_dw, pr_du_cov, pr_dw_cov, pr_dtrans = self.model(img0, img1)
                 if not isValidation:
                     du_list.append(pr_du.cpu().data.numpy())
                     dw_list.append(pr_dw.cpu().data.numpy())
                     du_cov_list.append(pr_du_cov.cpu().data.numpy())
                     dw_cov_list.append(pr_dw_cov.cpu().data.numpy())
+                    dtrans_list.append(pr_dtrans.cpu().data.numpy())
                 if isTarget:
                     du = du.to(self.device)
                     batch_loss = self.loss(pr_du, du, pr_du_cov) + self.loss(pr_dw, dw, pr_dw_cov)
@@ -143,8 +146,9 @@ class ModelContainer_CNN():
             pr_dw = np.concatenate(dw_list, axis=0)
             du_cov = np.concatenate(du_cov_list, axis=0)
             dw_cov = np.concatenate(dw_cov_list, axis=0)
-            return pr_du, pr_dw, du_cov, dw_cov, mae
+            dtrans = np.concatenate(dtrans_list, axis=0)
+            return pr_du, pr_dw, du_cov, dw_cov, dtrans, mae
 
 if __name__ == '__main__':
-    from Model_Simple_CNN_0 import Model_Simple_CNN_0
-    mc = ModelContainer_CNN(Model_Simple_CNN_0())
+    from Model_CNN_0 import Model_CNN_0
+    mc = ModelContainer_CNN(Model_CNN_0())

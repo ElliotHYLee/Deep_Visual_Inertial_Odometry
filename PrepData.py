@@ -55,20 +55,21 @@ class CNNData(NNData):
         self.img0 = self.standardizeImage(self.img0, mean, std)
         self.img1 = self.standardizeImage(self.img1, mean, std)
 
-        print(self.img0.shape)
-        print(self.img1.shape)
-        print(self.dt.shape)
-        print(self.dtrans.shape)
-        print(self.du.shape)
-        print(self.dw.shape)
-        print(self.totalN)
+        # print(self.img0.shape)
+        # print(self.img1.shape)
+        # print(self.dt.shape)
+        # print(self.dtrans.shape)
+        # print(self.du.shape)
+        # print(self.dw.shape)
+        # print(self.totalN)
 
         if isTrain:
             print('shuffling the data...')
             self.train_img0, self.val_img0, \
             self.train_img1, self.val_img1, \
             self.train_du, self.val_du, \
-            self.train_dw, self.val_dw = train_test_split(self.img0, self.img1, self.du, self.dw, test_size=0.1, shuffle=True)
+            self.train_dw, self.val_dw,\
+            self.train_dtrans, self.val_dtrans  = train_test_split(self.img0, self.img1, self.du, self.dw, self.dtrans, test_size=0.1, shuffle=True)
 
 
 # only for trainer

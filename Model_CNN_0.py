@@ -1,18 +1,18 @@
-from MyUtils import *
-# from MyUtils2 import *
+from MyPyTorchAPI.CNNUtils import *
 import torch.nn as nn
-import torch.nn.functional as F
 import torch
 import numpy as np
 from git_branch_param import *
-from Mahalanobis import MyCustomLoss
-from MyActivation import *
+from MyPyTorchAPI.CustomLoss import MahalanobisLoss
+from MyPyTorchAPI.CustomActivation import *
 
-class Model_Simple_CNN_0(nn.Module):
-    def __init__(self, input_size=(6, 350, 720)):
-        super(Model_Simple_CNN_0, self).__init__()
+class Model_CNN_0(nn.Module):
+    def __init__(self, dsName='airsim'):
+        super(Model_CNN_0, self).__init__()
+        input_channel = 2 if dsName.lower() == 'euroc' else 6
+        input_size = (input_channel, 360, 720)
         seq1 = MySeqModel(input_size, [
-            Conv2DBlock(6, 64, kernel=3, stride=2, padding=1, atvn='prlu', bn = True, dropout=True),
+            Conv2DBlock(input_channel, 64, kernel=3, stride=2, padding=1, atvn='prlu', bn = True, dropout=True),
             Conv2DBlock(64, 128, kernel=3, stride=2, padding=1, atvn='prlu', bn = True, dropout=True),
             Conv2DBlock(128, 256, kernel=3, stride=2, padding=1, atvn='prlu', bn = True, dropout=True),
             Conv2DBlock(256, 512, kernel=3, stride=2, padding=1, atvn='prlu', bn = True, dropout=True),
@@ -55,7 +55,7 @@ class Model_Simple_CNN_0(nn.Module):
                                    nn.Linear(64, 64),
                                    nn.BatchNorm1d(64),
                                    nn.PReLU(),
-                                   nn.Linear(64, 6), MyActivation())
+                                   nn.Linear(64, 6), Sigmoid100())
 
         self.fc_dw_cov = nn.Sequential(
                                    nn.Linear(NN_size, 512),
@@ -67,7 +67,7 @@ class Model_Simple_CNN_0(nn.Module):
                                    nn.Linear(64, 64),
                                    nn.BatchNorm1d(64),
                                    nn.PReLU(),
-                                   nn.Linear(64, 6), MyActivation())
+                                   nn.Linear(64, 6), Sigmoid100())
 
 
         # self.du_mean =  np.loadtxt('Results/airsim/' + branchName() + '_train_du_mean.txt')
@@ -97,14 +97,13 @@ class Model_Simple_CNN_0(nn.Module):
         du = self.fc_du(x)
         dw = self.fc_dw(x)
         du_cov = self.fc_du_cov(x)
-        #du_cov = torch.clamp(du_cov, min=0.1, max=1.41)
         dw_cov = self.fc_dw_cov(x)
-        #dw_cov = torch.clamp(dw_cov, min=0.1, max=1.41)
-        return du, dw, du_cov, dw_cov
+        dtrans = None
+        return du, dw, du_cov, dw_cov, dtrans
 
 
 if __name__ == '__main__':
-    m = Model_Simple_CNN_0()
+    m = Model_CNN_0()
     img1 = torch.zeros((2, 3, 360, 720))
     img2 = img1
     du, dw = m.forward(img1, img2)
