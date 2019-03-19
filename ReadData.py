@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 from git_branch_param import *
 from sklearn.preprocessing import MinMaxScaler
 
-class ReadData_CNN():
+class ReadData():
     def __init__(self, dsName='airsim', seq=0, isTrain=True):
         self.isTrain = isTrain
         self.dsName = dsName
-        self.path = getPath(dsName, seq=seq, subType='mr')
+        self.path = getPath(dsName, seq=seq, subType='mrseg')
         # non images
         if dsName == 'airsim':
             self.data = pd.read_csv(self.path + 'data.txt', sep=' ', header=None)
@@ -132,7 +132,7 @@ class ReadData_RNN():
 
 if __name__ == '__main__':
     s = time.time()
-    d = ReadData_CNN(dsName='euroc', seq=1, isTrain=True)
+    d = ReadData(dsName='airsim', seq=1, isTrain=True)
     print(time.time() - s)
 
     # plt.figure()
