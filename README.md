@@ -1,8 +1,7 @@
 # VisualOdometry3D
-# VisualOdometry
 
-Using convolutional neural network, the velocity of the camera is estimated. After predicting the velocity, it is numerically integrated to calculate the positions of the camera. <br>
-
+Using convolutional neural network, the velocity of the camera is estimated. 
+After predicting the velocity, 3D transformation matrices are concanated to estimate the position.
 
 [Click for Youtube video:
 <img src="https://github.com/ElliotHYLee/OpticalFlow2VelocityEstimation/blob/master/Images/Capture.JPG">](https://youtu.be/-t8VCICzGD0)
@@ -11,26 +10,38 @@ Citation: <br>Hongyun Lee, Matthew McCrink, and James W. Gregory. "Visual-Inerti
 
 
 ## ToDo
-1. Mapping
+- LSTM integration
+- upload weight.pt 
+- explain data set & location
 
 ## Prereq.s
+<pre>
+pip install numpy
+pip install scipy
+pip install pandas
+pip install matplotlib
+pip install scikit-learn
+pip install pathlib
+pip install pypng
+pip install pillow
+pip install django
+pip install image
+pip install opencv-python opencv-contrib-python
+</pre>
+detail: https://github.com/ElliotHYLee/SystemReady
 
-Tensorflow version: 1.3.1 (Google Tensorflow .whl for 1.3.1)
-
-OpenCV 3.2 for data generation.
-
-*** Only tested with TF 1.3.1 GPU and OpenCV GPU builds. GTX1080ti, ubuntu16.
-
-python libraries:
-
-```
-chmod +x pythonReady.sh
-yes "yes" | sudo sh pythonReady.sh
-```
+## Tested System
+<pre>
+Windows10
+Python3 with native pip
+PyTorch: 1
+CUDA: 9.0
+Cudnn: 7.1
+</pre>
 ## Run
 
 ```
-python main.py 0
+python main_cnn.py
 ```
 
 ## Quick Overview of The Results
@@ -43,9 +54,8 @@ python main.py 0
 </ul>
 
 ## References(current & future)
-
-- FlowNet 2.0: Evolution of Optical Flow Estimation with Deep Networks(https://arxiv.org/abs/1612.01925)
 - DeepVO: Towards End-to-End Visual Odometry with Deep Recurrent Convolutional Neural Networks(https://senwang.gitlab.io/DeepVO/files/wang2017DeepVO.pdf)
+
 
 ## Traing Results
 
@@ -53,9 +63,6 @@ description
 
 <ul>
 <img src="https://github.com/ElliotHYLee/VisualOdometry/blob/master/Results/Images/seq0_pos.png" width="400">
-<img src="https://github.com/ElliotHYLee/VisualOdometry/blob/master/Results/Images/seq2_pos.png" width="400">
-<img src="https://github.com/ElliotHYLee/VisualOdometry/blob/master/Results/Images/seq4_pos.png" width="400">
-<img src="https://github.com/ElliotHYLee/VisualOdometry/blob/master/Results/Images/seq6_pos.png" width="400">
 </ul>
 
 ## Test Results
