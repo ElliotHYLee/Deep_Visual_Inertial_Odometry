@@ -62,13 +62,13 @@ python main_cnn.py
 description
 
 <ul>
-<img src="https://github.com/ElliotHYLee/VisualOdometry/blob/master/Results/Images/seq0_pos.png" width="400">
+<img src="https://github.com/ElliotHYLee/VisualOdometry3D/blob/master/Results/Figures/master_airsim_mr0_results.png" width="400">
 </ul>
 
 ## Test Results
 <ul>
-<img src="https://github.com/ElliotHYLee/VisualOdometry/blob/master/Results/Images/seq1_pos.png" width="400">
-<img src="https://github.com/ElliotHYLee/VisualOdometry/blob/master/Results/Images/seq3_pos.png" width="400">
+<img src="https://github.com/ElliotHYLee/VisualOdometry3D/blob/master/Results/Figures/master_airsim_mr1_results.png" width="400">
+<img src="https://github.com/ElliotHYLee/VisualOdometry3D/blob/master/Results/Figures/master_airsim_mr2_results.png" width="400">
 </ul>
 
 ## Correction Result
