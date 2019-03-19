@@ -21,7 +21,7 @@ class ModelContainer_CNN():
     def compile(self, loss=None, optimizer=None):
         self.loss = MahalanobisLoss()#nn.modules.loss.L1Loss()
         # self.optimizer = optim.SGD(self.model.parameters(), lr=10**-2, weight_decay=0.01)
-        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-4, weight_decay=10**-4)
+        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-3, weight_decay=10**-4)
 
     def fit(self, train, validation=None, batch_size=1, epochs=1, shuffle=True, wName='weight.pt', checkPointFreq = 1):
         self.checkPointFreq = checkPointFreq

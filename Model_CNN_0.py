@@ -55,7 +55,8 @@ class Model_CNN_0(nn.Module):
                                    nn.Linear(64, 64),
                                    nn.BatchNorm1d(64),
                                    nn.PReLU(),
-                                   nn.Linear(64, 6), Sigmoid100())
+                                   nn.Linear(64, 6),
+                                   Sigmoid100())
 
         self.fc_dw_cov = nn.Sequential(
                                    nn.Linear(NN_size, 512),
@@ -67,7 +68,8 @@ class Model_CNN_0(nn.Module):
                                    nn.Linear(64, 64),
                                    nn.BatchNorm1d(64),
                                    nn.PReLU(),
-                                   nn.Linear(64, 6), Sigmoid100())
+                                   nn.Linear(64, 6),
+                                   Sigmoid100())
 
 
         # self.du_mean =  np.loadtxt('Results/airsim/' + branchName() + '_train_du_mean.txt')
