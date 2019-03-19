@@ -1,7 +1,7 @@
 # VisualOdometry3D
 
 Using convolutional neural network, the velocity of the camera is estimated. 
-After predicting the velocity, 3D transformation matrices are concanated to estimate the position.
+After predicting the velocity, 3D transformation matrices are concanated to estimate the position. Yet, the rotation information is coming from gyro scope. The correction is also done with accelerometer
 
 [Click for Youtube video:
 <img src="https://github.com/ElliotHYLee/OpticalFlow2VelocityEstimation/blob/master/Images/Capture.JPG">](https://youtu.be/-t8VCICzGD0)
