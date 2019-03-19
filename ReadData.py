@@ -4,63 +4,43 @@ from git_branch_param import *
 from sklearn.preprocessing import MinMaxScaler
 
 class ReadData_CNN():
-    def __init__(self, seq=0, isTrain=True):
+    def __init__(self, dsName='airsim', seq=0, isTrain=True):
         self.isTrain = isTrain
-        self.path = getPath('AirSim', seq=0, subType='mr')
+        self.dsName = dsName
+        self.path = getPath(dsName, seq=seq, subType='mr')
         # non images
-        self.data = pd.read_csv(self.path + 'data.txt', sep=' ', header=None)
+        if dsName == 'airsim':
+            self.data = pd.read_csv(self.path + 'data.txt', sep=' ', header=None)
+            self.time_stamp = self.data.iloc[:, 0].values
+        else:
+            self.time_stamp = None
+
         self.dt = pd.read_csv(self.path + 'dt.txt', sep=',', header=None).values.astype(np.float32)
+        self.dtrans = pd.read_csv(self.path + 'dtrans.txt', sep=',', header=None).values.astype(np.float32)
         self.dw = pd.read_csv(self.path + 'dw.txt', sep=',', header=None).values.astype(np.float32)
         self.du = pd.read_csv(self.path + 'du.txt', sep=',', header=None).values.astype(np.float32)
         # images
-        self.time_stamp = self.data.iloc[:, 0].values
-        self.imgNames = []
-        for i in range(0, self.time_stamp.shape[0]):
-            self.imgNames.append('img_' + str(self.time_stamp[i]) + '.png')
+        self.imgNames = getImgNames(self.path, dsName, ts = self.time_stamp)
         self.imgTotalN = len(self.imgNames)
-        self.imgs = np.zeros((self.imgTotalN, 3, 360, 720), dtype=np.float32)
+        self.numChannel = 3 if self.dsName is not 'euroc' else 1
+        self.imgs = np.zeros((self.imgTotalN, self.numChannel, 360, 720), dtype=np.float32)
         self.getImages()
-        self.ch_mean, self.ch_std = [0]*3, [0]*3
 
         print('standardizing imgs...')
-        self.du_stand = np.zeros_like(self.du)
-        self.dw_stand = np.zeros_like(self.dw)
         self.standardize_image()
-
-    def standardize_target(self):
-        train_mean_du, train_std_du, train_mean_dw, train_std_dw = None, None, None, None
-        if self.isTrain:
-            train_mean_du = np.mean(self.du, axis=0)
-            train_std_du = np.std(self.du, axis=0)
-            train_mean_dw = np.mean(self.dw, axis=0)
-            train_std_dw = np.std(self.dw, axis=0)
-            np.savetxt('Results/airsim/' + branchName() + '_train_du_mean.txt', train_mean_du)
-            np.savetxt('Results/airsim/' + branchName() + '_train_du_std.txt', train_std_du)
-            np.savetxt('Results/airsim/' + branchName() + '_train_dw_mean.txt', train_mean_dw)
-            np.savetxt('Results/airsim/' + branchName() + '_train_dw_std.txt', train_std_dw)
-        else:
-            train_mean_du = np.loadtxt('Results/airsim/' + branchName() + '_train_du_mean.txt')
-            train_std_du = np.loadtxt('Results/airsim/' + branchName() + '_train_du_std.txt')
-            train_mean_dw = np.loadtxt('Results/airsim/' + branchName() + '_train_dw_mean.txt')
-            train_std_dw = np.loadtxt('Results/airsim/' + branchName() + '_train_dw_std.txt')
-
-        for i in range(0, self.du.shape[0]):
-            self.du_stand[i, :] = (self.du[i,:] - train_mean_du) / train_std_du
-            self.dw_stand[i, :] = (self.dw[i, :] - train_mean_dw) / train_std_dw
 
     def standardize_image(self):
         mean, std = None, None
-        if self.isTrain:
-            for i in range(0, 3):
-                self.ch_mean[i] = np.mean(self.imgs[:, i, :, :])
-                self.ch_std[i] = np.std(self.imgs[:, i, :, :])
-            mean = np.array(self.ch_mean)
-            std = np.array(self.ch_std)
-            np.save(branchName() +'_train_img_mean', mean)
-            np.save(branchName() +'_train_img_std', std)
+        normPath = 'Norms/' + branchName() + '_' + self.dsName
+        if self.isTrain and 1==1:
+            mean = np.mean(self.imgs, axis=(0, 2, 3))
+            std = np.std(self.imgs, axis=(0, 2, 3))
+            np.savetxt(normPath + '_img_mean.txt', mean)
+            np.savetxt(normPath + '_img_std.txt', std)
         else:
-            mean = np.load(branchName() +'_train_img_mean.npy')
-            std = np.load(branchName() +'_train_img_std.npy')
+            mean = np.loadtxt(normPath + '_img_mean.txt')
+            std = np.loadtxt(normPath + '_img_std.txt')
+
         for i in range(0, 3):
             self.imgs[:, i, :, :] = (self.imgs[:, i, :, :] - mean[i])/std[i]
 
@@ -69,13 +49,17 @@ class ReadData_CNN():
             sys.exit('ReadData-getImgsFromTo: this should be the case')
 
         end, N = getEnd(start, N, self.imgTotalN)
-        imgPath = self.path + 'images/'
         print('PrepData-reading imgs from %d to %d(): reading imgs' %(start, end))
         for i in range(start, end):
-            fName = imgPath + self.imgNames[i]
-            img = cv2.imread(fName)/255.0
-            img = np.reshape(img.astype(np.float32), (-1, 3, 360, 720))
-            self.imgs[i,:] = img # no lock is necessary
+            fName = self.imgNames[i]
+            if self.dsName == 'euroc':
+                img = cv2.imread(fName, 0) / 255.0
+            else:
+                img = cv2.imread(fName) / 255.0
+            if self.dsName is not 'airsim':
+                img = cv2.resize(img, (720, 360))
+            img = np.reshape(img.astype(np.float32), (-1, self.numChannel, 360, 720))
+            self.imgs[i,:] = img #no lock is necessary
         print('PrepData-reading imgs from %d to %d(): done reading imgs' % (start, end))
 
     def getImages(self):
@@ -147,18 +131,18 @@ class ReadData_RNN():
                 self.dw_input[i, :] = np.divide(self.dw_input[i, :] - dw_mean, dw_std)
 
 if __name__ == '__main__':
-    d = ReadData_CNN(0)
-    # s = time.time()
-    # dataObj = ReadData_CNN(0)
-    # print(time.time() - s)
+    s = time.time()
+    d = ReadData_CNN(dsName='euroc', seq=1, isTrain=True)
+    print(time.time() - s)
+
     # plt.figure()
     # plt.plot(dataObj.du)
     # plt.show()
 
-    # for i in range(0, dataObj.imgTotalN):
-    #     img = dataObj.imgs[i,:]
-    #     img = np.reshape(img, (360, 720, 3))
-    #     cv2.imshow('asdf', img)
-    #     cv2.waitKey(1)
+    for i in range(0, d.imgTotalN):
+        img = d.imgs[i,:]
+        img = np.reshape(img, (360, 720, d.numChannel))
+        cv2.imshow('asdf', img)
+        cv2.waitKey(1)
 
 

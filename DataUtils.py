@@ -11,11 +11,28 @@ def getPath(dsName = 'AirSim', seq = 0, subType='mr'):
     if dsName == 'airsim':
         path = 'D:/DLData/Airsim/' + subType + str(seq) + '/'
     elif dsName == 'euroc':
-        path = 'D:/DLData/EuRoc/mh_' + str(seq)
+        path = 'D:/DLData/EuRoc/mh_' + str(seq) +'/'
     elif dsName == 'kitti':
         path = 'D:/DLData/KITTI/odom/dataset/sequences/'
         path += '0'+str(seq) if seq<10 else str(seq)
+        path += '/'
     return path
+
+def getImgNames(path, dsName='AirSim', ts=None):
+    dsName = dsName.lower()
+    imgNames = []
+    if dsName == 'airsim':
+        for i in range(0, ts.shape[0]):
+            imgNames.append(path + 'images/img_' + str(ts[i]) + '.png')
+    elif dsName =='euroc':
+        imgNames = (pd.read_csv(path + 'fName.txt', sep=' ', header=None)).iloc[:, 0]
+        for i in range(0, len(imgNames)):
+            imgNames[i] = path + 'cam0/data/' + imgNames[i]
+    elif dsName =='kitti':
+        imgNames = (pd.read_csv(path + 'fNames.txt', sep=' ', header=None)).iloc[:, 0]
+        for i in range(0, len(imgNames)):
+            imgNames[i] = path + 'image_2/' + imgNames[i]
+    return imgNames
 
 def getEnd(start, N, totalN):
     end = start+N
