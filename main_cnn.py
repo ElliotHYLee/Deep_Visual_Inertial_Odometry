@@ -8,7 +8,7 @@ import time
 from git_branch_param import *
 
 dsName = 'airsim'
-subType= 'mr'
+subType= 'mrseg'
 def train():
     dm = VODataSetManager_CNN(dsName=dsName, seq=[0], isTrain=True)
     train, val = dm.trainSet, dm.valSet

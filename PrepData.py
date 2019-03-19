@@ -20,7 +20,7 @@ class NNData():
     def getImageStat(self, imgChunk):
         mean, std = None, None
         normPath = 'Norms/' + branchName() + '_' + self.dsName
-        if self.isTrain and 1==2:
+        if self.isTrain and 1==1:
             mean = np.mean(imgChunk, axis=(0, 2, 3))
             std = np.std(imgChunk, axis=(0, 2, 3))
             np.savetxt(normPath + '_img_mean.txt', mean)

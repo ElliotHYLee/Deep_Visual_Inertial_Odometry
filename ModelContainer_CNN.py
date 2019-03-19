@@ -19,24 +19,24 @@ class ModelContainer_CNN():
         self.current_val_loss = 10**5
         self.min_val_loss = 10**5
 
-        master = Tk()
-        Label(master, text="lRate").grid(row=0)
-        Label(master, text="wDecay").grid(row=1)
+        # master = Tk()
+        # Label(master, text="lRate").grid(row=0)
+        # Label(master, text="wDecay").grid(row=1)
+        #
+        # e1 = Entry(master)
+        # e2 = Entry(master)
+        #
+        # e1.grid(row=0, column=1)
+        # e2.grid(row=1, column=1)
+        #
+        # #Button(master, text='Quit', command=master.quit).grid(row=3, column=0, sticky=W, pady=4)
+        # Button(master, text='Update', command=self.updateLearningRate).grid(row=3, column=1, sticky=W, pady=4)
+        # mainloop()
 
-        e1 = Entry(master)
-        e2 = Entry(master)
-
-        e1.grid(row=0, column=1)
-        e2.grid(row=1, column=1)
-
-        #Button(master, text='Quit', command=master.quit).grid(row=3, column=0, sticky=W, pady=4)
-        Button(master, text='Update', command=self.updateLearningRate).grid(row=3, column=1, sticky=W, pady=4)
-        mainloop()
-
-    def updateLearningRate(self):
-        lr = el.get()
-        self.optimizer = optim.RMSprop(self.model.parameters(), lr=lr, weight_decay=10 ** -4)
-        print('current lr = %f'%(lr))
+    # def updateLearningRate(self):
+    #     lr = el.get()
+    #     self.optimizer = optim.RMSprop(self.model.parameters(), lr=lr, weight_decay=10 ** -4)
+    #     print('current lr = %f'%(lr))
 
     def compile(self, loss=None, optimizer=None):
         self.loss = MahalanobisLoss()#nn.modules.loss.L1Loss()

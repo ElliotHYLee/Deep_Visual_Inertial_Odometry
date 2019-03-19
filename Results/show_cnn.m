@@ -54,15 +54,17 @@ index = 1;
 w = 1000;
 h = 1200;
 fig = figure('Renderer', 'painters', 'Position', [600 100 w h]);
+
 axes( 'Position', [0, 0.95, 1, 0.05] ) ;
 set( gca, 'Color', 'None', 'XColor', 'None', 'YColor', 'None' ) ;
 figTitle = [dsName, ' ', subType, ' ', int2str(seq)];
 text( 0.5, 0, figTitle, 'FontSize', 20', 'FontWeight', 'Bold','HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
 
+text( 0.75, 0, '- Ground Truth', 'FontSize', 10', 'Color', 'red', 'FontWeight', 'Bold','HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
+text( 0.737, -0.3, '- Predicted', 'FontSize', 10', 'Color', 'blue', 'FontWeight', 'Bold','HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
 % plot du
 for i=1:1:3
     subplot(subPlotRow, subPlotCol, index)
-    grid on
     index = mysubplot(gt_du(:,i), pr_du(:,i), index);
     if i==1 strYLabel = 'x';
     elseif i==2 strYLabel = 'y';
@@ -75,8 +77,8 @@ end
 % plot du_std
 for i=1:1:3
     subplot(subPlotRow, subPlotCol, index)
+    plot(du_std3(:,i), 'b.', 'MarkerSize',5);
     grid on
-    plot(du_std3(:,i), 'b.');
     index = index + 1;
     if i==1 strYLabel = 'x';
     elseif i==2 strYLabel = 'y';
@@ -94,21 +96,21 @@ for i=1:1:3
     elseif i==2 strYLabel = 'y';
     else strYLabel = 'z';
     end
-    ylabel([strcat('\fontsize{14} {\Delta}w_', strYLabel, ', m')])
+    ylabel([strcat('\fontsize{14} {\Delta}w_', strYLabel, ', rad')])
     xlabel(['\fontsize{14} Data Points'])
 end
 
 % plot dw_std
 for i=1:1:3
     subplot(subPlotRow, subPlotCol, index)
+    plot(dw_std3(:,i), 'b.', 'MarkerSize',5);
     grid on
-    plot(dw_std3(:,i), 'b.');
     index = index + 1;
     if i==1 strYLabel = 'x';
     elseif i==2 strYLabel = 'y';
     else strYLabel = 'z';
     end
-    ylabel([strcat('\fontsize{14} 1{\sigma}_{{\Delta}w_', strYLabel, '}, m')])
+    ylabel([strcat('\fontsize{14} 1{\sigma}_{{\Delta}w_', strYLabel, '}, rad')])
     xlabel(['\fontsize{14} Data Points'])
 end
 
@@ -126,9 +128,9 @@ end
 
 % plot position 2D
 subplot(subPlotRow, subPlotCol, index)
-index = mysubplot2D(gt_pos(:,1), gt_pos(:,2), pr_pos(:,1), pr_pos(:,2), index);
-ylabel(['\fontsize{14} Position_x, m'])
-xlabel(['\fontsize{14} Position_y, m'])
+index = mysubplot2D(gt_pos(:,2), gt_pos(:,1), pr_pos(:,2), pr_pos(:,1), index);
+ylabel(['\fontsize{14} Position_y, m'])
+xlabel(['\fontsize{14} Position_x, m'])
 
 subplot(subPlotRow, subPlotCol, index)
 index = mysubplot2D(gt_pos(:,1), gt_pos(:,3), pr_pos(:,1), pr_pos(:,3), index);
@@ -140,6 +142,8 @@ index = mysubplot2D(gt_pos(:,2), gt_pos(:,3), pr_pos(:,2), pr_pos(:,3), index);
 ylabel(['\fontsize{14} Position_y, m'])
 xlabel(['\fontsize{14} Position_z, m'])
 
+
+
 err = abs(gt_du-pr_du);
 cov(err)
 
@@ -148,16 +152,18 @@ saveas(fig, figName)
 
 function[pltIndex] = mysubplot(gt, pr, index)
     hold on
-    plot(gt, 'r.')
-    plot(pr, 'b.')
+    grid on
+    plot(gt, 'r.', 'MarkerSize',10)
+    plot(pr, 'b.', 'MarkerSize',1)
     hold off
     pltIndex = index + 1;
 end
 
 function[pltIndex] = mysubplot2D(gt1, gt2, pr1, pr2, index)
     hold on
-    plot(gt1,gt2, 'r.')
-    plot(pr1,pr2, 'b.')
+    grid on
+    plot(gt1,gt2, 'r.', 'MarkerSize',10)
+    plot(pr1,pr2, 'b.', 'MarkerSize',1)
     hold off
     pltIndex = index + 1;
 end
