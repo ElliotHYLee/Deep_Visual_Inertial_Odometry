@@ -10,7 +10,7 @@ from git_branch_param import *
 dsName = 'airsim'
 subType= 'mrseg'
 def train():
-    dm = VODataSetManager_CNN(dsName=dsName, seq=[0], isTrain=True)
+    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[0], isTrain=True)
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0())
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
