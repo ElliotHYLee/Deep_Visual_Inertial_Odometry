@@ -69,7 +69,7 @@ class CNNData(NNData):
             self.train_img1, self.val_img1, \
             self.train_du, self.val_du, \
             self.train_dw, self.val_dw,\
-            self.train_dtrans, self.val_dtrans  = train_test_split(self.img0, self.img1, self.du, self.dw, self.dtrans, test_size=0.1, shuffle=True)
+            self.train_dtrans, self.val_dtrans  = train_test_split(self.img0, self.img1, self.du, self.dw, self.dtrans, test_size=0.2, shuffle=True)
 
 
 # only for trainer
@@ -90,7 +90,7 @@ class RNNDataManager():
         self.train_du_input, self.val_du_input, \
         self.train_dw_input, self.val_dw_input, \
         self.train_du_gt, self.val_du_gt, \
-        self.train_dw_gt, self.val_dw_gt = train_test_split(self.du_rnn_input, self.dw_rnn_input, self.du_gt, self.dw_gt, test_size=0.1, shuffle=True)
+        self.train_dw_gt, self.val_dw_gt = train_test_split(self.du_rnn_input, self.dw_rnn_input, self.du_gt, self.dw_gt, test_size=0.2, shuffle=True)
 
 class RNNData(NNData):
     def __init__(self, seq=0, isTrain = True, T=10):
