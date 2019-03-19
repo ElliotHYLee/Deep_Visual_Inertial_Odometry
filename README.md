@@ -9,6 +9,10 @@ After predicting the velocity, 3D transformation matrices are concanated to esti
 Citation: <br>Hongyun Lee, Matthew McCrink, and James W. Gregory. "Visual-Inertial Odometry for Unmanned Aerial Vehicle using Deep Leering", 2019 Intelligent/Autonomous Guidance and Navigation, AIAA SciTech Conference, accepted for publication
 
 
+## References(current & future)
+- DeepVO: Towards End-to-End Visual Odometry with Deep Recurrent Convolutional Neural Networks(https://senwang.gitlab.io/DeepVO/files/wang2017DeepVO.pdf)
+
+
 ## ToDo
 - LSTM integration
 - upload weight.pt 
@@ -54,6 +58,8 @@ Cudnn: v7.1
 python main_cnn.py
 ```
 
+
+
 ## Quick Overview of The Results
 
 <ul>
@@ -62,9 +68,6 @@ python main_cnn.py
 <img src="https://github.com/ElliotHYLee/VisualOdometry/blob/master/Results/Images/seq_corr9.png" width="400">
 <img src="https://github.com/ElliotHYLee/VisualOdometry/blob/master/Results/Images/seq_corr10.png" width="400">
 </ul>
-
-## References(current & future)
-- DeepVO: Towards End-to-End Visual Odometry with Deep Recurrent Convolutional Neural Networks(https://senwang.gitlab.io/DeepVO/files/wang2017DeepVO.pdf)
 
 
 ## Traing Results
