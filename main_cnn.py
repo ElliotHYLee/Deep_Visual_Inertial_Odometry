@@ -27,9 +27,9 @@ def testModel():
 def test():
     for seq in range(0,3):
         if dsName == 'airsim':
-            commName = 'Result/' + branchName() + '_' + dsName + '_' + subType + str(seq)
+            commName = 'Results/' + branchName() + '_' + dsName + '_' + subType + str(seq)
         else:
-            commName = 'Result/' + branchName() + '_' + dsName + '_' + str(seq)
+            commName = 'Results/' + branchName() + '_' + dsName + '_' + str(seq)
 
         dm = VODataSetManager_CNN(dsName=dsName, seq=[seq], isTrain=False)
         dataset = dm.testSet
