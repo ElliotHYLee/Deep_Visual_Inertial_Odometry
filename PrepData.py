@@ -5,78 +5,70 @@ import matplotlib.pyplot as plt
 import time
 
 class NNData():
-    def __init__(self, seq=[1,3,5], isTrain=True):
+    def __init__(self, dsName='airsim', seq=[1,3,5], isTrain=True):
+        self.dsName = dsName
         self.isTrain = isTrain
+        self.imgs = None
         self.img0 = None
         self.img1 = None
         self.dt = None
+        self.dtrans = None
         self.du = None
         self.dw = None
         self.totalN = None
 
-    def standardize_3DVector(self, data, name=''):
-        if self.isTrain:
-            data_mean = np.mean(data, axis=0)
-            data_std = np.std(data, axis=0)
-            np.savetxt('Results/euroc/' + branchName() + '_train_' + name + '_mean.txt', data_mean)
-            np.savetxt('Results/euroc/' + branchName() + '_train_' + name + '_std.txt', data_std)
-        else:
-            data_mean = np.loadtxt('Results/euroc/' + branchName() + '_train_' + name + '_mean.txt')
-            data_std = np.loadtxt('Results/euroc/' + branchName() + '_train_' + name + '_std.txt')
-
-        data_stand = np.zeros_like(data)
-        for i in range(0, data.shape[0]):
-            data_stand[i,:] = (data[i,:] - data_mean) / data_std
-        return data_stand
-
-    def standardize_image(self):
+    def getImageStat(self, imgChunk):
         mean, std = None, None
-        if self.isTrain:
-            self.ch_mean = np.mean(self.img0[:, 0, :, :])
-            self.ch_std = np.std(self.img0[:, 0, :, :])
-            mean = np.array(self.ch_mean)
-            std = np.array(self.ch_std)
-            np.save(branchName() +'_train_img_mean', mean)
-            np.save(branchName() +'_train_img_std', std)
+        normPath = 'Norms/' + branchName() + '_' + self.dsName
+        if self.isTrain and 1==1:
+            mean = np.mean(imgChunk, axis=(0, 2, 3))
+            std = np.std(imgChunk, axis=(0, 2, 3))
+            np.savetxt(normPath + '_img_mean.txt', mean)
+            np.savetxt(normPath + '_img_std.txt', std)
         else:
-            mean = np.load(branchName() +'_train_img_mean.npy')
-            std = np.load(branchName() +'_train_img_std.npy')
-        print(self.img0.shape)
-        for i in range(0, 1):
-            self.img0[:, i, :, :] = (self.img0[:, i, :, :] - mean) / std
-            self.img1[:, i, :, :] = (self.img1[:, i, :, :] - mean) / std
+            mean = np.loadtxt(normPath + '_img_mean.txt')
+            std = np.loadtxt(normPath + '_img_std.txt')
+        return mean, std
+
+    def standardizeImage(self, imgChunk, mean, std):
+        for i in range(0, imgChunk.shape[1]):
+            imgChunk[:, i, :, :] = (imgChunk[:, i, :, :] - mean[i])/std[i]
+        return imgChunk
 
 class CNNData(NNData):
-    def __init__(self, seq=[1, 3, 5], isTrain=True):
-        super().__init__(seq, isTrain)
+    def __init__(self, dsName='airsim', seq=[1, 3, 5], isTrain=True):
+        super().__init__(dsName, seq, isTrain)
         self.isTrain = isTrain
-        dataObj = [ReadData_CNN(seq[i]) for i in range(0, len(seq))]
+        self.dsName = dsName
+        dataObj = [ReadData(dsName, seq[i], isTrain) for i in range(0, len(seq))]
         self.imgs = [dataObj[i].imgs for i in range(0, len(seq))]
         self.img0 = np.concatenate([self.imgs[i][0:-1, :] for i in range(0, len(seq))], axis=0)
         self.img1 = np.concatenate([self.imgs[i][1:, :] for i in range(0, len(seq))], axis=0)
         self.dt = np.concatenate([dataObj[i].dt for i in range(0, len(seq))], axis=0)
+        self.dtrans = np.concatenate([dataObj[i].dtrans for i in range(0, len(seq))], axis=0)
         self.du = np.concatenate([dataObj[i].du for i in range(0, len(seq))], axis=0)
         self.dw = np.concatenate([dataObj[i].dw for i in range(0, len(seq))], axis=0)
         self.totalN = sum([dataObj[i].imgTotalN for i in range(0, len(seq))])
-        # print(self.img0.shape)
-        # print(self.img1.shape)
-        # print(self.dt.shape)
-        # print(self.dt.shape)
-        # print(self.du.shape)
-        # print(self.dw.shape)
-        # print(self.totalN)
 
         print('standardizing data...')
-        self.standardize_image()
-        self.du_stand = self.standardize_3DVector(self.du, 'du')
-        self.dw_stand = self.standardize_3DVector(self.du, 'dw')
+        mean, std = self.getImageStat(self.img0)
+        self.img0 = self.standardizeImage(self.img0, mean, std)
+        self.img1 = self.standardizeImage(self.img1, mean, std)
+
+        print(self.img0.shape)
+        print(self.img1.shape)
+        print(self.dt.shape)
+        print(self.dtrans.shape)
+        print(self.du.shape)
+        print(self.dw.shape)
+        print(self.totalN)
 
         if isTrain:
             print('shuffling the data...')
             self.train_img0, self.val_img0, \
             self.train_img1, self.val_img1, \
             self.train_du, self.val_du, \
-            self.train_dw, self.val_dw = train_test_split(self.img0, self.img1, self.du_stand, self.dw_stand, test_size=0.1, shuffle=True)
+            self.train_dw, self.val_dw = train_test_split(self.img0, self.img1, self.du, self.dw, test_size=0.1, shuffle=True)
 
 
 # only for trainer
@@ -132,7 +124,7 @@ class RNNData(NNData):
 
 if __name__ == '__main__':
     s = time.time()
-    m = RNNDataManager([1, 3, 5])
+    m = CNNData(dsName='airsim', seq=[1,2], isTrain=True)
     print(time.time() - s)
     # s = time.time()
     # fName = 'F:Airsim/mr' + str(2) + '/series/series_' + 'imgBox0' + '_' + str(1) + '.npy'

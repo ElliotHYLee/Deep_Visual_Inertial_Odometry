@@ -7,7 +7,7 @@ class ReadData():
     def __init__(self, dsName='airsim', seq=0, isTrain=True):
         self.isTrain = isTrain
         self.dsName = dsName
-        self.path = getPath(dsName, seq=seq, subType='mrseg')
+        self.path = getPath(dsName, seq=seq, subType='mr')
         # non images
         if dsName == 'airsim':
             self.data = pd.read_csv(self.path + 'data.txt', sep=' ', header=None)
@@ -26,8 +26,8 @@ class ReadData():
         self.imgs = np.zeros((self.imgTotalN, self.numChannel, 360, 720), dtype=np.float32)
         self.getImages()
 
-        print('standardizing imgs...')
-        self.standardize_image()
+        # print('standardizing imgs...')
+        # self.standardize_image()
 
     def standardize_image(self):
         mean, std = None, None
@@ -65,7 +65,7 @@ class ReadData():
     def getImages(self):
         partN = 500
         nThread = int(self.imgTotalN/partN) + 1
-        print(nThread)
+        print('# of thread reading imgs: %d'%(nThread))
         threads = []
         for i in range(0, nThread):
             start = i*partN
