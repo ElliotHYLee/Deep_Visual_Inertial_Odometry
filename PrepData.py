@@ -1,10 +1,10 @@
 from ReadData import *
 import time
-from sklearn.utils import shuffle
+
 from git_branch_param import branchName
 ##############################################################################################
 ## Rule of thumb: don't call any other function to reduce lines of code with the img data in np.
-## Or it could cause memeory dupilication.
+## Otherwise, it could cause memeory dupilication.
 ##############################################################################################
 class Singleton:
     __instance = None
@@ -14,8 +14,7 @@ class Singleton:
         return cls.__instance
 
 class DataManager(Singleton):
-    def initHelper(self, dsName='airsim', subType='mr', seq=[1, 3, 5], isTrain=True):
-        self.isTrain = isTrain
+    def initHelper(self, dsName='airsim', subType='mr', seq=[1, 3, 5]):
         self.dsName = dsName
         self.numChannel = 3 if self.dsName is not 'euroc' else 1
         self.subType = subType
@@ -32,16 +31,13 @@ class DataManager(Singleton):
         print(self.numTotalData)
 
         # prepare indice shuffle
-        self.idx = [None]*self.numDataset
-        s, f = 0, 0
-        for i in range(0, self.numDataset):
-            f = s + self.numDataList[i]
-            self.idx[i] = np.arange(s, f, 1)
-            s = f + 1 # skip for img1
-
-        self.idx = np.concatenate(self.idx, axis=0)
-        if self.isTrain:
-            self.idx = shuffle(self.idx)
+        # self.idx = [None]*self.numDataset
+        # s, f = 0, 0
+        # for i in range(0, self.numDataset):
+        #     f = s + self.numDataList[i]
+        #     self.idx[i] = np.arange(s, f, 1)
+        #     s = f
+        # self.idx = np.concatenate(self.idx, axis=0)
 
         # numeric data
         print('numeric data concat')
@@ -66,34 +62,34 @@ class DataManager(Singleton):
         dataObj = None
         print('done img data concat')
 
-        # get image mean, std
-        print('preparing to standardize imgs')
-        mean = np.mean(self.imgs, axis=(0, 2, 3))
-        std = np.std(self.imgs, axis=(0, 2, 3))
-        normPath = 'Norms/' + branchName() + '_' + self.dsName + '_' + self.subType
-        if self.isTrain:
-            np.savetxt(normPath + '_img_mean.txt', mean)
-            np.savetxt(normPath + '_img_std.txt', std)
-        else:
-            mean = np.loadtxt(normPath + '_img_mean.txt')
-            std = np.loadtxt(normPath + '_img_std.txt')
-            if self.dsName == 'euroc':
-                self.mean = np.array([mean])
-                self.std = np.array([std])
-
-        # standardize imgs
-        print('standardizing imgs')
-        mean = mean.astype(np.float32)
-        std = std.astype(np.float32)
-        for i in range(0, self.imgs.shape[1]):
-            self.imgs[:, i, :, :] = (self.imgs[:, i, :, :] - mean[i])/std[i]
-        print('done standardizing imgs')
+        # # get image mean, std
+        # print('preparing to standardize imgs')
+        # mean = np.mean(self.imgs, axis=(0, 2, 3))
+        # std = np.std(self.imgs, axis=(0, 2, 3))
+        # normPath = 'Norms/' + branchName() + '_' + self.dsName + '_' + self.subType
+        # if self.isTrain:
+        #     np.savetxt(normPath + '_img_mean.txt', mean)
+        #     np.savetxt(normPath + '_img_std.txt', std)
+        # else:
+        #     mean = np.loadtxt(normPath + '_img_mean.txt')
+        #     std = np.loadtxt(normPath + '_img_std.txt')
+        #     if self.dsName == 'euroc':
+        #         self.mean = np.array([mean])
+        #         self.std = np.array([std])
+        #
+        # # standardize imgs
+        # print('standardizing imgs')
+        # mean = mean.astype(np.float32)
+        # std = std.astype(np.float32)
+        # for i in range(0, self.imgs.shape[1]):
+        #     self.imgs[:, i, :, :] = (self.imgs[:, i, :, :] - mean[i])/std[i]
+        # print('done standardizing imgs')
 
 
 if __name__ == '__main__':
     s = time.time()
     m = DataManager()
-    m.initHelper(dsName='airsim', subType='mr', seq=[0], isTrain=True)
+    m.initHelper(dsName='airsim', subType='mr', seq=[0])
     print('wait 3 secs')
     time.sleep(3)
     m2 = DataManager()
