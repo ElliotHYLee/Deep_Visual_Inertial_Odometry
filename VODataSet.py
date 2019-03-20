@@ -39,8 +39,6 @@ class VODataSet_CNN(Dataset):
             print(self.dm.imgs.shape)
             print(i, index)
 
-
-
     def __len__(self):
         return self.N
 

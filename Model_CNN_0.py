@@ -1,9 +1,5 @@
 from MyPyTorchAPI.CNNUtils import *
-import torch.nn as nn
-import torch
 import numpy as np
-from git_branch_param import *
-from MyPyTorchAPI.CustomLoss import MahalanobisLoss
 from MyPyTorchAPI.CustomActivation import *
 
 class Model_CNN_0(nn.Module):

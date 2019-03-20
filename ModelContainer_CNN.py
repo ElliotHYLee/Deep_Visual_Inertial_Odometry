@@ -2,7 +2,6 @@ import torch.optim as optim
 from VODataSet import DataLoader
 import torch
 import torch.nn as nn
-import sys
 import numpy as np
 from MyPyTorchAPI.CustomLoss import MahalanobisLoss
 from tkinter import *

@@ -7,10 +7,10 @@ import numpy as np
 import time
 from git_branch_param import *
 
-dsName = 'kitti'
-subType= 'none'
+dsName = 'airsim'
+subType= 'mr'
 def train():
-    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[0,2,4,6], isTrain=True)
+    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[0], isTrain=True)
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
@@ -25,7 +25,7 @@ def testModel():
     return mc
 
 def test():
-    for seq in range(0,11):
+    for seq in range(0,3):
         commName = 'Results/Data/' + branchName() + '_' + dsName + '_'
         commName += subType + str(seq) if dsName == 'airsim' else str(seq)
         dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)

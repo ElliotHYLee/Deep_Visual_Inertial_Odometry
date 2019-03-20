@@ -1,9 +1,5 @@
 import numpy as np
 import pandas as pd
-import threading
-import cv2
-import time
-import sys
 
 def getPath(dsName = 'AirSim', seq = 0, subType='mr'):
     path = None
