@@ -1,4 +1,4 @@
-# Deep VisualInertial Odometry
+# Deep Visual Inertial Odometry
 
 
 Using convolutional neural network, the velocity of the camera is estimated. 
