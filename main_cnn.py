@@ -41,7 +41,7 @@ def test():
 
 
 if __name__ == '__main__':
-    # s = time.time()
-    # train()
-    # print(time.time() - s)
+    s = time.time()
+    train()
+    print(time.time() - s)
     test()
