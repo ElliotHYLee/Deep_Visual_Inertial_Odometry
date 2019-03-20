@@ -70,13 +70,6 @@ class Model_CNN_0(nn.Module):
                                    nn.PReLU(),
                                    nn.Linear(64, 6),
                                    Sigmoid(a=0.5, max=np.sqrt(2)))
-
-
-        # self.du_mean =  np.loadtxt('Results/airsim/' + branchName() + '_train_du_mean.txt')
-        # self.du_std = np.loadtxt('Results/airsim/' + branchName() + '_train_du_std.txt')
-        # self.dw_mean = np.loadtxt('Results/airsim/' + branchName() + '_train_dw_mean.txt')
-        # self.dw_std = np.loadtxt('Results/airsim/' + branchName() + '_train_dw_std.txt')
-
         self.init_w()
 
     def init_w(self):
