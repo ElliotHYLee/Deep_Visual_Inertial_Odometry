@@ -78,56 +78,6 @@ class CNNData(NNData):
             self.train_dtrans, self.val_dtrans  = train_test_split(self.img0, self.img1, self.du, self.dw, self.dtrans, test_size=0.2, shuffle=True)
 
 
-# only for trainer
-class RNNDataManager():
-    def __init__(self, seq=[1,3,5], T=10):
-        self.rnnDataObj = [RNNData(seq[i], T=T) for i in range(0, len(seq))]
-        self.du_rnn_input = np.concatenate([self.rnnDataObj[i].du_rnn_input for i in range(0, len(seq))], axis=0)
-        self.dw_rnn_input = np.concatenate([self.rnnDataObj[i].dw_rnn_input for i in range(0, len(seq))], axis=0)
-        self.du_gt = np.concatenate([self.rnnDataObj[i].du_gt for i in range(0, len(seq))], axis=0)
-        self.dw_gt = np.concatenate([self.rnnDataObj[i].dw_gt for i in range(0, len(seq))], axis=0)
-
-        # print(self.du_rnn_input.shape)
-        # print(self.dw_rnn_input.shape)
-        # print(self.du_gt.shape)
-        # print(self.dw_gt.shape)
-
-        print('shuffling the data...')
-        self.train_du_input, self.val_du_input, \
-        self.train_dw_input, self.val_dw_input, \
-        self.train_du_gt, self.val_du_gt, \
-        self.train_dw_gt, self.val_dw_gt = train_test_split(self.du_rnn_input, self.dw_rnn_input, self.du_gt, self.dw_gt, test_size=0.2, shuffle=True)
-
-class RNNData(NNData):
-    def __init__(self, seq=0, isTrain = True, T=10):
-        super().__init__(seq, isTrain)
-        d = ReadData_RNN(seq, isTrain)
-        self.du_input = d.du_input
-        self.dw_input = d.dw_input
-
-        self.du_gt = self.standardize_3DVector(d.du_output, 'du_rnn')
-        self.dw_gt = self.standardize_3DVector(d.dw_output, 'dw_rnn')
-
-        self.T = T
-        self.du_rnn_input = self.make_series(self.du_input)
-        self.dw_rnn_input = self.make_series(self.dw_input)
-        self.du_gt = self.make_series(self.du_gt)
-        self.dw_gt = self.make_series(self.dw_gt)
-
-        # print(self.du_gt.shape)
-        # print(self.dw_gt.shape)
-        # print(self.du_rnn_input.shape)
-        # print(self.dw_rnn_input.shape)
-
-    def make_series(self, data):
-        N = data.shape[0]
-        dim = data.shape[1]
-        padded = np.zeros((self.T+N-1, dim))
-        padded[self.T-1:, :] = data
-        series = np.zeros((N ,self.T,dim))
-        for i in range(0,series.shape[0]):
-            series[i,:,:] = padded[i:i+self.T, :]
-        return series
 
 if __name__ == '__main__':
     s = time.time()

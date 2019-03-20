@@ -25,6 +25,8 @@ class ReadData():
         self.imgTotalN = len(self.imgNames)
         self.numChannel = 3 if self.dsName is not 'euroc' else 1
         self.imgs = np.zeros((self.imgTotalN, self.numChannel, 360, 720), dtype=np.float32)
+
+
         self.getImages()
 
         # print('standardizing imgs...')
@@ -75,61 +77,6 @@ class ReadData():
 
         for thread in threads:
             thread.join() # wait until this thread ends ~ bit of loss in time..
-
-class ReadData_RNN():
-    def __init__(self, seq=0, isTrain=True):
-        self.isTrain = isTrain
-        branch = branchName()
-        modelName = 'simple'
-        self.du_input = np.loadtxt('Results/airsim/mr' + str(seq) + '/' + modelName + branch + '_du.txt', dtype=np.float32)
-        self.path = 'F:/Airsim/mrseg' + str(seq) + '/'
-        self.dw_input = pd.read_csv(self.path + 'dw.txt', sep=',', header=None).values.astype(np.float32)
-        self.du_output = pd.read_csv(self.path + 'du.txt', sep=',', header=None).values.astype(np.float32)
-        self.N = self.dw_input.shape[0]
-        #self.normalize_input()
-        #self.standardize_input()
-        self.standardize_output()
-
-    def normalize_input(self):
-        self.dw_input[:, 0] /= 1
-        self.dw_input[:, 1] /= 0.2
-        self.dw_input[:, 2] /= 0.02
-
-    def standardize_output(self):
-        if self.isTrain:
-            train_mean_du_gt = np.mean(self.du_output, axis=0)
-            train_std_du_gt = np.std(self.du_output, axis=0)
-            np.savetxt('Results/airsim/' + branchName() + '_train_mean_du_gt.txt', train_mean_du_gt)
-            np.savetxt('Results/airsim/' + branchName() + '_train_std_du_gt.txt', train_std_du_gt)
-        else:
-            train_mean_du_gt = np.loadtxt('Results/airsim/' + branchName() + '_train_mean_du_gt.txt')
-            train_std_du_gt = np.loadtxt('Results/airsim/' + branchName() + '_train_std_du_gt.txt')
-        for i in range(0, self.du_output.shape[0]):
-            self.du_output[i, :] = np.divide(self.du_output[i, :] - train_mean_du_gt, train_std_du_gt)
-
-    def standardize_input(self):
-        if self.isTrain:
-            train_mean_du_input = np.mean(self.du_input, axis=0)
-            train_std_du_input = np.std(self.du_input, axis=0)
-            train_mean_dw_input = np.mean(self.dw_input, axis=0)
-            train_std_dw_input = np.std(self.dw_input, axis=0)
-
-            np.savetxt(branchName() + '_train_mean_du_input.txt', train_mean_du_input)
-            np.savetxt(branchName() + '_train_std_du_input.txt', train_std_du_input)
-            np.savetxt(branchName() + '_train_mean_dw_input.txt', train_mean_dw_input)
-            np.savetxt(branchName() + '_train_std_dw_input.txt', train_std_dw_input)
-
-            for i in range(0, self.du_output.shape[0]):
-                self.du_input[i, :] = np.divide(self.du_input[i, :] - train_mean_du_input, train_std_du_input)
-                self.dw_input[i, :] = np.divide(self.dw_input[i, :] - train_mean_dw_input, train_std_dw_input)
-        else:
-            du_mean = np.loadtxt(branchName() + '_train_mean_du_input.txt')
-            du_std = np.loadtxt(branchName() + '_train_std_du_input.txt')
-            dw_mean = np.loadtxt(branchName() + '_train_mean_dw_input.txt')
-            dw_std = np.loadtxt(branchName() + '_train_std_dw_input.txt')
-            for i in range(0, 3):
-                self.du_input[i, :] = np.divide(self.du_input[i, :] - du_mean, du_std)
-                self.dw_input[i, :] = np.divide(self.dw_input[i, :] - dw_mean, dw_std)
 
 if __name__ == '__main__':
     s = time.time()
