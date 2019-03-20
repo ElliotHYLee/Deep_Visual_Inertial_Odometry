@@ -29,6 +29,10 @@ class NNData():
         else:
             mean = np.loadtxt(normPath + '_img_mean.txt')
             std = np.loadtxt(normPath + '_img_std.txt')
+            if self.dsName == 'euroc':
+                mean = np.array([mean])
+                std = np.array([std])
+
         return mean, std
 
     def standardizeImage(self, imgChunk, mean, std):
