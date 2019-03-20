@@ -51,29 +51,28 @@ class DataManager(Singleton):
         dataObj = None
         print('done img data concat')
 
-        # # get image mean, std
-        # print('preparing to standardize imgs')
-        # mean = np.mean(self.imgs, axis=(0, 2, 3))
-        # std = np.std(self.imgs, axis=(0, 2, 3))
-        # normPath = 'Norms/' + branchName() + '_' + self.dsName + '_' + self.subType
-        # if self.isTrain:
-        #     np.savetxt(normPath + '_img_mean.txt', mean)
-        #     np.savetxt(normPath + '_img_std.txt', std)
-        # else:
-        #     mean = np.loadtxt(normPath + '_img_mean.txt')
-        #     std = np.loadtxt(normPath + '_img_std.txt')
-        #     if self.dsName == 'euroc':
-        #         self.mean = np.array([mean])
-        #         self.std = np.array([std])
-        #
-        # # standardize imgs
-        # print('standardizing imgs')
-        # mean = mean.astype(np.float32)
-        # std = std.astype(np.float32)
-        # for i in range(0, self.imgs.shape[1]):
-        #     self.imgs[:, i, :, :] = (self.imgs[:, i, :, :] - mean[i])/std[i]
-        # print('done standardizing imgs')
+    def standardizeImgs(self, isTrain):
+        print('preparing to standardize imgs')
+        mean = np.mean(self.imgs, axis=(0, 2, 3))
+        std = np.std(self.imgs, axis=(0, 2, 3))
+        normPath = 'Norms/' + branchName() + '_' + self.dsName + '_' + self.subType
+        if isTrain:
+            np.savetxt(normPath + '_img_mean.txt', mean)
+            np.savetxt(normPath + '_img_std.txt', std)
+        else:
+            mean = np.loadtxt(normPath + '_img_mean.txt')
+            std = np.loadtxt(normPath + '_img_std.txt')
+            if self.dsName == 'euroc':
+                self.mean = np.array([mean])
+                self.std = np.array([std])
 
+        # standardize imgs
+        print('standardizing imgs')
+        mean = mean.astype(np.float32)
+        std = std.astype(np.float32)
+        for i in range(0, self.imgs.shape[1]):
+            self.imgs[:, i, :, :] = (self.imgs[:, i, :, :] - mean[i])/std[i]
+        print('done standardizing imgs')
 
 if __name__ == '__main__':
     s = time.time()

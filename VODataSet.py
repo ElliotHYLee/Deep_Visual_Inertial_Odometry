@@ -6,9 +6,11 @@ import time
 from sklearn.utils import shuffle
 
 class VODataSetManager_CNN():
-    def __init__(self, dsName='airsim', subType='mr', seq=[2,2], isTrain=True, split=0.2):
+    def __init__(self, dsName='airsim', subType='mr', seq=[0], isTrain=True, split=0.2):
         data = DataManager()
         data.initHelper(dsName, subType, seq)
+        data.standardizeImgs(isTrain)
+
         idx = np.arange(0, data.numTotalData, 1)
         N = data.numTotalData
         if isTrain:
@@ -45,10 +47,11 @@ class VODataSet_CNN(Dataset):
 
 if __name__ == '__main__':
     start = time.time()
-    dm = VODataSetManager_CNN(dsName='kitti', subType='none', seq=[0, 2, 4, 6], isTrain=True)
+    dm = VODataSetManager_CNN(dsName='kitti', subType='none', seq=[0, 2, 4, 6], isTrain=False)
     print(time.time() - start)
-    trainSet, valSet = dm.trainSet, dm.valSet
-    trainLoader = DataLoader(dataset = trainSet, batch_size=64)
+    #trainSet, valSet = dm.trainSet, dm.valSet
+    dataSet = dm.testSet
+    trainLoader = DataLoader(dataset = dataSet, batch_size=64)
     sum = 0
     for batch_idx, (img0, img1, du, dw, dtrans) in enumerate(trainLoader):
         img0 = img0.data.numpy()
