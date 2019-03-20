@@ -1,12 +1,12 @@
 from torch.utils.data import Dataset, DataLoader
-from PrepData import CNNData
+from PrepData import DataManager
 import numpy as np
 from sklearn.model_selection import train_test_split
 import time
 
 class VODataSetManager_CNN():
     def __init__(self, dsName='airsim', subType='mr', seq=0, isTrain=True):
-        data = CNNData(dsName, subType, seq, isTrain=isTrain)
+        data = DataManager(dsName, subType, seq, isTrain=isTrain)
         if isTrain:
             self.trainSet = VODataSet_CNN(data.train_img0, data.train_img1, data.train_du, data.train_dw, data.train_dtrans)
             self.valSet = VODataSet_CNN(data.val_img0, data.val_img1, data.val_du, data.val_dw, data.val_dtrans)
