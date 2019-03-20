@@ -23,21 +23,10 @@ class DataManager(Singleton):
 
         # get number of data points
         self.numDataList = [dataObj[i].numData for i in range(0, self.numDataset)]
-        #self.accumNumData = np.cumsum(self.numDataList)
         self.numTotalData = np.sum(self.numDataList)
         self.numTotalImgData = np.sum([dataObj[i].numImgs for i in range(0, self.numDataset)])
         print(self.numDataList)
-        #print(self.accumNumData)
         print(self.numTotalData)
-
-        # prepare indice shuffle
-        # self.idx = [None]*self.numDataset
-        # s, f = 0, 0
-        # for i in range(0, self.numDataset):
-        #     f = s + self.numDataList[i]
-        #     self.idx[i] = np.arange(s, f, 1)
-        #     s = f
-        # self.idx = np.concatenate(self.idx, axis=0)
 
         # numeric data
         print('numeric data concat')
