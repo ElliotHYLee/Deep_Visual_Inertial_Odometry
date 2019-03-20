@@ -1,9 +1,6 @@
 from DataUtils import *
-from git_branch_param import *
-from sklearn.model_selection import train_test_split
 class ReadData():
-    def __init__(self, dsName='airsim', subType='mr', seq=0, isTrain=True):
-        self.isTrain = isTrain
+    def __init__(self, dsName='airsim', subType='mr', seq=0):
         self.dsName = dsName
         self.subType = subType
         self.path = getPath(dsName, seq=seq, subType=subType)
@@ -26,13 +23,6 @@ class ReadData():
         self.numChannel = 3 if self.dsName is not 'euroc' else 1
         self.imgs = np.zeros((self.numImgs, self.numChannel, 360, 720), dtype=np.float32)
         self.getImages()
-
-        # prepare idx for split, shuffle if isTrain
-        if self.isTrain:
-            self.idx = np.arange(0, self.numData, 1)
-            self.train_idx, self.val_idx = train_test_split(self.idx, test_size=0.2, shuffle=True)
-            self.numTrainData = self.train_idx.shape[0]
-            self.numValData = self.val_idx.shape[0]
 
     def getImgsFromTo(self, start, N):
         if start>self.numImgs:
@@ -67,7 +57,7 @@ class ReadData():
 
 if __name__ == '__main__':
     s = time.time()
-    d = ReadData(dsName='airsim', subType='mr', seq=1, isTrain=True)
+    d = ReadData(dsName='airsim', subType='mr', seq=1)
     print(time.time() - s)
 
     for i in range(0, d.numImgs):
