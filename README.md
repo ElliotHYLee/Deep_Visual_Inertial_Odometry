@@ -1,4 +1,5 @@
-# DeepVIO
+# DeepVisualInertialOdometry
+
 
 Using convolutional neural network, the velocity of the camera is estimated. 
 After predicting the velocity, 3D transformation matrices are concanated to estimate the position. Yet, the rotation information is coming from gyro scope. The correction is also done with accelerometer
