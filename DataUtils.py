@@ -1,11 +1,17 @@
 import numpy as np
 import pandas as pd
 
+
+# this is a mess. Hope I could fix it sometime.
+
 def getPath(dsName = 'AirSim', seq = 0, subType='mr'):
     path = None
     dsName = dsName.lower()
     if dsName == 'airsim':
-        path = 'D:/DLData/Airsim/' + subType + str(seq) + '/'
+        if subType == 'mr':
+            path = 'D:/DLData/Airsim/' + subType + str(seq) + '/'
+        elif subType == 'bar' or subType == 'pin':
+            path = 'D:/DLData/Airsim/mr' + str(seq) + '/'
     elif dsName == 'euroc':
         path = 'D:/DLData/EuRoc/mh_' + str(seq) +'/'
     elif dsName == 'kitti':
@@ -14,12 +20,19 @@ def getPath(dsName = 'AirSim', seq = 0, subType='mr'):
         path += '/'
     return path
 
-def getImgNames(path, dsName='AirSim', ts=None):
+def getImgNames(path, dsName='AirSim', ts=None, subType=''):
     dsName = dsName.lower()
     imgNames = []
     if dsName == 'airsim':
-        for i in range(0, ts.shape[0]):
-            imgNames.append(path + 'images/img_' + str(ts[i]) + '.png')
+        if subType == 'mr':
+            for i in range(0, ts.shape[0]):
+                imgNames.append(path + 'images/img_' + str(ts[i]) + '.png')
+        elif subType == 'bar':
+            for i in range(0, ts.shape[0]):
+                imgNames.append(path + 'images_bar/img_' + str(ts[i]) + '.png')
+        elif subType == 'pin':
+            for i in range(0, ts.shape[0]):
+                imgNames.append(path + 'images_pin/img_' + str(ts[i]) + '.png')
     elif dsName =='euroc':
         imgNames = (pd.read_csv(path + 'fName.txt', sep=' ', header=None)).iloc[:, 0]
         for i in range(0, len(imgNames)):

@@ -20,7 +20,7 @@ class ReadData():
         self.numData = self.du.shape[0]
 
         # images
-        self.imgNames = getImgNames(self.path, dsName, ts = self.time_stamp)
+        self.imgNames = getImgNames(self.path, dsName, ts = self.time_stamp, subType=subType)
         self.numImgs = len(self.imgNames)
         self.numChannel = 3 if self.dsName is not 'euroc' else 1
         self.imgs = np.zeros((self.numImgs, self.numChannel, 360, 720), dtype=np.float32)

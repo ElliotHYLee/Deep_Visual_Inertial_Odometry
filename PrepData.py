@@ -63,8 +63,8 @@ class DataManager(Singleton):
             mean = np.loadtxt(normPath + '_img_mean.txt')
             std = np.loadtxt(normPath + '_img_std.txt')
             if self.dsName == 'euroc':
-                self.mean = np.array([mean])
-                self.std = np.array([std])
+                mean = np.reshape(mean, (1,1))
+                std = np.reshape(std, (1,1))
 
         # standardize imgs
         print('standardizing imgs')
