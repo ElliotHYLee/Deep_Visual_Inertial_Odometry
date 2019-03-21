@@ -8,7 +8,7 @@ import time
 from git_branch_param import *
 
 dsName = 'airsim'
-subType= 'bar'
+subType= 'pin'
 
 wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
 resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
