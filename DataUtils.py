@@ -37,12 +37,12 @@ def getEnd(start, N, totalN):
         N = end-start
     return end, N
 
-def saveSeriesData(seq, index, name, data):
-    fName='F:Airsim/mr' + str(seq) + '/series/series_' + name + '_'+str(index)
-    #fName='Data/airsim/mr' + str(seq) + '/series_' + name + '_'+str(index)
-    print('saving: '+fName)
-    np.save(fName, data)
-    print('done saving: ' +fName)
+# def saveSeriesData(seq, index, name, data):
+#     fName='F:Airsim/mr' + str(seq) + '/series/series_' + name + '_'+str(index)
+#     #fName='Data/airsim/mr' + str(seq) + '/series_' + name + '_'+str(index)
+#     print('saving: '+fName)
+#     np.save(fName, data)
+#     print('done saving: ' +fName)
 
 class ThreadManager():
     def __init__(self, maxN=2):
