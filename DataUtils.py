@@ -1,10 +1,29 @@
 import numpy as np
 import pandas as pd
-
-
+from sys import platform
 # this is a mess. Hope I could fix it sometime.
+def getPath(dsName='Airsim', seq=0, subType='mr'):
+    if platform == "linux" or platform == "linux2":
+        return getPathAWS(dsName, seq, subType)
+    elif platform == "win32":
+        return getPathWin(dsName, seq, subType)
 
-def getPath(dsName = 'AirSim', seq = 0, subType='mr'):
+def getPathAWS(dsName = 'AirSim', seq = 0, subType='mr'):
+    path = None
+    dsName = dsName.lower()
+    if dsName == 'airsim':
+        if subType == 'mr':
+            path = '../../Data/Airsim/' + subType + str(seq) + '/'
+        elif subType == 'bar' or subType == 'pin':
+            path = '../../Data/Airsim/mr' + str(seq) + '/'
+    elif dsName == 'euroc':
+        path = '~/Data/EuRoc/mh_' + str(seq) +'/'
+    elif dsName == 'kitti':
+        path = '~/Data/KITTI/odom/dataset/sequences/'
+        path += '0'+str(seq) if seq<10 else str(seq)
+        path += '/'
+    return path
+def getPathWin(dsName = 'AirSim', seq = 0, subType='mr'):
     path = None
     dsName = dsName.lower()
     if dsName == 'airsim':
