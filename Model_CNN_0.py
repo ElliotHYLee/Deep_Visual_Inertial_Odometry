@@ -2,7 +2,7 @@ from MyPyTorchAPI.CNNUtils import *
 import numpy as np
 from MyPyTorchAPI.CustomActivation import *
 from SE3Layer import GetTrans
-from torch.autograd import Variable
+
 from LSTMFC import LSTMFC
 from CNNFC import CNNFC
 
@@ -41,27 +41,13 @@ class Model_CNN_0(nn.Module):
 
         self.init_w()
 
-        self.num_layers = 2
-        self.hiddenSize = 64
-        self.num = 1
-
         self.lstm_du = LSTMFC(NN_size, 2, 64, 3)
-        self.fc_lstm_du_cov = nn.Sequential(LSTMFC(NN_size, 2, 64, 6),
+        self.lstm_du_cov = nn.Sequential(LSTMFC(NN_size, 2, 64, 6),
                                     Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
         self.lstm_dw = LSTMFC(NN_size, 2, 64, 3)
-        self.fc_lstm_dw_cov = nn.Sequential(LSTMFC(NN_size, 2, 64, 6),
+        self.lstm_dw_cov = nn.Sequential(LSTMFC(NN_size, 2, 64, 6),
                                     Sigmoid(a=sigmoidInclination, max=sigmoidMax))
-
-    def init_hidden(self, batch_size=8):
-        h_t = torch.zeros([self.num_layers * self.num, batch_size, self.hiddenSize], dtype=torch.float32)
-        c_t = torch.zeros([self.num_layers * self.num, batch_size, self.hiddenSize], dtype=torch.float32)
-        if torch.cuda.is_available():
-            h_t = h_t.cuda()
-            c_t = c_t.cuda()
-        h_t = Variable(h_t)
-        c_t = Variable(c_t)
-        return (h_t, c_t)
 
     def init_w(self):
         for m in self.modules():
@@ -91,17 +77,12 @@ class Model_CNN_0(nn.Module):
         xSer = x.unsqueeze(0)
 
         # rnn du correction
-        duSer, (h, c) = self.lstm_du(xSer)
-        du_rnn = self.fc_lstm_du(duSer.squeeze(0))
-        duCovSer, (h, c) = self.lstm_du_cov(xSer)
-        du_rnn_cov = self.fc_lstm_du_cov(duCovSer.squeeze(0))
+        du_rnn = self.lstm_du(xSer)
+        du_rnn_cov = self.lstm_du_cov(xSer)
 
         # rnn dw correction
-        dwSer, (h, c) = self.lstm_du(xSer)
-        dw_rnn = self.fc_lstm_dw(dwSer.squeeze(0))
-        dwCovSer, (h, c) = self.lstm_dw_cov(xSer)
-        dw_rnn_cov = self.fc_lstm_dw_cov(dwCovSer.squeeze(0))
-
+        dw_rnn = self.lstm_dw(xSer)
+        dw_rnn_cov = self.lstm_dw_cov(xSer)
 
         return du_cnn, du_cnn_cov, \
                dw_cnn, dw_cnn_cov, \

@@ -1,6 +1,6 @@
 clc, clear, close all
-dsName = 'airsim';
-subType = 'mr';
+dsName = 'euroc';
+subType = '';
 seq = 2;
 
 %% Get Ground Truth Info.
