@@ -17,8 +17,6 @@ class Model_CNN_0(nn.Module):
         )
         self.encoder = seq1.block
         NN_size = int(seq1.flattend_size)
-        # print(seq1.output_size)
-
         sigmoidMax = np.sqrt(1)
         sigmoidInclination = 0.1
 
@@ -69,6 +67,22 @@ class Model_CNN_0(nn.Module):
                                    nn.PReLU(),
                                    nn.Linear(64, 6),
                                    Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+
+        
+
+        self.fc_dtrans_cov = nn.Sequential(
+                                    nn.Linear(NN_size, 512),
+                                    nn.BatchNorm1d(512),
+                                    nn.PReLU(),
+                                    nn.Linear(512, 64),
+                                    nn.BatchNorm1d(64),
+                                    nn.PReLU(),
+                                    nn.Linear(64, 64),
+                                    nn.BatchNorm1d(64),
+                                    nn.PReLU(),
+                                    nn.Linear(64, 6),
+                                    Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+
         self.init_w()
 
     def init_w(self):
@@ -87,7 +101,6 @@ class Model_CNN_0(nn.Module):
         input = torch.cat((x1, x2), 1)
         x = self.encoder(input)
         x = x.view(x.size(0), -1)
-
         du = self.fc_du(x)
         dw = self.fc_dw(x)
         du_cov = self.fc_du_cov(x)
