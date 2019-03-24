@@ -1,7 +1,7 @@
 from MyPyTorchAPI.CNNUtils import *
 import numpy as np
 from MyPyTorchAPI.CustomActivation import *
-
+from SE3Layer import GetTrans
 class Model_CNN_0(nn.Module):
     def __init__(self, dsName='airsim'):
         super(Model_CNN_0, self).__init__()
@@ -68,9 +68,7 @@ class Model_CNN_0(nn.Module):
                                    nn.Linear(64, 6),
                                    Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
-        
-
-        self.fc_dtrans_cov = nn.Sequential(
+        self.fc_dtr_cov = nn.Sequential(
                                     nn.Linear(NN_size, 512),
                                     nn.BatchNorm1d(512),
                                     nn.PReLU(),
@@ -84,6 +82,7 @@ class Model_CNN_0(nn.Module):
                                     Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
         self.init_w()
+        self.getTrans = GetTrans()
 
     def init_w(self):
         for m in self.modules():
@@ -105,15 +104,16 @@ class Model_CNN_0(nn.Module):
         dw = self.fc_dw(x)
         du_cov = self.fc_du_cov(x)
         dw_cov = self.fc_dw_cov(x)
-        dtrans = None
-        return du, dw, du_cov, dw_cov, dtrans
-
+        dtr = self.getTrans(du, dw)
+        dtr_cov = self.fc_dtr_cov(x)
+        return du, du_cov, dw, dw_cov, dtr, dtr_cov
 
 if __name__ == '__main__':
-    m = Model_CNN_0()
-    img1 = torch.zeros((2, 3, 360, 720))
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    m = nn.DataParallel(Model_CNN_0()).to(device)
+    img1 = torch.zeros((5, 3, 360, 720), dtype=torch.float).cuda()
     img2 = img1
-    du, dw = m.forward(img1, img2)
+    du, dw, dtr, du_cov, dw_cov, dtr_cov = m.forward(img1, img2)
     # print(m)
 
 

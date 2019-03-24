@@ -13,14 +13,14 @@ C = (1-A)./thsq
 
 skew1 = make_skew(dw(1,:))
 skew2 = skew1*skew1;
-eye(3) + B(1,:)*skew1 + C(1,:)*skew2
+V1 = eye(3) + B(1,:)*skew1 + C(1,:)*skew2
+trans1 = V1*du(1,:)'
+
 
 skew1 = make_skew(dw(2,:))
 skew2 = skew1*skew1;
-eye(3) + B(2,:)*skew1 + C(2,:)*skew2
-
-
-
+V2 = eye(3) + B(2,:)*skew1 + C(2,:)*skew2
+trans2 = V2*du(2,:)'
 
 function[sk] = make_skew(w)
     sk = [0     -w(3)  w(2) ;...

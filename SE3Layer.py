@@ -1,7 +1,6 @@
 import torch
 import numpy as np
-from SO3Layer import GetSkew, GetIdentity
-from MyPyTorchAPI.MatOp import BatchScalar33MatMul
+from MyPyTorchAPI.MatOp import *
 
 class GetV(torch.nn.Module):
     def __init__(self, serLen = 0):
@@ -17,12 +16,12 @@ class GetV(torch.nn.Module):
         s = s.expand_as(mat)
         return s*mat
 
-    def forward(self, du, dw):
+    def forward(self, dw):
         if self.isSeries:
             pass
         else:
-            bn = du.shape[0]
-            th_sq = torch.bmm(du.unsqueeze(1), dw.unsqueeze(2))
+            bn = dw.shape[0]
+            th_sq = torch.bmm(dw.unsqueeze(1), dw.unsqueeze(2))
             th_sq = th_sq.squeeze(2)
             th = torch.sqrt(th_sq)
             skew = self.getSkew(dw)
@@ -38,8 +37,19 @@ class GetV(torch.nn.Module):
 
             V = torch.add(I, self.bs33mm(B, skew))
             V = torch.add(V, self.bs33mm(C, skew2))
-            print(V)
             return V
+
+class GetTrans(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.getV = GetV()
+        self.b33mv3m = Batch33MatVec3Mul()
+
+    def forward(self, du, dw):
+        V = self.getV(dw)
+        dtrans  = self.b33mv3m(V, du)
+        return dtrans
+
 
 class SE3Layer(torch.nn.Module):
     def __init__(self):
@@ -50,25 +60,6 @@ class SE3Layer(torch.nn.Module):
 
 
 if __name__ == '__main__':
-    # a = np.array([[2], [3]], dtype=np.float32)
-    # b = np.array([[[1, 2, 3], [4, 5, 6], [0, 1, 2]], [[1, 2, 3], [4, 5, 6], [0, 1, 2]]], dtype=np.float32)
-    # a = torch.from_numpy(a)
-    # b = torch.from_numpy(b)
-    #
-    # a = a.unsqueeze(2)
-    # a = a.expand_as(b)
-    # print(a.shape)
-    # print(b.shape)
-    # c = a*b
-    # print(c)
-
-    # a = a.expand_as(b)
-    # print(a.shape)
-    # print(b.shape)
-    # c = a*b
-
-
-
     # non-series MD
     du = np.array([[1,2,3], [4,5,6]], dtype=np.float32)
     dw = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.float32)
@@ -76,9 +67,9 @@ if __name__ == '__main__':
     du = torch.from_numpy(du).cuda()
     dw = torch.from_numpy(dw).cuda()
 
-
-    getTrans = GetV()
-    dtrans = getTrans(du, dw)
+    dummy = GetTrans()
+    dtrans = dummy(du, dw)
+    print(dtrans)
 
 
     # series MD
