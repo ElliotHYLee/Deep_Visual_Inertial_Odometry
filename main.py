@@ -14,10 +14,10 @@ wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
 resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
 
 def train():
-    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[1,2,3,5], isTrain=True)
+    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[0], isTrain=True)
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
-    mc.load_weights(wName, train=True)
+    #mc.load_weights(wName, train=True)
     mc.fit(train, val, batch_size=10, epochs=40,
            wName=wName, checkPointFreq=1)
 
@@ -44,7 +44,7 @@ def test():
 
 
 if __name__ == '__main__':
-    # s = time.time()
-    # train()
-    # print(time.time() - s)
+    s = time.time()
+    train()
+    print(time.time() - s)
     test()

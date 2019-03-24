@@ -11,7 +11,7 @@ class ModelContainer_CNN():
     def __init__(self, net_model):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         print(torch.cuda.device)
-        self.model = nn.DataParallel(net_model).to(self.device)
+        self.model = nn.DataParallel(net_model, device_ids=[0]).to(self.device)
         self.compile()
         self.train_loss = []
         self.val_loss = []
@@ -85,10 +85,13 @@ class ModelContainer_CNN():
             # forward pass and calc loss
             pr_du, pr_du_cov, \
             pr_dw, pr_dw_cov, \
-            pr_dtr, pr_dtr_cov = self.model(img0, img1)
+            pr_dtr, pr_dtr_cov, \
+            pr_du_rnn, pr_du_rnn_cov = self.model(img0, img1)
+
             batch_loss = self.loss(pr_du, du, pr_du_cov) + \
                          self.loss(pr_dw, dw, pr_dw_cov) + \
-                         self.loss(pr_dtr, dtr, pr_dtr_cov)
+                         self.loss(pr_dtr, dtr, pr_dtr_cov) + \
+                         self.loss(pr_du_rnn, du, pr_du_rnn_cov)
             epoch_loss += batch_loss.item()
 
             # update weights
@@ -133,7 +136,8 @@ class ModelContainer_CNN():
             with torch.no_grad():
                 pr_du, pr_du_cov, \
                 pr_dw, pr_dw_cov, \
-                pr_dtr, pr_dtr_cov = self.model(img0, img1)
+                pr_dtr, pr_dtr_cov,\
+                pr_du_rnn, pr_du_rnn_cov = self.model(img0, img1)
 
                 if not isValidation:
                     du_list.append(pr_du.cpu().data.numpy())
@@ -146,7 +150,8 @@ class ModelContainer_CNN():
                 if isTarget:
                     batch_loss = self.loss(pr_du, du, pr_du_cov) +\
                                  self.loss(pr_dw, dw, pr_dw_cov) + \
-                                 self.loss(pr_dtr, dtr, pr_dtr_cov)
+                                 self.loss(pr_dtr, dtr, pr_dtr_cov) + \
+                                 self.loss(pr_du_rnn, du, pr_du_rnn_cov)
 
                     loss += batch_loss.item()
 

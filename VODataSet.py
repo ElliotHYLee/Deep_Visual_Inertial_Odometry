@@ -14,7 +14,7 @@ class VODataSetManager_CNN():
         idx = np.arange(0, data.numTotalData, 1)
         N = data.numTotalData
         if isTrain:
-            idx = shuffle(idx)
+            #idx = shuffle(idx)
             valN = int(N * split)
             trainN = N - valN
             trainIdx = idx[0:trainN]
