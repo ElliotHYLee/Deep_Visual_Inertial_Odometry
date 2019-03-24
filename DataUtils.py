@@ -23,6 +23,7 @@ def getPathAWS(dsName = 'AirSim', seq = 0, subType='mr'):
         path += '0'+str(seq) if seq<10 else str(seq)
         path += '/'
     return path
+
 def getPathWin(dsName = 'AirSim', seq = 0, subType='mr'):
     path = None
     dsName = dsName.lower()
