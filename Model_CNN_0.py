@@ -16,8 +16,11 @@ class Model_CNN_0(nn.Module):
             Conv2DBlock(1024, 6, kernel=3, stride=2, padding=1, atvn='prlu', bn = True, dropout=True),]
         )
         self.encoder = seq1.block
-        NN_size = seq1.flattend_size
+        NN_size = int(seq1.flattend_size)
         # print(seq1.output_size)
+
+        sigmoidMax = np.sqrt(1)
+        sigmoidInclination = 0.1
 
         self.fc_du = nn.Sequential(nn.Linear(NN_size, 512),
                                    nn.BatchNorm1d(512),
@@ -52,7 +55,7 @@ class Model_CNN_0(nn.Module):
                                    nn.BatchNorm1d(64),
                                    nn.PReLU(),
                                    nn.Linear(64, 6),
-                                   Sigmoid(a=0.5, max=np.sqrt(2)))
+                                   Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
         self.fc_dw_cov = nn.Sequential(
                                    nn.Linear(NN_size, 512),
@@ -65,7 +68,7 @@ class Model_CNN_0(nn.Module):
                                    nn.BatchNorm1d(64),
                                    nn.PReLU(),
                                    nn.Linear(64, 6),
-                                   Sigmoid(a=0.5, max=np.sqrt(2)))
+                                   Sigmoid(a=sigmoidInclination, max=sigmoidMax))
         self.init_w()
 
     def init_w(self):
