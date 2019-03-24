@@ -20,6 +20,7 @@ class Model_CNN_0(nn.Module):
         sigmoidMax = np.sqrt(1)
         sigmoidInclination = 0.1
 
+        # fc_du
         self.fc_du = nn.Sequential(nn.Linear(NN_size, 512),
                                    nn.BatchNorm1d(512),
                                    nn.PReLU(),
@@ -31,6 +32,7 @@ class Model_CNN_0(nn.Module):
                                    nn.PReLU(),
                                    nn.Linear(64, 3))
 
+        # fc_dw
         self.fc_dw = nn.Sequential(nn.Linear(NN_size, 512),
                                    nn.BatchNorm1d(512),
                                    nn.PReLU(),
@@ -41,7 +43,7 @@ class Model_CNN_0(nn.Module):
                                    nn.BatchNorm1d(64),
                                    nn.PReLU(),
                                    nn.Linear(64, 3))
-
+        # fc_du_cov
         self.fc_du_cov = nn.Sequential(
                                    nn.Linear(NN_size, 512),
                                    nn.BatchNorm1d(512),
@@ -55,6 +57,7 @@ class Model_CNN_0(nn.Module):
                                    nn.Linear(64, 6),
                                    Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
+        # fc_dw_cov
         self.fc_dw_cov = nn.Sequential(
                                    nn.Linear(NN_size, 512),
                                    nn.BatchNorm1d(512),
@@ -68,6 +71,7 @@ class Model_CNN_0(nn.Module):
                                    nn.Linear(64, 6),
                                    Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
+        # fc_dtr_cov
         self.fc_dtr_cov = nn.Sequential(
                                     nn.Linear(NN_size, 512),
                                     nn.BatchNorm1d(512),
@@ -82,6 +86,7 @@ class Model_CNN_0(nn.Module):
                                     Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
         self.init_w()
+
         self.getTrans = GetTrans()
 
     def init_w(self):
@@ -96,7 +101,7 @@ class Model_CNN_0(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-    def forward(self, x1, x2):
+    def forward(self, x1, x2, dw_gyro):
         input = torch.cat((x1, x2), 1)
         x = self.encoder(input)
         x = x.view(x.size(0), -1)
