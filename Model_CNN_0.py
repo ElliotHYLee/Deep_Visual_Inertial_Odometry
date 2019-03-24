@@ -101,10 +101,13 @@ class Model_CNN_0(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-    def forward(self, x1, x2, dw_gyro):
+    def forward(self, x1, x2):
         input = torch.cat((x1, x2), 1)
         x = self.encoder(input)
         x = x.view(x.size(0), -1)
+
+        print(x.shape)
+
         du = self.fc_du(x)
         dw = self.fc_dw(x)
         du_cov = self.fc_du_cov(x)
@@ -115,8 +118,8 @@ class Model_CNN_0(nn.Module):
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    m = nn.DataParallel(Model_CNN_0()).to(device)
-    img1 = torch.zeros((5, 3, 360, 720), dtype=torch.float).cuda()
+    m = nn.DataParallel(Model_CNN_0(), device_ids=[0]).to(device)
+    img1 = torch.zeros((10, 3, 360, 720), dtype=torch.float).cuda()
     img2 = img1
     du, dw, dtr, du_cov, dw_cov, dtr_cov = m.forward(img1, img2)
     # print(m)

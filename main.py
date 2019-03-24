@@ -18,7 +18,7 @@ def train():
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
     mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=64, epochs=40,
+    mc.fit(train, val, batch_size=10, epochs=40,
            wName=wName, checkPointFreq=1)
 
 def test():

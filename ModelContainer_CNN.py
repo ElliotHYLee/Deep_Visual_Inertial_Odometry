@@ -85,7 +85,7 @@ class ModelContainer_CNN():
             # forward pass and calc loss
             pr_du, pr_du_cov, \
             pr_dw, pr_dw_cov, \
-            pr_dtr, pr_dtr_cov = self.model(img0, img1, dw)
+            pr_dtr, pr_dtr_cov = self.model(img0, img1)
             batch_loss = self.loss(pr_du, du, pr_du_cov) + \
                          self.loss(pr_dw, dw, pr_dw_cov) + \
                          self.loss(pr_dtr, dtr, pr_dtr_cov)
@@ -133,7 +133,7 @@ class ModelContainer_CNN():
             with torch.no_grad():
                 pr_du, pr_du_cov, \
                 pr_dw, pr_dw_cov, \
-                pr_dtr, pr_dtr_cov = self.model(img0, img1, dw)
+                pr_dtr, pr_dtr_cov = self.model(img0, img1)
 
                 if not isValidation:
                     du_list.append(pr_du.cpu().data.numpy())
