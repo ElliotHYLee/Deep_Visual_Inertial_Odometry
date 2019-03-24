@@ -8,7 +8,7 @@ import time
 from git_branch_param import *
 
 dsName = 'airsim'
-subType= 'pin'
+subType= 'mr'
 
 wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
 resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
@@ -32,12 +32,17 @@ def test():
         # wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
         mc.load_weights(wName, train=False)
 
-        pr_du, pr_dw, du_cov, dw_cov, pr_dtrans, loss = mc.predict(dataset)
+        pr_du, du_cov, \
+        pr_dw, dw_cov, \
+        pr_dtr, dtr_cov, \
+        mae = mc.predict(dataset)
+
         np.savetxt(commName + '_du.txt', pr_du)
-        np.savetxt(commName + '_dw.txt', pr_dw)
         np.savetxt(commName + '_du_cov.txt', du_cov)
+        np.savetxt(commName + '_dw.txt', pr_dw)
         np.savetxt(commName + '_dw_cov.txt', dw_cov)
-        # np.savetxt(commName + '_dtrans.txt', pr_dtrans)
+        np.savetxt(commName + '_dtr.txt', pr_dtr)
+        np.savetxt(commName + '_dtr_cov.txt', dtr_cov)
 
 
 if __name__ == '__main__':
