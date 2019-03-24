@@ -103,9 +103,11 @@ class Model_CNN_0(nn.Module):
                                         nn.Linear(64, 64),
                                         nn.PReLU(),
                                         nn.Linear(64, 3))
+
         self.lstm_du_cov = nn.LSTM(input_size=NN_size, hidden_size=64,
                                num_layers=2, batch_first=True,
                                bidirectional=False)
+
         self.fc_lstm_du_cov = nn.Sequential(
                                     nn.Linear(64, 64),
                                     nn.BatchNorm1d(64),
@@ -119,6 +121,7 @@ class Model_CNN_0(nn.Module):
         self.lstm_dw = nn.LSTM(input_size=NN_size, hidden_size=64,
                                num_layers=2, batch_first=True,
                                bidirectional=False)
+
         self.fc_lstm_dw = nn.Sequential(nn.Linear(64, 64),
                                         nn.PReLU(),
                                         nn.Linear(64, 64),
@@ -128,6 +131,7 @@ class Model_CNN_0(nn.Module):
         self.lstm_dw_cov = nn.LSTM(input_size=NN_size, hidden_size=64,
                                num_layers=2, batch_first=True,
                                bidirectional=False)
+
         self.fc_lstm_dw_cov = nn.Sequential(
                                     nn.Linear(64, 64),
                                     nn.BatchNorm1d(64),
@@ -182,7 +186,9 @@ class Model_CNN_0(nn.Module):
         du_rnn_cov = self.fc_lstm_du_cov(duCovSer)
 
 
-        return du_cnn, du_cnn_cov, dw_cnn, dw_cnn_cov, dtr_cnn, dtr_cnn_cov,\
+        return du_cnn, du_cnn_cov, \
+               dw_cnn, dw_cnn_cov, \
+               dtr_cnn, dtr_cnn_cov,\
                du_rnn, du_rnn_cov
 
 if __name__ == '__main__':

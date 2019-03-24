@@ -125,6 +125,7 @@ class ModelContainer_CNN():
     def predict(self, data_incoming, isValidation=False, isTarget=True):
         data_loader = data_incoming if isValidation else DataLoader(dataset=data_incoming, batch_size=16, shuffle=False)
         du_list, dw_list, dtr_list, du_cov_list, dw_cov_list, dtr_cov_list = [], [], [], [], [], []
+        du_rnn_list, du_cov_rnn_list = [], []
         loss = 0
         for batch_idx, (img0, img1, du, dw, dtr) in enumerate(data_loader):
             img0 = img0.to(self.device)
@@ -139,15 +140,17 @@ class ModelContainer_CNN():
                 pr_dtr, pr_dtr_cov,\
                 pr_du_rnn, pr_du_rnn_cov = self.model(img0, img1)
 
-                if not isValidation:
+                if not isValidation: #if test
                     du_list.append(pr_du.cpu().data.numpy())
-                    dw_list.append(pr_dw.cpu().data.numpy())
-                    dtr_list.append(pr_dtr.cpu().data.numpy())
                     du_cov_list.append(pr_du_cov.cpu().data.numpy())
+                    dw_list.append(pr_dw.cpu().data.numpy())
                     dw_cov_list.append(pr_dw_cov.cpu().data.numpy())
+                    dtr_list.append(pr_dtr.cpu().data.numpy())
                     dtr_cov_list.append(pr_dtr_cov.cpu().data.numpy())
+                    du_rnn_list.append((pr_du_rnn.cpu()).data.numpy())
+                    du_cov_rnn_list.append((pr_du_rnn_cov.cpu()).data.numpy())
 
-                if isTarget:
+                if isTarget: # if test or validation with available ground truth
                     batch_loss = self.loss(pr_du, du, pr_du_cov) +\
                                  self.loss(pr_dw, dw, pr_dw_cov) + \
                                  self.loss(pr_dtr, dtr, pr_dtr_cov) + \
@@ -160,14 +163,19 @@ class ModelContainer_CNN():
             return mae
         else:
             pr_du = np.concatenate(du_list, axis=0)
-            pr_dw = np.concatenate(dw_list, axis=0)
-            pr_dtr = np.concatenate(dtr_list, axis=0)
             du_cov = np.concatenate(du_cov_list, axis=0)
+            pr_dw = np.concatenate(dw_list, axis=0)
             dw_cov = np.concatenate(dw_cov_list, axis=0)
+            pr_dtr = np.concatenate(dtr_list, axis=0)
             dtr_cov = np.concatenate(dtr_cov_list, axis=0)
+
+            pr_du_rnn = np.concatenate(du_rnn_list, axis=0)
+            pr_du_cov_rnn = np.concatenate(du_cov_rnn_list, axis=0)
+
             return pr_du, du_cov, \
                    pr_dw, dw_cov, \
                    pr_dtr, dtr_cov, \
+                   pr_du_rnn, pr_du_cov_rnn, \
                    mae
 
 if __name__ == '__main__':

@@ -15,9 +15,9 @@ gt_dw = importdata(gt_dwName);
 
 %% Get Prediction Info.
 prPath = ['Data\',getPRPath(dsName, subType, seq)];
-pr_duName = strcat(prPath, '_du.txt')
+pr_duName = strcat(prPath, '_du_rnn.txt')
 pr_dwName = strcat(prPath, '_dw.txt');
-pr_duCovName = strcat(prPath, '_du_cov.txt');
+pr_duCovName = strcat(prPath, '_du_cov_rnn.txt');
 pr_dwCovName = strcat(prPath, '_dw_cov.txt');
 
 pr_du = importdata(pr_duName);

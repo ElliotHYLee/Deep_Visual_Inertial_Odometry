@@ -18,8 +18,7 @@ def train():
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
     #mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=10, epochs=40,
-           wName=wName, checkPointFreq=1)
+    mc.fit(train, val, batch_size=10, epochs=40, wName=wName, checkPointFreq=1)
 
 def test():
     for seq in range(0,3):
@@ -33,6 +32,7 @@ def test():
         pr_du, du_cov, \
         pr_dw, dw_cov, \
         pr_dtr, dtr_cov, \
+        pr_du_rnn, pr_du_cov_rnn, \
         mae = mc.predict(dataset)
 
         np.savetxt(commName + '_du.txt', pr_du)
@@ -41,10 +41,12 @@ def test():
         np.savetxt(commName + '_dw_cov.txt', dw_cov)
         np.savetxt(commName + '_dtr.txt', pr_dtr)
         np.savetxt(commName + '_dtr_cov.txt', dtr_cov)
+        np.savetxt(commName + '_du_rnn.txt', pr_du_rnn)
+        np.savetxt(commName + '_du_cov_rnn.txt', pr_du_cov_rnn)
 
 
 if __name__ == '__main__':
-    s = time.time()
-    train()
-    print(time.time() - s)
+    # s = time.time()
+    # train()
+    # print(time.time() - s)
     test()
