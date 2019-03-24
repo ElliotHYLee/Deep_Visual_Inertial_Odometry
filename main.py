@@ -7,21 +7,21 @@ import numpy as np
 import time
 from git_branch_param import *
 
-dsName = 'airsim'
-subType= 'mr'
+dsName = 'euroc'
+subType= 'none'
 
 wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
 resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
 
 def train():
-    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[0], isTrain=True)
+    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[2,3,4,5], isTrain=True)
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
     #mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=10, epochs=40, wName=wName, checkPointFreq=1)
+    mc.fit(train, val, batch_size=30, epochs=40, wName=wName, checkPointFreq=1)
 
 def test():
-    for seq in range(0,3):
+    for seq in range(1,6):
         commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
         dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
         dataset = dm.testSet
@@ -33,6 +33,7 @@ def test():
         pr_dw, dw_cov, \
         pr_dtr, dtr_cov, \
         pr_du_rnn, pr_du_cov_rnn, \
+        pr_dw_rnn, pr_dw_cov_rnn, \
         mae = mc.predict(dataset)
 
         np.savetxt(commName + '_du.txt', pr_du)
@@ -43,10 +44,12 @@ def test():
         np.savetxt(commName + '_dtr_cov.txt', dtr_cov)
         np.savetxt(commName + '_du_rnn.txt', pr_du_rnn)
         np.savetxt(commName + '_du_cov_rnn.txt', pr_du_cov_rnn)
+        np.savetxt(commName + '_dw_rnn.txt', pr_dw_rnn)
+        np.savetxt(commName + '_dw_cov_rnn.txt', pr_dw_cov_rnn)
 
 
 if __name__ == '__main__':
-    # s = time.time()
-    # train()
-    # print(time.time() - s)
+    s = time.time()
+    train()
+    print(time.time() - s)
     test()

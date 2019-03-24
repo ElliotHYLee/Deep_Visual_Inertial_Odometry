@@ -3,7 +3,8 @@ import numpy as np
 from MyPyTorchAPI.CustomActivation import *
 from SE3Layer import GetTrans
 from torch.autograd import Variable
-
+from LSTMFC import LSTMFC
+from CNNFC import CNNFC
 
 class Model_CNN_0(nn.Module):
     def __init__(self, dsName='airsim'):
@@ -24,122 +25,32 @@ class Model_CNN_0(nn.Module):
         sigmoidInclination = 0.1
 
         # fc_du
-        self.fc_du = nn.Sequential(nn.Linear(NN_size, 512),
-                                   nn.BatchNorm1d(512),
-                                   nn.PReLU(),
-                                   nn.Linear(512, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 3))
+        self.fc_du = CNNFC(NN_size, 3)
+        self.fc_du_cov = nn.Sequential(CNNFC(NN_size, 6),
+                                       Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
         # fc_dw
-        self.fc_dw = nn.Sequential(nn.Linear(NN_size, 512),
-                                   nn.BatchNorm1d(512),
-                                   nn.PReLU(),
-                                   nn.Linear(512, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 3))
-        # fc_du_cov
-        self.fc_du_cov = nn.Sequential(
-                                   nn.Linear(NN_size, 512),
-                                   nn.BatchNorm1d(512),
-                                   nn.PReLU(),
-                                   nn.Linear(512, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 6),
-                                   Sigmoid(a=sigmoidInclination, max=sigmoidMax))
-
-        # fc_dw_cov
-        self.fc_dw_cov = nn.Sequential(
-                                   nn.Linear(NN_size, 512),
-                                   nn.BatchNorm1d(512),
-                                   nn.PReLU(),
-                                   nn.Linear(512, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 6),
+        self.fc_dw = CNNFC(NN_size, 3)
+        self.fc_dw_cov = nn.Sequential(CNNFC(NN_size, 6),
                                    Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
         # fc_dtr_cov
-        self.fc_dtr_cov = nn.Sequential(
-                                    nn.Linear(NN_size, 512),
-                                    nn.BatchNorm1d(512),
-                                    nn.PReLU(),
-                                    nn.Linear(512, 64),
-                                    nn.BatchNorm1d(64),
-                                    nn.PReLU(),
-                                    nn.Linear(64, 64),
-                                    nn.BatchNorm1d(64),
-                                    nn.PReLU(),
-                                    nn.Linear(64, 6),
+        self.fc_dtr = GetTrans()
+        self.fc_dtr_cov = nn.Sequential(CNNFC(NN_size, 6),
                                     Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
         self.init_w()
 
-        self.getTrans = GetTrans()
-
         self.num_layers = 2
         self.hiddenSize = 64
         self.num = 1
-        self.lstm_du = nn.LSTM(input_size=NN_size, hidden_size=64,
-                               num_layers=2, batch_first=True,
-                               bidirectional=False)
-        self.fc_lstm_du = nn.Sequential(nn.Linear(64, 64),
-                                        nn.PReLU(),
-                                        nn.Linear(64, 64),
-                                        nn.PReLU(),
-                                        nn.Linear(64, 3))
 
-        self.lstm_du_cov = nn.LSTM(input_size=NN_size, hidden_size=64,
-                               num_layers=2, batch_first=True,
-                               bidirectional=False)
-
-        self.fc_lstm_du_cov = nn.Sequential(
-                                    nn.Linear(64, 64),
-                                    nn.BatchNorm1d(64),
-                                    nn.PReLU(),
-                                    nn.Linear(64, 64),
-                                    nn.BatchNorm1d(64),
-                                    nn.PReLU(),
-                                    nn.Linear(64, 6),
+        self.lstm_du = LSTMFC(NN_size, 2, 64, 3)
+        self.fc_lstm_du_cov = nn.Sequential(LSTMFC(NN_size, 2, 64, 6),
                                     Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
-        self.lstm_dw = nn.LSTM(input_size=NN_size, hidden_size=64,
-                               num_layers=2, batch_first=True,
-                               bidirectional=False)
-
-        self.fc_lstm_dw = nn.Sequential(nn.Linear(64, 64),
-                                        nn.PReLU(),
-                                        nn.Linear(64, 64),
-                                        nn.PReLU(),
-                                        nn.Linear(64, 3))
-
-        self.lstm_dw_cov = nn.LSTM(input_size=NN_size, hidden_size=64,
-                               num_layers=2, batch_first=True,
-                               bidirectional=False)
-
-        self.fc_lstm_dw_cov = nn.Sequential(
-                                    nn.Linear(64, 64),
-                                    nn.BatchNorm1d(64),
-                                    nn.PReLU(),
-                                    nn.Linear(64, 64),
-                                    nn.BatchNorm1d(64),
-                                    nn.PReLU(),
-                                    nn.Linear(64, 6),
+        self.lstm_dw = LSTMFC(NN_size, 2, 64, 3)
+        self.fc_lstm_dw_cov = nn.Sequential(LSTMFC(NN_size, 2, 64, 6),
                                     Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
     def init_hidden(self, batch_size=8):
@@ -165,6 +76,7 @@ class Model_CNN_0(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x1, x2):
+        # do CNN for the batch as series
         input = torch.cat((x1, x2), 1)
         x = self.encoder(input)
         x = x.view(x.size(0), -1)
@@ -172,24 +84,30 @@ class Model_CNN_0(nn.Module):
         dw_cnn = self.fc_dw(x)
         du_cnn_cov = self.fc_du_cov(x)
         dw_cnn_cov = self.fc_dw_cov(x)
-        dtr_cnn = self.getTrans(du_cnn, dw_cnn)
+        dtr_cnn = self.fc_dtr(du_cnn, dw_cnn)
         dtr_cnn_cov = self.fc_dtr_cov(x)
 
+        # prep for RNN
         xSer = x.unsqueeze(0)
-        duSer, (h, c) = self.lstm_du(xSer)
-        duSer = duSer.squeeze(0)
-        du_rnn = self.fc_lstm_du(duSer)
-        #print(du_rnn.shape)
 
+        # rnn du correction
+        duSer, (h, c) = self.lstm_du(xSer)
+        du_rnn = self.fc_lstm_du(duSer.squeeze(0))
         duCovSer, (h, c) = self.lstm_du_cov(xSer)
-        duCovSer = duCovSer.squeeze(0)
-        du_rnn_cov = self.fc_lstm_du_cov(duCovSer)
+        du_rnn_cov = self.fc_lstm_du_cov(duCovSer.squeeze(0))
+
+        # rnn dw correction
+        dwSer, (h, c) = self.lstm_du(xSer)
+        dw_rnn = self.fc_lstm_dw(dwSer.squeeze(0))
+        dwCovSer, (h, c) = self.lstm_dw_cov(xSer)
+        dw_rnn_cov = self.fc_lstm_dw_cov(dwCovSer.squeeze(0))
 
 
         return du_cnn, du_cnn_cov, \
                dw_cnn, dw_cnn_cov, \
                dtr_cnn, dtr_cnn_cov,\
-               du_rnn, du_rnn_cov
+               du_rnn, du_rnn_cov, \
+               dw_rnn, dw_rnn_cov
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
