@@ -101,7 +101,7 @@ class Model_CNN_0(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-    def forward(self, x1, x2, dw_gyro):
+    def forward(self, x1, x2):
         input = torch.cat((x1, x2), 1)
         x = self.encoder(input)
         x = x.view(x.size(0), -1)
