@@ -1,6 +1,6 @@
 clc, clear, close all
-dsName = 'euroc';
-subType = '';
+dsName = 'airsim';
+subType = 'mr';
 seq = 2;
 
 %% Get Ground Truth Info.
@@ -11,7 +11,6 @@ gt_dwName = strcat(gtPath, '\dw.txt');
 dt = importdata(gt_dtName);
 gt_du = importdata(gt_duName);
 gt_dw = importdata(gt_dwName);
-
 
 %% Get Prediction Info.
 prPath = ['Data\',getPRPath(dsName, subType, seq)];

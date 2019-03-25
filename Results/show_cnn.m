@@ -1,7 +1,7 @@
 clc, clear, close all
 dsName = 'euroc';
 subType = '';
-seq = 1;
+seq = 3;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
