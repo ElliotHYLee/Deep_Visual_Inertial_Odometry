@@ -50,19 +50,15 @@ if __name__ == '__main__':
     seq = [0]
     seqRange = [0, 3]
     #runTrain(dsName, 'mr', seq, seqRange)
-    runTrain(dsName, 'mrseg', seq, seqRange)
-    runTrain(dsName, 'bar', seq, seqRange)
+    #runTrain(dsName, 'mrseg', seq, seqRange)
+    #runTrain(dsName, 'bar', seq, seqRange)
     runTrain(dsName, 'pin', seq, seqRange)
 
     dsName = 'euroc'
-    seq = [1,2,3,5]
-    seqRange = [1, 6]
-    runTrain(dsName, 'none', seq, seqRange)
+    runTrain(dsName, 'none', seq=[1,2,3,5], seqRange=[1, 6])
 
     dsName = 'kitti'
-    seq = [0,2,4,6]
-    seqRange = [0, 11]
-    runTrain(dsName, 'none', seq, seqRange)
+    runTrain(dsName, 'none', seq = [0,2,4,6], seqRange = [0, 11])
 
 
 
