@@ -7,7 +7,7 @@ import numpy as np
 import time
 from git_branch_param import *
 
-dsName = 'kitti'
+dsName = 'euroc'
 subType= 'none'
 
 wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
@@ -21,7 +21,7 @@ def train():
     mc.fit(train, val, batch_size=10, epochs=40, wName=wName, checkPointFreq=1)
 
 def test():
-    for seq in range(0,10):
+    for seq in range(10,11):
         commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
         dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
         dataset = dm.testSet
@@ -49,7 +49,7 @@ def test():
 
 
 if __name__ == '__main__':
-    s = time.time()
-    train()
-    print(time.time() - s)
+    # s = time.time()
+    # train()
+    # print(time.time() - s)
     test()

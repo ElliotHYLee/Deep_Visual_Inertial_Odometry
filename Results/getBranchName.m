@@ -1,3 +1,3 @@
 function[branchName] = getBranchName()
-    branchName = 'rcnn2';
+    branchName = 'rcnn';
 end
