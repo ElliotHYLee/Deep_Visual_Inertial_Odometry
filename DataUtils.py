@@ -12,7 +12,7 @@ def getPathAWS(dsName = 'AirSim', seq = 0, subType='mr'):
     path = None
     dsName = dsName.lower()
     if dsName == 'airsim':
-        if subType == 'mr':
+        if subType == 'mr' or subType=='mrseg':
             path = '../../Data/Airsim/' + subType + str(seq) + '/'
         elif subType == 'bar' or subType == 'pin':
             path = '../../Data/Airsim/mr' + str(seq) + '/'
@@ -28,7 +28,7 @@ def getPathWin(dsName = 'AirSim', seq = 0, subType='mr'):
     path = None
     dsName = dsName.lower()
     if dsName == 'airsim':
-        if subType == 'mr':
+        if subType == 'mr' or subType=='mrseg':
             path = 'D:/DLData/Airsim/' + subType + str(seq) + '/'
         elif subType == 'bar' or subType == 'pin':
             path = 'D:/DLData/Airsim/mr' + str(seq) + '/'
@@ -44,7 +44,7 @@ def getImgNames(path, dsName='AirSim', ts=None, subType=''):
     dsName = dsName.lower()
     imgNames = []
     if dsName == 'airsim':
-        if subType == 'mr':
+        if subType == 'mr' or subType=='mrseg':
             for i in range(0, ts.shape[0]):
                 imgNames.append(path + 'images/img_' + str(ts[i]) + '.png')
         elif subType == 'bar':

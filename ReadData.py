@@ -9,6 +9,7 @@ class ReadData():
 
         # non images
         if dsName == 'airsim':
+            #print(self.path)
             self.data = pd.read_csv(self.path + 'data.txt', sep=' ', header=None)
             self.time_stamp = self.data.iloc[:, 0].values
         else:
@@ -21,6 +22,7 @@ class ReadData():
 
         # images
         self.imgNames = getImgNames(self.path, dsName, ts = self.time_stamp, subType=subType)
+        #print(self.imgNames)
         self.numImgs = len(self.imgNames)
         self.numChannel = 3 if self.dsName is not 'euroc' else 1
         self.imgs = np.zeros((self.numImgs, self.numChannel, 360, 720), dtype=np.float32)
@@ -31,7 +33,7 @@ class ReadData():
             sys.exit('ReadData-getImgsFromTo: this should be the case')
 
         end, N = getEnd(start, N, self.numImgs)
-        print('PrepData-reading imgs from %d to %d(): reading imgs' %(start, end))
+        #print('PrepData-reading imgs from %d to %d(): reading imgs' %(start, end))
         for i in range(start, end):
             fName = self.imgNames[i]
             if self.dsName == 'euroc':
@@ -42,7 +44,7 @@ class ReadData():
                 img = cv2.resize(img, (720, 360))
             img = np.reshape(img.astype(np.float32), (-1, self.numChannel, 360, 720))
             self.imgs[i,:] = img #no lock is necessary
-        print('PrepData-reading imgs from %d to %d(): done reading imgs' % (start, end))
+        #print('PrepData-reading imgs from %d to %d(): done reading imgs' % (start, end))
 
     def getImages(self):
         partN = 500

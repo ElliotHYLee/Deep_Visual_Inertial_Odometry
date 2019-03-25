@@ -21,6 +21,7 @@ class GetV(torch.nn.Module):
             pass
         else:
             bn = dw.shape[0]
+            dw = torch.add(dw, 10 ** -10)
             th_sq = torch.bmm(dw.unsqueeze(1), dw.unsqueeze(2))
             th_sq = th_sq.squeeze(2)
             th = torch.sqrt(th_sq)
@@ -61,8 +62,8 @@ class SE3Layer(torch.nn.Module):
 
 if __name__ == '__main__':
     # non-series MD
-    du = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.float32)
-    dw = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.float32)
+    du = np.array([[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3]], dtype=np.float32)
+    dw = np.array([[10**-5, 10**-5, 10**-5], [10**-5, 10**-5, 10**-5]], dtype=np.float32)
 
     du = torch.from_numpy(du).cuda()
     dw = torch.from_numpy(dw).cuda()

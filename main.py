@@ -7,22 +7,18 @@ import numpy as np
 import time
 from git_branch_param import *
 
-dsName = 'airsim'
-subType= 'mr'
-
-wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
-resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
-
-def train():
-    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[1,2,3,5], isTrain=True)
+def train(dsName, subType, seq):
+    wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
+    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=seq, isTrain=True)
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
-    mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=64, epochs=40,
-           wName=wName, checkPointFreq=1)
+    #mc.load_weights(wName, train=True)
+    mc.fit(train, val, batch_size=64, epochs=40, wName=wName, checkPointFreq=1)
 
-def test():
-    for seq in range(0,3):
+def test(dsName, subType, seqRange):
+    wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
+    resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
+    for seq in range(seqRange[0], seqRange[1]):
         commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
         dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
         dataset = dm.testSet
@@ -43,8 +39,51 @@ def test():
         np.savetxt(commName + '_dtr_cov.txt', dtr_cov)
 
 
+def runTrain(dsName, subType, seq, seqRange):
+    s = time.time()
+    train(dsName, subType, seq)
+    print(time.time() - s)
+    test(dsName, subType, seqRange)
+
 if __name__ == '__main__':
-    # s = time.time()
-    # train()
-    # print(time.time() - s)
-    test()
+    dsName = 'airsim'
+    seq = [0]
+    seqRange = [0, 3]
+    #runTrain(dsName, 'mr', seq, seqRange)
+    runTrain(dsName, 'mrseg', seq, seqRange)
+    runTrain(dsName, 'bar', seq, seqRange)
+    runTrain(dsName, 'pin', seq, seqRange)
+
+    dsName = 'euroc'
+    seq = [1,2,3,5]
+    seqRange = [1, 6]
+    runTrain(dsName, 'none', seq, seqRange)
+
+    dsName = 'kitti'
+    seq = [0,2,4,6]
+    seqRange = [0, 11]
+    runTrain(dsName, 'none', seq, seqRange)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

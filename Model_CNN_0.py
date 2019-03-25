@@ -2,6 +2,7 @@ from MyPyTorchAPI.CNNUtils import *
 import numpy as np
 from MyPyTorchAPI.CustomActivation import *
 from SE3Layer import GetTrans
+from CNNFC import CNNFC
 class Model_CNN_0(nn.Module):
     def __init__(self, dsName='airsim'):
         super(Model_CNN_0, self).__init__()
@@ -21,73 +22,32 @@ class Model_CNN_0(nn.Module):
         sigmoidInclination = 0.1
 
         # fc_du
-        self.fc_du = nn.Sequential(nn.Linear(NN_size, 512),
-                                   nn.BatchNorm1d(512),
-                                   nn.PReLU(),
-                                   nn.Linear(512, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 3))
+        self.fc_du = CNNFC(NN_size, 3)
 
         # fc_dw
-        self.fc_dw = nn.Sequential(nn.Linear(NN_size, 512),
-                                   nn.BatchNorm1d(512),
-                                   nn.PReLU(),
-                                   nn.Linear(512, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 3))
+        self.fc_dw = CNNFC(NN_size, 3)
+
+        #fc_dtr
+        self.fc_dtr = GetTrans()
+
         # fc_du_cov
         self.fc_du_cov = nn.Sequential(
-                                   nn.Linear(NN_size, 512),
-                                   nn.BatchNorm1d(512),
-                                   nn.PReLU(),
-                                   nn.Linear(512, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 6),
-                                   Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+                        CNNFC(NN_size, 6),
+                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
         # fc_dw_cov
         self.fc_dw_cov = nn.Sequential(
-                                   nn.Linear(NN_size, 512),
-                                   nn.BatchNorm1d(512),
-                                   nn.PReLU(),
-                                   nn.Linear(512, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 64),
-                                   nn.BatchNorm1d(64),
-                                   nn.PReLU(),
-                                   nn.Linear(64, 6),
-                                   Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+                        CNNFC(NN_size, 6),
+                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
         # fc_dtr_cov
         self.fc_dtr_cov = nn.Sequential(
-                                    nn.Linear(NN_size, 512),
-                                    nn.BatchNorm1d(512),
-                                    nn.PReLU(),
-                                    nn.Linear(512, 64),
-                                    nn.BatchNorm1d(64),
-                                    nn.PReLU(),
-                                    nn.Linear(64, 64),
-                                    nn.BatchNorm1d(64),
-                                    nn.PReLU(),
-                                    nn.Linear(64, 6),
-                                    Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+                        CNNFC(NN_size, 6),
+                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
         self.init_w()
 
-        self.getTrans = GetTrans()
+
 
     def init_w(self):
         for m in self.modules():
@@ -101,15 +61,16 @@ class Model_CNN_0(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-    def forward(self, x1, x2):
+    def forward(self, x1, x2, dw_gt):
         input = torch.cat((x1, x2), 1)
         x = self.encoder(input)
         x = x.view(x.size(0), -1)
         du = self.fc_du(x)
         dw = self.fc_dw(x)
+
         du_cov = self.fc_du_cov(x)
         dw_cov = self.fc_dw_cov(x)
-        dtr = self.getTrans(du, dw)
+        dtr = self.fc_dtr(du, dw_gt)
         dtr_cov = self.fc_dtr_cov(x)
         return du, du_cov, dw, dw_cov, dtr, dtr_cov
 
