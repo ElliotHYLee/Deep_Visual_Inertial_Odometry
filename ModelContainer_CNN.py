@@ -21,14 +21,14 @@ class ModelContainer_CNN():
 
     def compile(self, loss=None, optimizer=None):
         self.loss = MahalanobisLoss(series_Len=0)#nn.modules.loss.L1Loss()
-        # self.optimizer = optim.SGD(self.model.parameters(), lr=10**-2, weight_decay=0.01)
+        #self.optimizer = optim.SGD(self.model.parameters(), lr=10**-2, weight_decay=0.01)
         self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-4, weight_decay=10**-4)
 
     def fit(self, train, validation=None, batch_size=1, epochs=1, shuffle=True, wName='weight.pt', checkPointFreq = 1):
         self.checkPointFreq = checkPointFreq
         self.wName = wName if self.wName is None else self.wName
-        self.train_loader = DataLoader(dataset=train, batch_size=batch_size, shuffle=shuffle)
-        self.valid_loader = DataLoader(dataset=validation, batch_size=batch_size, shuffle=shuffle)
+        self.train_loader = DataLoader(dataset = train, batch_size=batch_size, shuffle=shuffle)
+        self.valid_loader = DataLoader(dataset = validation, batch_size=batch_size, shuffle=shuffle)
 
         for epoch in range(0, epochs):
             train_loss, val_loss = self.runEpoch(epoch)
@@ -89,11 +89,6 @@ class ModelContainer_CNN():
             batch_loss = self.loss(pr_du, du, pr_du_cov) + \
                          self.loss(pr_dw, dw, pr_dw_cov) + \
                          self.loss(pr_dtr, dtr, pr_dtr_cov)
-
-            # print(pr_du[0,:])
-            # print(pr_dw[0,:])
-            # print(pr_dtr[0,:])
-            # asd
 
             epoch_loss += batch_loss.item()
 

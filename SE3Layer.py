@@ -21,7 +21,7 @@ class GetV(torch.nn.Module):
             pass
         else:
             bn = dw.shape[0]
-            dw = torch.add(dw, 10 ** -10)
+            dw = torch.add(dw, 10 **-10)
             th_sq = torch.bmm(dw.unsqueeze(1), dw.unsqueeze(2))
             th_sq = th_sq.squeeze(2)
             th = torch.sqrt(th_sq)
