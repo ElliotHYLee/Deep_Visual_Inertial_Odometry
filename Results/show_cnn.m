@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'euroc';
-subType = '';
-seq = 1;
+dsName = 'airsim';
+subType = 'mr';
+seq = 0;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);

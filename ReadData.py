@@ -31,7 +31,7 @@ class ReadData():
             sys.exit('ReadData-getImgsFromTo: this should be the case')
 
         end, N = getEnd(start, N, self.numImgs)
-        print('PrepData-reading imgs from %d to %d(): reading imgs' %(start, end))
+        #print('PrepData-reading imgs from %d to %d(): reading imgs' %(start, end))
         for i in range(start, end):
             fName = self.imgNames[i]
             if self.dsName == 'euroc':
@@ -42,7 +42,7 @@ class ReadData():
                 img = cv2.resize(img, (720, 360))
             img = np.reshape(img.astype(np.float32), (-1, self.numChannel, 360, 720))
             self.imgs[i,:] = img #no lock is necessary
-        print('PrepData-reading imgs from %d to %d(): done reading imgs' % (start, end))
+        #print('PrepData-reading imgs from %d to %d(): done reading imgs' % (start, end))
 
     def getImages(self):
         partN = 500
