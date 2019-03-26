@@ -22,35 +22,30 @@ class Model_CNN_0(nn.Module):
         )
         self.encoder = seq1.block
         NN_size = int(seq1.flattend_size)
-        sigmoidMax = np.sqrt(1)
-        sigmoidInclination = 0.1
+        sigMax = np.sqrt(1)
+        sigIncln = 0.1
 
         # CNNs
         # fc_du
         self.fc_du = CNNFC(NN_size, 3)
-        self.fc_du_cov = nn.Sequential(CNNFC(NN_size, 6),
-                                       Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+        self.fc_du_cov = nn.Sequential(CNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
 
         # fc_dw
         self.fc_dw = CNNFC(NN_size, 3)
-        self.fc_dw_cov = nn.Sequential(CNNFC(NN_size, 6),
-                                   Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+        self.fc_dw_cov = nn.Sequential(CNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
 
         # fc_dtr_cov
         self.fc_dtr = GetTrans()
-        self.fc_dtr_cov = nn.Sequential(CNNFC(NN_size, 6),
-                                    Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+        self.fc_dtr_cov = nn.Sequential(CNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
 
         self.init_w()
 
         # RNNs
         self.fc_du_rnn = CNNFC(NN_size, 3)
-        self.fc_du_cov_rnn = nn.Sequential(CNNFC(NN_size, 6),
-                                       Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+        self.fc_du_cov_rnn = nn.Sequential(CNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
 
         self.fc_dw_rnn = CNNFC(NN_size, 3)
-        self.fc_dw_cov_rnn = nn.Sequential(CNNFC(NN_size, 6),
-                                           Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+        self.fc_dw_cov_rnn = nn.Sequential(CNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
 
         self.proc_dw_gt = nn.Sequential(nn.Linear(3, 64),
                                         nn.PReLU(),
@@ -60,8 +55,7 @@ class Model_CNN_0(nn.Module):
 
         self.lstm = MyLSTM(NN_size+64, 2, NN_size)
 
-        self.fc_dtr_cov_rnn = nn.Sequential(CNNFC(NN_size, 6),
-                                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+        self.fc_dtr_cov_rnn = nn.Sequential(CNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
 
 
 

@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-class CNNFC(torch.nn.Module):
+class CNNFC(nn.Module):
     def __init__(self, fc_input_size, fc_output_size):
         super().__init__()
         self.fc = nn.Sequential(nn.Linear(fc_input_size, 512),

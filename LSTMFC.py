@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
-class LSTMFC(torch.nn.Module):
+class LSTMFC(nn.Module):
     def __init__(self, LSTM_input_size, LSTM_num_layer, LSTM_hidden_size,
                  fc_output_size):
         super().__init__()
