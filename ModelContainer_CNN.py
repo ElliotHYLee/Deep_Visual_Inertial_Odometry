@@ -87,13 +87,16 @@ class ModelContainer_CNN():
             pr_dw, pr_dw_cov, \
             pr_dtr, pr_dtr_cov, \
             pr_du_rnn, pr_du_rnn_cov, \
-            pr_dw_rnn, pr_dw_rnn_cov = self.model(img0, img1, dw)
+            pr_dw_rnn, pr_dw_rnn_cov, \
+            pr_dtr_rnn, pr_dtr_rnn_cov = self.model(img0, img1, dw)
 
             batch_loss = self.loss(pr_du, du, pr_du_cov) + \
                          self.loss(pr_dw, dw, pr_dw_cov) + \
                          self.loss(pr_dtr, dtr, pr_dtr_cov) + \
                          self.loss(pr_du_rnn, du, pr_du_rnn_cov) + \
-                         self.loss(pr_dw_rnn, dw, pr_dw_rnn_cov)
+                         self.loss(pr_dw_rnn, dw, pr_dw_rnn_cov) + \
+                         self.loss(pr_dtr_rnn, dtr, pr_dtr_rnn_cov)
+
 
             epoch_loss += batch_loss.item()
 
@@ -129,6 +132,8 @@ class ModelContainer_CNN():
         data_loader = data_incoming if isValidation else DataLoader(dataset=data_incoming, batch_size=16, shuffle=False)
         du_list, dw_list, dtr_list, du_cov_list, dw_cov_list, dtr_cov_list = [], [], [], [], [], []
         du_rnn_list, du_cov_rnn_list, dw_rnn_list, dw_cov_rnn_list = [], [], [], []
+        dtr_rnn_list, dtr_cov_rnn_list = [], []
+
         loss = 0
         for batch_idx, (img0, img1, du, dw, dtr) in enumerate(data_loader):
             img0 = img0.to(self.device)
@@ -140,9 +145,10 @@ class ModelContainer_CNN():
             with torch.no_grad():
                 pr_du, pr_du_cov, \
                 pr_dw, pr_dw_cov, \
-                pr_dtr, pr_dtr_cov,\
+                pr_dtr, pr_dtr_cov, \
                 pr_du_rnn, pr_du_rnn_cov, \
-                pr_dw_rnn, pr_dw_rnn_cov = self.model(img0, img1, dw)
+                pr_dw_rnn, pr_dw_rnn_cov, \
+                pr_dtr_rnn, pr_dtr_rnn_cov = self.model(img0, img1, dw)
 
                 if not isValidation: #if test
                     du_list.append(pr_du.cpu().data.numpy())
@@ -155,13 +161,16 @@ class ModelContainer_CNN():
                     du_cov_rnn_list.append((pr_du_rnn_cov.cpu()).data.numpy())
                     dw_rnn_list.append((pr_dw_rnn.cpu()).data.numpy())
                     dw_cov_rnn_list.append((pr_dw_rnn_cov.cpu()).data.numpy())
+                    dtr_rnn_list.append((pr_dtr_rnn.cpu()).data.numpy())
+                    dtr_cov_rnn_list.append((pr_dtr_rnn_cov.cpu()).data.numpy())
 
                 if isTarget: # if test or validation with available ground truth
-                    batch_loss = self.loss(pr_du, du, pr_du_cov) +\
+                    batch_loss = self.loss(pr_du, du, pr_du_cov) + \
                                  self.loss(pr_dw, dw, pr_dw_cov) + \
                                  self.loss(pr_dtr, dtr, pr_dtr_cov) + \
                                  self.loss(pr_du_rnn, du, pr_du_rnn_cov) + \
-                                 self.loss(pr_dw_rnn, dw, pr_dw_rnn_cov)
+                                 self.loss(pr_dw_rnn, dw, pr_dw_rnn_cov) + \
+                                 self.loss(pr_dtr_rnn, dtr, pr_dtr_rnn_cov)
 
                     loss += batch_loss.item()
 
@@ -181,11 +190,15 @@ class ModelContainer_CNN():
             pr_dw_rnn = np.concatenate(dw_rnn_list, axis=0)
             pr_dw_cov_rnn = np.concatenate(dw_cov_rnn_list, axis=0)
 
+            pr_dtr_rnn = np.concatenate(dtr_rnn_list, axis=0)
+            pr_dtr_cov_rnn = np.concatenate(dtr_cov_rnn_list, axis=0)
+
             return pr_du, du_cov, \
                    pr_dw, dw_cov, \
                    pr_dtr, dtr_cov, \
                    pr_du_rnn, pr_du_cov_rnn, \
                    pr_dw_rnn, pr_dw_cov_rnn, \
+                   pr_dtr_rnn, pr_dtr_cov_rnn, \
                    mae
 
 if __name__ == '__main__':

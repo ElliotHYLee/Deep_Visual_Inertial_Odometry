@@ -13,7 +13,7 @@ def train(dsName, subType, seq):
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
     #mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=64, epochs=40, wName=wName, checkPointFreq=1)
+    mc.fit(train, val, batch_size=10, epochs=40, wName=wName, checkPointFreq=1)
 
 def test(dsName, subType, seqRange):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
@@ -31,6 +31,7 @@ def test(dsName, subType, seqRange):
         pr_dtr, dtr_cov, \
         pr_du_rnn, pr_du_cov_rnn, \
         pr_dw_rnn, pr_dw_cov_rnn, \
+        pr_dtr_rnn, pr_dtr_cov_rnn, \
         mae = mc.predict(dataset)
 
         np.savetxt(commName + '_du.txt', pr_du)
@@ -63,13 +64,13 @@ if __name__ == '__main__':
     dsName = 'airsim'
     seq = [0]
     seqRange = [0, 3]
-    runTrain(dsName, 'mr', seq, seqRange)
-    # runTrain(dsName, 'mrseg', seq, seqRange)
-    # runTrain(dsName, 'bar', seq, seqRange)
-    # runTrain(dsName, 'pin', seq, seqRange)
-    #
-    # dsName = 'euroc'
-    # runTrain(dsName, 'none', seq=[1,2,3,5], seqRange=[1, 6])
-    #
-    # dsName = 'kitti'
-    # runTrain(dsName, 'none', seq = [0,2,4,6], seqRange = [0, 11])
+    #runTrainTest(dsName, 'mr', seq, seqRange)
+    runTrainTest(dsName, 'mrseg', seq, seqRange)
+    runTrainTest(dsName, 'bar', seq, seqRange)
+    runTrainTest(dsName, 'pin', seq, seqRange)
+
+    dsName = 'euroc'
+    runTrainTest(dsName, 'none', seq=[1, 2, 3, 5], seqRange=[1, 6])
+
+    dsName = 'kitti'
+    runTrainTest(dsName, 'none', seq=[0, 2, 4, 6], seqRange=[0, 11])

@@ -25,6 +25,7 @@ class Model_CNN_0(nn.Module):
         sigmoidMax = np.sqrt(1)
         sigmoidInclination = 0.1
 
+        # CNNs
         # fc_du
         self.fc_du = CNNFC(NN_size, 3)
         self.fc_du_cov = nn.Sequential(CNNFC(NN_size, 6),
@@ -42,6 +43,7 @@ class Model_CNN_0(nn.Module):
 
         self.init_w()
 
+        # RNNs
         self.fc_du_rnn = CNNFC(NN_size, 3)
         self.fc_du_cov_rnn = nn.Sequential(CNNFC(NN_size, 6),
                                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
@@ -50,23 +52,18 @@ class Model_CNN_0(nn.Module):
         self.fc_dw_cov_rnn = nn.Sequential(CNNFC(NN_size, 6),
                                            Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
-        self.fc_dtr_cov_rnn = nn.Sequential(CNNFC(NN_size, 6),
-                                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
-
-        # self.lstm_du = LSTMFC(NN_size, 2, 64, 3)
-        # self.lstm_du_cov = nn.Sequential(LSTMFC(NN_size, 2, 64, 6),
-        #                             Sigmoid(a=sigmoidInclination, max=sigmoidMax))
-        #
-        # self.lstm_dw = LSTMFC(NN_size, 2, 64, 3)
-        # self.lstm_dw_cov = nn.Sequential(LSTMFC(NN_size, 2, 64, 6),
-        #                             Sigmoid(a=sigmoidInclination, max=sigmoidMax))
-
-        self.lstm = MyLSTM(NN_size+64, 2, NN_size)
         self.proc_dw_gt = nn.Sequential(nn.Linear(3, 64),
                                         nn.PReLU(),
                                         nn.BatchNorm1d(64),
                                         nn.Linear(64, 64),
                                         nn.PReLU())
+
+        self.lstm = MyLSTM(NN_size+64, 2, NN_size)
+
+        self.fc_dtr_cov_rnn = nn.Sequential(CNNFC(NN_size, 6),
+                                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+
+
 
 
     def init_hidden(self, batch_size=8):
@@ -106,13 +103,15 @@ class Model_CNN_0(nn.Module):
         # prep for RNN
         xSer = x.unsqueeze(0)
 
+        # process dw_gt for RNN
         dw_gt_proc = self.proc_dw_gt(dw_gt)
         dw_gtSer = dw_gt_proc.unsqueeze(0)
 
+        # LSTM
         lstm_input = torch.cat((xSer, dw_gtSer), dim=2)
-
         lstm_out = self.lstm(lstm_input)
         lstm_out = lstm_out.squeeze(0)
+        # LSTM processed batch is ready
 
         du_rnn = self.fc_du_rnn(lstm_out)
         du_rnn_cov = self.fc_du_cov_rnn(lstm_out)
@@ -127,7 +126,8 @@ class Model_CNN_0(nn.Module):
                dw_cnn, dw_cnn_cov, \
                dtr_cnn, dtr_cnn_cov,\
                du_rnn, du_rnn_cov, \
-               dw_rnn, dw_rnn_cov
+               dw_rnn, dw_rnn_cov, \
+               dtr_rnn, dtr_rnn_cov
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

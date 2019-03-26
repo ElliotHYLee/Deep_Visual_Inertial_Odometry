@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'kitti';
-subType = '';
-seq = 7;
+dsName = 'airsim';
+subType = 'mr';
+seq = 2;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
@@ -14,10 +14,10 @@ gt_dw = importdata(gt_dwName);
 
 %% Get Prediction Info.
 prPath = ['Data\',getPRPath(dsName, subType, seq)];
-pr_duName = strcat(prPath, '_du_rnn.txt')
-pr_dwName = strcat(prPath, '_dw.txt');
+pr_duName = strcat(prPath, '_du_rnn.txt');
+pr_dwName = strcat(prPath, '_dw_rnn.txt');
 pr_duCovName = strcat(prPath, '_du_cov_rnn.txt');
-pr_dwCovName = strcat(prPath, '_dw_cov.txt');
+pr_dwCovName = strcat(prPath, '_dw_cov_rnn.txt');
 
 pr_du = importdata(pr_duName);
 pr_dw = importdata(pr_dwName);
