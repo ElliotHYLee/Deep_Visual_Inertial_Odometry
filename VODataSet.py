@@ -13,6 +13,7 @@ class VODataSetManager_CNN():
 
         idx = np.arange(0, data.numTotalData, 1)
         N = data.numTotalData
+        #possibleN = N - delay
         if isTrain:
             #idx = shuffle(idx)
             valN = int(N * split)

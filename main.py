@@ -18,7 +18,7 @@ def train(dsName, subType, seq):
 def test(dsName, subType, seqRange):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
-    for seq in range(0,3):
+    for seq in range(seqRange[0],seqRange[1]):
         commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
         dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
         dataset = dm.testSet
@@ -61,13 +61,10 @@ if __name__ == '__main__':
     dsName = 'airsim'
     seq = [0]
     seqRange = [0, 3]
-    #runTrainTest(dsName, 'mr', seq, seqRange)
+    runTrainTest(dsName, 'mr', seq, seqRange)
     runTrainTest(dsName, 'mrseg', seq, seqRange)
     runTrainTest(dsName, 'bar', seq, seqRange)
     runTrainTest(dsName, 'pin', seq, seqRange)
 
-    dsName = 'euroc'
-    runTrainTest(dsName, 'none', seq=[1, 2, 3, 5], seqRange=[1, 6])
-
-    dsName = 'kitti'
-    runTrainTest(dsName, 'none', seq=[0, 2, 4, 6], seqRange=[0, 11])
+    runTrainTest('euroc', 'none', seq=[1, 2, 3, 5], seqRange=[1, 6])
+    runTrainTest('kitti', 'none', seq=[0, 2, 4, 6], seqRange=[0, 11])

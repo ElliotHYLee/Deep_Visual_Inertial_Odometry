@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'airsim';
-subType = 'mr';
-seq = 2;
+dsName = 'euroc';
+subType = '';
+seq = 5;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
@@ -147,7 +147,7 @@ err = abs(gt_du-pr_du);
 mae = mean(err)
 cov(err)
 
-figName = strcat('Figures\',getPRPath(dsName, subType, seq), '_results.png');
+figName = strcat('Figures\',getPRPath(dsName, subType, seq), '_results_rnn.png');
 saveas(fig, figName)
 
 function[pltIndex] = mysubplot(gt, pr, index)
