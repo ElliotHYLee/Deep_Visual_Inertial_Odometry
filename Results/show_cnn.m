@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'kitti';
+dsName = 'euroc';
 subType = '';
-seq = 8;
+seq = 4;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
@@ -141,7 +141,6 @@ subplot(subPlotRow, subPlotCol, index)
 index = mysubplot2D(gt_pos(:,2), gt_pos(:,3), pr_pos(:,2), pr_pos(:,3), index);
 ylabel(['\fontsize{14} Position_y, m'])
 xlabel(['\fontsize{14} Position_z, m'])
-
 
 
 err = abs(gt_du-pr_du);
