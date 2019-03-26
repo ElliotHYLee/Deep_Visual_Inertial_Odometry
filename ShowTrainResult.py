@@ -16,11 +16,15 @@ def show(dsName, subType):
     val_line, =plt.plot(val_loss, 'b-o')
     plt.legend((train_line, val_line),('Train Loss', 'Validation Loss'))
     plt.title('Mahalanobis Distance')
+    plt.grid(b=True, which='major', color='#666666', linestyle='-')
+    plt.minorticks_on()
+    plt.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
+    plt.ylim(bottom=0)  # adjust the bottom leaving top unchanged
     plt.show()
 
 if __name__ == '__main__':
     dsName = 'airsim'
-    subType='mr'
+    subType='mrseg'
     show(dsName, subType)
 
 

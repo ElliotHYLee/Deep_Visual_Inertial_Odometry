@@ -45,9 +45,6 @@ def test(dsName, subType, seqRange):
         np.savetxt(commName + '_dw_rnn.txt', pr_dw_rnn)
         np.savetxt(commName + '_dw_cov_rnn.txt', pr_dw_cov_rnn)
 
-
-
-
 def runTrainTest(dsName, subType, seq, seqRange):
     runTrain(dsName, subType, seq, seqRange)
     runTest(dsName, subType, seq, seqRange)

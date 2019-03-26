@@ -57,9 +57,6 @@ class Model_CNN_0(nn.Module):
 
         self.fc_dtr_cov_rnn = nn.Sequential(CNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
 
-
-
-
     def init_hidden(self, batch_size=8):
         h_t = torch.zeros([self.num_layers * self.num, batch_size, self.hiddenSize], dtype=torch.float32)
         c_t = torch.zeros([self.num_layers * self.num, batch_size, self.hiddenSize], dtype=torch.float32)
@@ -105,8 +102,8 @@ class Model_CNN_0(nn.Module):
         lstm_input = torch.cat((xSer, dw_gtSer), dim=2)
         lstm_out = self.lstm(lstm_input)
         lstm_out = lstm_out.squeeze(0)
-        # LSTM processed batch is ready
 
+        # LSTM processed batch is ready
         du_rnn = self.fc_du_rnn(lstm_out)
         du_rnn_cov = self.fc_du_cov_rnn(lstm_out)
 
