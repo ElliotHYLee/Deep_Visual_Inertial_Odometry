@@ -7,21 +7,21 @@ import numpy as np
 import time
 from git_branch_param import *
 
-dsName = 'euroc'
-subType= 'none'
+dsName = 'airsim'
+subType= 'mr'
 
 wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
 resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
 
 def train():
-    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[0,2,4,6], isTrain=True)
+    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[0], isTrain=True)
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
     #mc.load_weights(wName, train=True)
     mc.fit(train, val, batch_size=10, epochs=40, wName=wName, checkPointFreq=1)
 
 def test():
-    for seq in range(10,11):
+    for seq in range(0,3):
         commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
         dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
         dataset = dm.testSet
@@ -49,7 +49,7 @@ def test():
 
 
 if __name__ == '__main__':
-    # s = time.time()
-    # train()
-    # print(time.time() - s)
+    s = time.time()
+    train()
+    print(time.time() - s)
     test()

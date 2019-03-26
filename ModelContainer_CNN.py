@@ -87,7 +87,7 @@ class ModelContainer_CNN():
             pr_dw, pr_dw_cov, \
             pr_dtr, pr_dtr_cov, \
             pr_du_rnn, pr_du_rnn_cov, \
-            pr_dw_rnn, pr_dw_rnn_cov = self.model(img0, img1)
+            pr_dw_rnn, pr_dw_rnn_cov = self.model(img0, img1, dw)
 
             batch_loss = self.loss(pr_du, du, pr_du_cov) + \
                          self.loss(pr_dw, dw, pr_dw_cov) + \
@@ -142,7 +142,7 @@ class ModelContainer_CNN():
                 pr_dw, pr_dw_cov, \
                 pr_dtr, pr_dtr_cov,\
                 pr_du_rnn, pr_du_rnn_cov, \
-                pr_dw_rnn, pr_dw_rnn_cov = self.model(img0, img1)
+                pr_dw_rnn, pr_dw_rnn_cov = self.model(img0, img1, dw)
 
                 if not isValidation: #if test
                     du_list.append(pr_du.cpu().data.numpy())
