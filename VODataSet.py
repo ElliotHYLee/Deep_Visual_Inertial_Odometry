@@ -9,7 +9,7 @@ class VODataSetManager_CNN():
     def __init__(self, dsName='airsim', subType='mr', seq=[0], isTrain=True, split=0.2):
         data = DataManager()
         data.initHelper(dsName, subType, seq)
-        data.standardizeImgs(isTrain)
+        #data.standardizeImgs(isTrain)
 
         idx = np.arange(0, data.numTotalData, 1)
         N = data.numTotalData
@@ -33,7 +33,7 @@ class VODataSet_CNN(Dataset):
     def __getitem__(self, i):
         index = self.idxList[i]
         try:
-            return self.dm.imgs[index], self.dm.imgs[index+1], self.dm.du[index], self.dm.dw[index], self.dm.dtrans[index]
+            return self.dm.imgs[index], self.dm.imgs[index+1], self.dm.du[index], self.dm.dw[index], self.dm.dtr[index]
         except:
             print('this is an error @ VODataSet_CNN of VODataSet.py')
             print(self.dm.imgs.shape)
@@ -41,7 +41,6 @@ class VODataSet_CNN(Dataset):
 
     def __len__(self):
         return self.N
-
 
 if __name__ == '__main__':
     start = time.time()
