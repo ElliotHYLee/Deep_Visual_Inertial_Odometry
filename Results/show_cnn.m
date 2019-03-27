@@ -1,29 +1,73 @@
 clc, clear, close all
-dsName = 'euroc';
-subType = '';
-seq = 4;
+dsName = 'airsim';
+subType = 'mrseg';
+seq = 2;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
 gt_dtName = strcat(gtPath, 'dt.txt');
 gt_duName = strcat(gtPath, '\du.txt');
 gt_dwName = strcat(gtPath, '\dw.txt');
+gt_dtr_gndName = strcat(gtPath, '\dtrans_gnd.txt');
+
 dt = importdata(gt_dtName);
 gt_du = importdata(gt_duName);
 gt_dw = importdata(gt_dwName);
-
+gt_dtr_gnd  = importdata(gt_dtr_gndName);
 
 %% Get Prediction Info.
 prPath = ['Data\',getPRPath(dsName, subType, seq)];
 pr_duName = strcat(prPath, '_du.txt');
 pr_dwName = strcat(prPath, '_dw.txt');
+pr_dtr_gndName = strcat(prPath, '_dtr_gnd.txt');
 pr_duCovName = strcat(prPath, '_du_cov.txt');
 pr_dwCovName = strcat(prPath, '_dw_cov.txt');
+pr_dtr_gnd_covName = strcat(prPath, '_dtr_gnd_cov.txt');
 
 pr_du = importdata(pr_duName);
 pr_dw = importdata(pr_dwName);
+pr_dtr_gnd = importdata(pr_dtr_gndName);
 pr_du_cov = importdata(pr_duCovName);
 pr_dw_cov = importdata(pr_dwCovName);
+pr_dtr_gnd_cov = importdata(pr_dtr_gnd_covName);
+
+err_dtr_gnd = gt_dtr_gnd- pr_dtr_gnd;
+figure
+subplot(4,3,1)
+plot(err_dtr_gnd(:,1))
+grid on 
+grid minor
+
+subplot(4,3,2)
+plot(err_dtr_gnd(:,2))
+grid on 
+grid minor
+
+subplot(4,3,3)
+plot(err_dtr_gnd(:,3))
+grid on 
+grid minor
+
+[dtr_gnd_Q, dtr_gnd_cov3] = getCov(pr_du_cov);
+dtr_gnd_std3 = sqrt(dtr_gnd_cov3);
+
+subplot(4,3,4)
+plot(dtr_gnd_std3(:,1))
+grid on 
+grid minor
+
+subplot(4,3,5)
+plot(dtr_gnd_std3(:,2))
+grid on 
+grid minor
+
+subplot(4,3,6)
+plot(dtr_gnd_std3(:,3))
+grid on 
+grid minor
+
+
+
 N = length(pr_du);
 [du_Q, du_cov3] = getCov(pr_du_cov);
 [dw_Q, dw_cov3] = getCov(pr_dw_cov);

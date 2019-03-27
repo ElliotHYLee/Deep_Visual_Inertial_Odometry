@@ -3,7 +3,7 @@ import numpy as np
 from MyPyTorchAPI.CustomActivation import *
 from SE3Layer import GetTrans
 from CNNFC import CNNFC
-from MyPyTorchAPI.MatOp import Batch33MatVec3Mul
+from MyPyTorchAPI.MatOp import Batch33MatVec3Mul, GetCovMatFromChol
 
 class Model_CNN_0(nn.Module):
     def __init__(self, dsName='airsim'):
@@ -51,6 +51,7 @@ class Model_CNN_0(nn.Module):
 
         # fc_dtr_gnd
         self.fc_dtr_gnd = Batch33MatVec3Mul()
+        self.getQ = GetCovMatFromChol()
         self.fc_dtr_gnd_cov = nn.Sequential(
                         CNNFC(NN_size, 6),
                         Sigmoid(a=sigmoidInclination, max=sigmoidMax))
@@ -82,13 +83,12 @@ class Model_CNN_0(nn.Module):
         pr_dtr_cov = self.fc_dtr_cov(x)
 
         pr_dtr_gnd = self.fc_dtr_gnd(rotM, pr_dtr)
-        pr_dtr_gnd_cov = self.fc_dtr_gnd_cov(x)
 
 
         return pr_du, pr_du_cov, \
                pr_dw, pr_dw_cov, \
                pr_dtr, pr_dtr_cov, \
-               pr_dtr_gnd, pr_dtr_gnd_cov
+               pr_dtr_gnd
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

@@ -54,8 +54,8 @@ if __name__ == '__main__':
     seqRange = [0, 3]
     runTrain(dsName, 'mr', seq, seqRange)
     runTrain(dsName, 'mrseg', seq, seqRange)
-    runTrain(dsName, 'bar', seq, seqRange)
-    runTrain(dsName, 'pin', seq, seqRange)
+    # runTrain(dsName, 'bar', seq, seqRange)
+    # runTrain(dsName, 'pin', seq, seqRange)
 
     dsName = 'euroc'
     runTrain(dsName, 'none', seq=[1,2,3,5], seqRange=[1, 6])
