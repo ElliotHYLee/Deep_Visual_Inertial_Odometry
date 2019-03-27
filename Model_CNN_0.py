@@ -17,6 +17,8 @@ class Model_CNN_0(nn.Module):
             Conv2DBlock(1024, 6, kernel=3, stride=2, padding=1, atvn='prlu', bn = True, dropout=True),]
         )
         self.encoder = seq1.block
+        self.init_w()
+
         NN_size = int(seq1.flattend_size)
         sigmoidMax = np.sqrt(1)
         sigmoidInclination = 0.1
@@ -45,7 +47,9 @@ class Model_CNN_0(nn.Module):
                         CNNFC(NN_size, 6),
                         Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
-        self.init_w()
+
+
+
 
 
 
@@ -61,7 +65,7 @@ class Model_CNN_0(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-    def forward(self, x1, x2, dw_gt):
+    def forward(self, x1, x2, dw_gt, rotM):
         input = torch.cat((x1, x2), 1)
         x = self.encoder(input)
         x = x.view(x.size(0), -1)
@@ -72,6 +76,10 @@ class Model_CNN_0(nn.Module):
         dw_cov = self.fc_dw_cov(x)
         dtr = self.fc_dtr(du, dw_gt)
         dtr_cov = self.fc_dtr_cov(x)
+
+
+
+
         return du, du_cov, dw, dw_cov, dtr, dtr_cov
 
 if __name__ == '__main__':

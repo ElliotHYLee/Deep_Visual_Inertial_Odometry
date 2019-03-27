@@ -33,7 +33,8 @@ class VODataSet_CNN(Dataset):
     def __getitem__(self, i):
         index = self.idxList[i]
         try:
-            return self.dm.imgs[index], self.dm.imgs[index+1], self.dm.du[index], self.dm.dw[index], self.dm.dtr[index]
+            return self.dm.imgs[index], self.dm.imgs[index+1], self.dm.du[index], self.dm.dw[index], self.dm.dtr[index], \
+                   self.dm.dtr_gnd[index], self.dm.rotM_bdy2gnd[index]
         except:
             print('this is an error @ VODataSet_CNN of VODataSet.py')
             print(self.dm.imgs.shape)
