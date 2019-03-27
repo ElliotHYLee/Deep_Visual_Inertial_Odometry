@@ -27,12 +27,12 @@ class ReadData():
         self.pos_gnd = pd.read_csv(self.path + 'pos.txt', sep=',', header=None).values.astype(np.float32)
         self.acc_gnd = pd.read_csv(self.path + 'acc_gnd.txt', sep=',', header=None).values.astype(np.float32)
 
-        print(self.dt.shape)
-        print(self.dtr.shape)
-        print(self.dtr_gnd.shape)
-        print(self.acc_gnd.shape)
-        print(self.pos_gnd.shape)
-        print(self.rotM_bdy2gnd.shape)
+        # print(self.dt.shape)
+        # print(self.dtr.shape)
+        # print(self.dtr_gnd.shape)
+        # print(self.acc_gnd.shape)
+        # print(self.pos_gnd.shape)
+        # print(self.rotM_bdy2gnd.shape)
 
         # images
         self.imgNames = getImgNames(self.path, dsName, ts = self.time_stamp, subType=subType)
