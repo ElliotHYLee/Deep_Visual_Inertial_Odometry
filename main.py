@@ -29,6 +29,7 @@ def test(dsName, subType, seqRange):
         pr_du, du_cov, \
         pr_dw, dw_cov, \
         pr_dtr, dtr_cov, \
+        pr_dtr_gnd, dtr_gnd_cov, \
         mae = mc.predict(dataset)
 
         np.savetxt(commName + '_du.txt', pr_du)
@@ -37,6 +38,8 @@ def test(dsName, subType, seqRange):
         np.savetxt(commName + '_dw_cov.txt', dw_cov)
         np.savetxt(commName + '_dtr.txt', pr_dtr)
         np.savetxt(commName + '_dtr_cov.txt', dtr_cov)
+        np.savetxt(commName + '_dtr_gnd.txt', pr_dtr)
+        np.savetxt(commName + '_dtr_gnd_cov.txt', dtr_cov)
 
 
 def runTrain(dsName, subType, seq, seqRange):

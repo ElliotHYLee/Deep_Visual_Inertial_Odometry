@@ -3,6 +3,8 @@ import numpy as np
 from MyPyTorchAPI.CustomActivation import *
 from SE3Layer import GetTrans
 from CNNFC import CNNFC
+from MyPyTorchAPI.MatOp import Batch33MatVec3Mul
+
 class Model_CNN_0(nn.Module):
     def __init__(self, dsName='airsim'):
         super(Model_CNN_0, self).__init__()
@@ -47,11 +49,10 @@ class Model_CNN_0(nn.Module):
                         CNNFC(NN_size, 6),
                         Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
-
-
-
-
-
+        self.fc_dtr_gnd = Batch33MatVec3Mul()
+        self.fc_dtr_gnd_cov = nn.Sequential(
+                        CNNFC(NN_size, 6),
+                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
     def init_w(self):
         for m in self.modules():
@@ -69,18 +70,24 @@ class Model_CNN_0(nn.Module):
         input = torch.cat((x1, x2), 1)
         x = self.encoder(input)
         x = x.view(x.size(0), -1)
-        du = self.fc_du(x)
-        dw = self.fc_dw(x)
 
-        du_cov = self.fc_du_cov(x)
-        dw_cov = self.fc_dw_cov(x)
-        dtr = self.fc_dtr(du, dw_gt)
-        dtr_cov = self.fc_dtr_cov(x)
+        pr_du = self.fc_du(x)
+        pr_du_cov = self.fc_du_cov(x)
+
+        pr_dw = self.fc_dw(x)
+        pr_dw_cov = self.fc_dw_cov(x)
+
+        pr_dtr = self.fc_dtr(pr_du, dw_gt)
+        pr_dtr_cov = self.fc_dtr_cov(x)
+
+        pr_dtr_gnd = self.fc_dtr_gnd(rotM, pr_dtr)
+        pr_dtr_gnd_cov = self.fc_dtr_gnd_cov(x)
 
 
-
-
-        return du, du_cov, dw, dw_cov, dtr, dtr_cov
+        return pr_du, pr_du_cov, \
+               pr_dw, pr_dw_cov, \
+               pr_dtr, pr_dtr_cov, \
+               pr_dtr_gnd, pr_dtr_gnd_cov
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
