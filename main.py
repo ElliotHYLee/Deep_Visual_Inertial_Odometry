@@ -1,4 +1,4 @@
-from VODataSet import VODataSetManager_CNN
+from VODataSet import VODataSetManager_RCNN
 import matplotlib.pyplot as plt
 from Model_CNN_0 import Model_CNN_0
 
@@ -9,18 +9,18 @@ from git_branch_param import *
 
 def train(dsName, subType, seq):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
-    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=seq, isTrain=True)
+    dm = VODataSetManager_RCNN(dsName=dsName, subType=subType, seq=seq, isTrain=True)
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
     #mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=20, epochs=40, wName=wName, checkPointFreq=1)
+    mc.fit(train, val, batch_size=2, epochs=40, wName=wName, checkPointFreq=1)
 
 def test(dsName, subType, seqRange):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
     for seq in range(seqRange[0],seqRange[1]):
         commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
-        dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
+        dm = VODataSetManager_RCNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
         dataset = dm.testSet
 
         mc = ModelContainer_CNN(Model_CNN_0(dsName))

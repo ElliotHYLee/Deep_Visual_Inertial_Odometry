@@ -11,7 +11,7 @@ class ModelContainer_CNN():
     def __init__(self, net_model):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         print(torch.cuda.device)
-        self.model = nn.DataParallel(net_model, device_ids=[0]).to(self.device)
+        self.model = nn.DataParallel(net_model, device_ids=[0,1]).to(self.device)
         self.compile()
         self.train_loss = []
         self.val_loss = []
