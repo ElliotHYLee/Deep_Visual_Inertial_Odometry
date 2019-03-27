@@ -9,7 +9,7 @@ class VODataSetManager_CNN():
     def __init__(self, dsName='airsim', subType='mr', seq=[0], isTrain=True, split=0.2):
         data = DataManager()
         data.initHelper(dsName, subType, seq)
-        #data.standardizeImgs(isTrain)
+        data.standardizeImgs(isTrain)
 
         idx = np.arange(0, data.numTotalData, 1)
         N = data.numTotalData

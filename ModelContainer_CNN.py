@@ -93,8 +93,8 @@ class ModelContainer_CNN():
 
             batch_loss = self.loss(pr_du, du, pr_du_cov) + \
                          self.loss(pr_dw, dw, pr_dw_cov) + \
-                         self.loss(pr_dtr, dtr, pr_dtr_cov)+ \
-                         self.loss(pr_dtr_gnd, dtr_gnd, pr_dtr_gnd_cov)
+                         self.loss(pr_dtr, dtr, pr_dtr_cov) #+ \
+                         #self.loss(pr_dtr_gnd, dtr_gnd, pr_dtr_gnd_cov)
 
             epoch_loss += batch_loss.item()
 
@@ -159,8 +159,8 @@ class ModelContainer_CNN():
                 if isTarget:
                     batch_loss = self.loss(pr_du, du, pr_du_cov) + \
                                  self.loss(pr_dw, dw, pr_dw_cov) + \
-                                 self.loss(pr_dtr, dtr, pr_dtr_cov)+ \
-                                 self.loss(pr_dtr_gnd, dtr_gnd, pr_dtr_gnd_cov)
+                                 self.loss(pr_dtr, dtr, pr_dtr_cov) #+ \
+                                 #self.loss(pr_dtr_gnd, dtr_gnd, pr_dtr_gnd_cov)
 
 
                     loss += batch_loss.item()
