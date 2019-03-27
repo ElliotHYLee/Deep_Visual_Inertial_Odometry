@@ -49,6 +49,7 @@ class Model_CNN_0(nn.Module):
                         CNNFC(NN_size, 6),
                         Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
+        # fc_dtr_gnd
         self.fc_dtr_gnd = Batch33MatVec3Mul()
         self.fc_dtr_gnd_cov = nn.Sequential(
                         CNNFC(NN_size, 6),
@@ -96,5 +97,4 @@ if __name__ == '__main__':
     img2 = img1
     du, dw, dtr, du_cov, dw_cov, dtr_cov = m.forward(img1, img2)
     # print(m)
-
 

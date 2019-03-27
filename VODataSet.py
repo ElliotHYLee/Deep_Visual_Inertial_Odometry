@@ -33,7 +33,7 @@ class VODataSet_CNN(Dataset):
     def __getitem__(self, i):
         index = self.idxList[i]
         try:
-            return self.dm.imgs[index], self.dm.imgs[index+1], self.dm.du[index], self.dm.dw[index], self.dm.dtr[index], \
+            return self.dm.imgs[index], self.dm.imgs[index+1], self.dm.du[index], self.dm.dw[index], self.dm.dtrans[index],\
                    self.dm.dtr_gnd[index], self.dm.rotM_bdy2gnd[index]
         except:
             print('this is an error @ VODataSet_CNN of VODataSet.py')
@@ -42,6 +42,7 @@ class VODataSet_CNN(Dataset):
 
     def __len__(self):
         return self.N
+
 
 if __name__ == '__main__':
     start = time.time()
@@ -66,6 +67,3 @@ if __name__ == '__main__':
             cv2.imshow('img1', img_t1)
             cv2.imshow('imgcon', imgcon)
             cv2.waitKey(1)
-
-
-

@@ -38,8 +38,8 @@ def test(dsName, subType, seqRange):
         np.savetxt(commName + '_dw_cov.txt', dw_cov)
         np.savetxt(commName + '_dtr.txt', pr_dtr)
         np.savetxt(commName + '_dtr_cov.txt', dtr_cov)
-        np.savetxt(commName + '_dtr_gnd.txt', pr_dtr)
-        np.savetxt(commName + '_dtr_gnd_cov.txt', dtr_cov)
+        np.savetxt(commName + '_dtr_gnd.txt', pr_dtr_gnd)
+        np.savetxt(commName + '_dtr_gnd_cov.txt', dtr_gnd_cov)
 
 
 def runTrain(dsName, subType, seq, seqRange):
@@ -52,17 +52,17 @@ if __name__ == '__main__':
     dsName = 'airsim'
     seq = [0]
     seqRange = [0, 3]
-    #runTrain(dsName, 'mr', seq, seqRange)
+    runTrain(dsName, 'mr', seq, seqRange)
     runTrain(dsName, 'mrseg', seq, seqRange)
-    #runTrain(dsName, 'bar', seq, seqRange)
-    #runTrain(dsName, 'pin', seq, seqRange)
+    runTrain(dsName, 'bar', seq, seqRange)
+    runTrain(dsName, 'pin', seq, seqRange)
 
-    # dsName = 'euroc'
-    # runTrain(dsName, 'none', seq=[1,2,3,5], seqRange=[1, 6])
-    #
-    # dsName = 'kitti'
-    # runTrain(dsName, 'none', seq = [0,2,4,6], seqRange = [0, 11])
-    #
+    dsName = 'euroc'
+    runTrain(dsName, 'none', seq=[1,2,3,5], seqRange=[1, 6])
+
+    dsName = 'kitti'
+    runTrain(dsName, 'none', seq = [0,2,4,6], seqRange = [0, 11])
+
 
 
 
