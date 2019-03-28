@@ -28,6 +28,11 @@ class ReadData():
         self.pos_gnd = pd.read_csv(self.path + 'pos.txt', sep=',', header=None).values.astype(np.float32)
         self.acc_gnd = pd.read_csv(self.path + 'acc_gnd.txt', sep=',', header=None).values.astype(np.float32)
 
+        print(self.dtr_gnd.shape)
+        print(self.acc_gnd.shape)
+        print(self.du.shape)
+
+
         # images
         self.imgNames = getImgNames(self.path, dsName, ts = self.time_stamp, subType=subType)
         #print(self.imgNames)

@@ -1,7 +1,7 @@
 clc, clear, close all
 dsName = 'kitti';
 subType = '';
-seq = 7;
+seq = 5;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
@@ -20,7 +20,7 @@ gt_dtr  = importdata(gt_dtrName);
 gt_dtr_gnd  = importdata(gt_dtr_gndName);
 linR = importdata(linRName);
 gt_pos = importdata(gt_posName);
-
+gt_pos = gt_pos - gt_pos(1,:);
 %% Get Prediction Info.
 prPath = ['Data\',getPRPath(dsName, subType, seq)];
 pr_duName = strcat(prPath, '_du.txt');
@@ -61,35 +61,65 @@ H = eye(3);
 P{1} = eye(3)*10^-5;
 R = eye(3)*10
 for i=1:1:N
-%     pos(i+1,:) = pos(i,:) + pr_dtr_gnd(i,:);
-%     P{i+1} = A*P{i}*A' + dtr_Q_gnd{i};
+    pos(i+1,:) = pos(i,:) + pr_dtr_gnd(i,:);
+    P{i+1} = A*P{i}*A' + dtr_Q_gnd{i};
 
-    pos(i+1,:) = A*pos(i,:)';
-    pp = A*P{i}*A' + R;
-    mCov = dtr_Q_gnd{i}
-    K = pp*H'*inv(H*pp*H'+mCov)
-    z = pos(i,:)' + pr_dtr_gnd(i,:)';
-    pos(i+1,:) = (pos(i,:)' + K*(z-H*pos(i,:)'))';
-    P{i+1} = pp - K*H*pp;
+%     pos(i+1,:) = A*pos(i,:)';
+%     pp = A*P{i}*A' + R;
+%     mCov = dtr_Q_gnd{i}
+%     K = pp*H'*inv(H*pp*H'+mCov)
+%     z = pos(i,:)' + pr_dtr_gnd(i,:)';
+%     pos(i+1,:) = (pos(i,:)' + K*(z-H*pos(i,:)'))';
+%     P{i+1} = pp - K*H*pp;
 end
-
-% figure
-% plot(pr_dtr_gnd)
 
 pos_int = cumtrapz(pr_dtr_gnd);
 
-figure
-plot(gt_pos(:,1), gt_pos(:,2), 'r')
-hold on
-plot(pos(:,1), pos(:,2),'b')
-plot(pos_int(:,1), pos_int(:,2),'g')
-for i=1:10:1000
-   [x,y] = getELPS(P{i});
-   x = x + pos(i,1);
-   y = y + pos(i,2);
-   plot(x,y, 'b')
+if strcmp(dsName,'kitti') 
+    f = N
+    figure
+    plot(gt_pos(1:f,1), gt_pos(1:f,3), 'r')
+    hold on
+    plot(pos(1:f,1), pos(1:f,3),'b')
+    plot(pos_int(1:f,1), pos_int(1:f,3),'g')
+    for i=1:100:f
+       Q = P{i};
+       [x,y] = getELPS(Q([1,3],[1,3]), 9);
+       x = x + pos(i,1);
+       y = y + pos(i,3);
+       plot(x,y, 'b')
+    end
+    
+elseif strcmp(dsName,'euroc')
+    f = 1500
+    figure
+    plot(gt_pos(1:f,2), gt_pos(1:f,1), 'r')
+    hold on
+    plot(pos(1:f,2), pos(1:f,1),'b')
+    plot(pos_int(1:f,2), pos_int(1:f,1),'g')
+    for i=1:50:f
+       [x,y] = getELPS(Q([1,2],[1,2]), 1);
+       x = x + pos(i,1);
+       y = y + pos(i,2);
+       plot(y,x, 'b')
+    end
+    
+else
+    f = N
+    figure
+    plot(gt_pos(1:f,2), gt_pos(1:f,1), 'r')
+    hold on
+    plot(pos(1:f,2), pos(1:f,1),'b')
+    plot(pos_int(1:f,2), pos_int(1:f,1),'g')
+    for i=1:50:f
+        Q = P{i};
+       [x,y] = getELPS(Q([1,2],[1,2]), 0.1);
+       x = x + pos(i,1);
+       y = y + pos(i,2);
+       plot(y,x, 'b')
+    end
+    
 end
-
 axis equal
 
 
@@ -114,10 +144,7 @@ dPos_std = sqrt(posCov3);
 % plot(dtr_gnd_std3(:,3), 'b.')
 % % ylim([0 1])
 
-function[x,y] = getELPS(Q)
-Q = Q(1:2,1:2);
-
-
+function[x,y] = getELPS(Q, s)
 [vec, val] = eig(Q);
 val = diag(val);
 [v, idx] = max(val);
@@ -126,17 +153,16 @@ angle = atan(V(2)/V(1));
 yaw = angle;
 yaw*180/pi
 
-
-s = 9.2;
-
 a = 2*sqrt(val(1)*s);
 b = 2*sqrt(val(2)*s);
+
+amp = max([a,b]);
 
 
 t = linspace(0,2*pi,1000);
 theta0 = yaw;
-x = b*sin(t+theta0);
-y = b*cos(t);
+x = amp*sin(t+theta0);
+y = amp*cos(t);
 end
 
 
