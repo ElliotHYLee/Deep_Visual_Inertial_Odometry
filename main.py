@@ -29,7 +29,7 @@ def test(dsName, subType, seqRange):
         pr_du, du_cov, \
         pr_dw, dw_cov, \
         pr_dtr, dtr_cov, \
-        pr_dtr_gnd, dtr_gnd_cov, \
+        pr_dtr_gnd, \
         mae = mc.predict(dataset)
 
         np.savetxt(commName + '_du.txt', pr_du)
@@ -39,42 +39,30 @@ def test(dsName, subType, seqRange):
         np.savetxt(commName + '_dtr.txt', pr_dtr)
         np.savetxt(commName + '_dtr_cov.txt', dtr_cov)
         np.savetxt(commName + '_dtr_gnd.txt', pr_dtr_gnd)
-        np.savetxt(commName + '_dtr_gnd_cov.txt', dtr_gnd_cov)
 
+def runTrainTest(dsName, subType, seq, seqRange):
+    runTrain(dsName, subType, seq, seqRange)
+    runTest(dsName, subType, seq, seqRange)
 
 def runTrain(dsName, subType, seq, seqRange):
     s = time.time()
     train(dsName, subType, seq)
     print(time.time() - s)
+
+def runTest(dsName, subType, seq, seqRange):
     test(dsName, subType, seqRange)
 
 if __name__ == '__main__':
     dsName = 'airsim'
     seq = [0]
     seqRange = [0, 3]
-    runTrain(dsName, 'mr', seq, seqRange)
-    runTrain(dsName, 'mrseg', seq, seqRange)
-    # runTrain(dsName, 'bar', seq, seqRange)
-    # runTrain(dsName, 'pin', seq, seqRange)
+    runTrainTest(dsName, 'mr', seq, seqRange)
+    runTrainTest(dsName, 'mrseg', seq, seqRange)
+    runTrainTest(dsName, 'bar', seq, seqRange)
+    runTrainTest(dsName, 'pin', seq, seqRange)
 
-    dsName = 'euroc'
-    runTrain(dsName, 'none', seq=[1,2,3,5], seqRange=[1, 6])
-
-    dsName = 'kitti'
-    runTrain(dsName, 'none', seq = [0,2,4,6], seqRange = [0, 11])
-
-
-
-
-
-
-
-
-
-
-
-
-
+    runTrainTest('euroc', 'none', seq=[1, 2, 5, 3], seqRange=[1, 6])
+    runTrainTest('kitti', 'none', seq=[0, 2, 4, 6], seqRange=[0, 11])
 
 
 

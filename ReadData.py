@@ -69,7 +69,7 @@ class ReadData():
 
 if __name__ == '__main__':
     s = time.time()
-    d = ReadData(dsName='airsim', subType='mr', seq=1)
+    d = ReadData(dsName='kitti', subType='none', seq=5)
     print(time.time() - s)
 
     for i in range(0, d.numImgs):
