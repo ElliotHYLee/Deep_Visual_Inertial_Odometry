@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from sys import platform
+from git_branch_param import *
 # this is a mess. Hope I could fix it sometime.
 def getPath(dsName='Airsim', seq=0, subType='mr'):
     if platform == "linux" or platform == "linux2":
@@ -70,12 +71,11 @@ def getEnd(start, N, totalN):
         N = end-start
     return end, N
 
-# def saveSeriesData(seq, index, name, data):
-#     fName='F:Airsim/mr' + str(seq) + '/series/series_' + name + '_'+str(index)
-#     #fName='Data/airsim/mr' + str(seq) + '/series_' + name + '_'+str(index)
-#     print('saving: '+fName)
-#     np.save(fName, data)
-#     print('done saving: ' +fName)
+def getPrPath(dsName, seq, subType):
+    resName = 'Results/Data/' + refBranchName() + '_' + dsName + '_'
+    path = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
+    return path
+
 
 class ThreadManager():
     def __init__(self, maxN=2):
