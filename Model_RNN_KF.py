@@ -10,18 +10,21 @@ class Model_RNN_KF(nn.Module):
     def __init__(self, dsName='airsim', delay=10):
         super(Model_RNN_KF, self).__init__()
 
-        self.acc_pattern = LSTM(3, 1, 100)
+        self.acc_pattern = LSTM(3, 1, 200)
         self.cnn_pattern = LSTM(3, 1, 200)
         self.vel_lstm = LSTM(3, 1, 200)
 
-        self.fc0 = nn.Sequential(nn.Linear(100, 100), nn.PReLU(),
-                                 nn.Linear(100, 3))
+        self.fc0 = nn.Sequential(nn.Linear(400, 200), nn.PReLU(),
+                                 nn.Linear(200, 3))
 
         self.fc1 = nn.Sequential(nn.Linear(400, 200), nn.PReLU(),
                                  nn.Linear(200, 3))
 
         self.fc2 = nn.Sequential(nn.Linear(400, 200), nn.PReLU(),
                                  nn.Linear(200, 3))
+
+        self.sig0 = Sigmoid(0.1, 10)
+        self.sig1 = Sigmoid(0.1, 10)
 
     def initVelImu(self):
         pass
@@ -33,13 +36,15 @@ class Model_RNN_KF(nn.Module):
         # print(gt_dtr_gnd_init.shape)
         #vel_imu = torch.add(vel_imu, gt_dtr_gnd_init)
 
-        # vel_imu = self.acc_pattern(vel_imu)
-        # vel_imu = self.fc0(vel_imu)
+        vel_imu_bais = self.acc_pattern(vel_imu)
+        vel_imu_bais = self.fc0(vel_imu_bais)
+        vel_imu = vel_imu - vel_imu_bais
 
-        # vel_cnn = self.cnn_pattern(pr_dtr_gnd)
-        # vel_cnn = self.fc1(vel_cnn)
+        vel_cnn_err = self.cnn_pattern(pr_dtr_gnd)
+        vel_cnn_err = self.fc1(vel_cnn_err)
+        vel_cnn = pr_dtr_gnd - vel_cnn_err
 
-        vel = vel_imu + pr_dtr_gnd
+        vel = vel_imu + vel_cnn
         vel = self.vel_lstm(vel)
         vel = self.fc2(vel)
         # vel_cnn = self.cnn_pattern(pr_dtr_gnd)
@@ -51,7 +56,7 @@ class Model_RNN_KF(nn.Module):
         #vel_input = vel_imu + vel_cnn
         #corr_vel = self.vel_lstm(vel_input)
 
-        return None, vel
+        return vel_imu, vel_cnn, vel, vel_imu_bais
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

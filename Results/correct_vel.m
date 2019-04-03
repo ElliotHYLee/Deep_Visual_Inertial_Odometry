@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'kitti';
+dsName = 'euroc';
 subType = '';
-seq = 5;
+seq = 4;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
@@ -72,7 +72,7 @@ velKF = [0 0 0];
 A = eye(3);
 H = eye(3);
 P{1} = eye(3)*10^-10;
-R = [1 0 0; 0 1 0; 0 0 1]*10^-2
+R = [1 0 0; 0 1 0; 0 0 1]*10^-4
 for i=1:1:N
     velKF(i+1,:) = A*velKF(i,:)' + 0.5*dt(i)*acc_gnd(i,:)';
     pp = A*P{i}*A' + R;
@@ -260,6 +260,10 @@ figure
 hold on
 plot(gt_pos(:,1), gt_pos(:,3), 'ro')
 plot(pos_intKF(:,1), pos_intKF(:,3), 'b.')
+
+
+dlmwrite('../velKF.txt', velKF)
+
 
 function[pltIndex] = mysubplot(gt, pr, index)
     hold on

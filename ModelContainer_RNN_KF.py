@@ -85,9 +85,9 @@ class ModelContainer_RNN_KF():
             gt_dtr_gnd_init = gt_dtr_gnd_init.to(self.device)
 
             # forward pass and calc loss
-            acc_cov, corr_vel = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
+            vel_imu, vel_cnn, corr_vel = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
 
-            batch_loss = self.loss(corr_vel, gt_dtr_gnd)
+            batch_loss = self.loss(corr_vel, gt_dtr_gnd) + self.loss(vel_imu, gt_dtr_gnd) + self.loss(vel_cnn, gt_dtr_gnd)
             epoch_loss += batch_loss.item()
 
             # update weights
@@ -132,14 +132,14 @@ class ModelContainer_RNN_KF():
             gt_dtr_gnd_init = gt_dtr_gnd_init.to(self.device)
 
             with torch.no_grad():
-                acc_cov, corr_vel = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
+                vel_imu, vel_cnn, corr_vel = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
 
                 if not isValidation:
-                    acc_cov_list.append(acc_cov.cpu().data.numpy())
+                    acc_cov_list.append(vel_imu.cpu().data.numpy())
                     corr_vel_list.append(corr_vel.cpu().data.numpy())
 
                 if isTarget:
-                    batch_loss = self.loss(corr_vel, gt_dtr_gnd)
+                    batch_loss = self.loss(corr_vel, gt_dtr_gnd) + self.loss(vel_imu, gt_dtr_gnd)+ self.loss(vel_cnn, gt_dtr_gnd)
                     loss += batch_loss.item()
 
         mae = loss / len(data_loader)
