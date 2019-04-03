@@ -5,65 +5,66 @@ import cv2
 import time
 from sklearn.utils import shuffle
 
-class VODataSetManager_CNN():
-    def __init__(self, dsName='airsim', subType='mr', seq=[0], isTrain=True, split=0.2):
+class VODataSetManager_RNN_KF():
+    def __init__(self, dsName='airsim', subType='mr', seq=[0], isTrain=True, split=0.2, delay = 10):
         data = DataManager()
         data.initHelper(dsName, subType, seq)
-        data.standardizeImgs(isTrain)
 
-        idx = np.arange(0, data.numTotalData, 1)
-        N = data.numTotalData
+        print(data.numDataCum)
+        idxList = []
+        for i in range(0, data.numDataset):
+            if i == 0:
+                idxList.append(np.arange(0, data.numDataCum[i] - delay, 1))
+            else:
+                idxList.append(np.arange(data.numDataCum[i-1], data.numDataCum[i] - delay, 1))
+
+        idx = np.concatenate(idxList)
+        N = data.numTotalData - delay * data.numDataset
         if isTrain:
             idx = shuffle(idx)
             valN = int(N * split)
             trainN = N - valN
             trainIdx = idx[0:trainN]
             valIdx = idx[trainN:]
-            self.trainSet = VODataSet_CNN(trainN, trainIdx)
-            self.valSet = VODataSet_CNN(valN, valIdx)
+            self.trainSet = VODataSet_RNN(trainN, trainIdx, delay)
+            self.valSet = VODataSet_RNN(valN, valIdx, delay)
         else:
-            self.testSet = VODataSet_CNN(N, idx)
+            self.testSet = VODataSet_RNN(N, idx, delay)
 
-class VODataSet_CNN(Dataset):
-    def __init__(self, N, idxList):
+class VODataSet_RNN(Dataset):
+    def __init__(self, N, idxList, delay):
         self.dm = DataManager()
         self.N = N
         self.idxList = idxList
+        self.delay = delay
 
     def __getitem__(self, i):
         index = self.idxList[i]
         try:
-            return self.dm.imgs[index], self.dm.imgs[index+1], self.dm.du[index], self.dm.dw[index], self.dm.dtrans[index],\
-                   self.dm.dtr_gnd[index], self.dm.rotM_bdy2gnd[index]
+            return self.dm.acc_gnd[index:index + self.delay], \
+                   self.dm.acc_gnd_standard[index:index + self.delay], \
+                   self.dm.dt[index:index + self.delay], \
+                   self.dm.pr_dtr_gnd[index:index + self.delay], \
+                   self.dm.dtr_cov_gnd[index:index + self.delay], \
+                   self.dm.gt_dtr_gnd[index:index + self.delay], \
+                   self.dm.gt_dtr_gnd[index]
         except:
             print('this is an error @ VODataSet_CNN of VODataSet.py')
-            print(self.dm.imgs.shape)
             print(i, index)
 
     def __len__(self):
         return self.N
 
-
 if __name__ == '__main__':
-    start = time.time()
-    dm = VODataSetManager_CNN(dsName='kitti', subType='none', seq=[0, 2, 4, 6], isTrain=False)
-    print(time.time() - start)
-    #trainSet, valSet = dm.trainSet, dm.valSet
-    dataSet = dm.testSet
+    dm = VODataSetManager_RNN_KF(dsName='euroc', subType='none', seq=[1, 2, 3, 5], isTrain=True)
+    trainSet, valSet = dm.trainSet, dm.valSet
+    dataSet = dm.valSet
     trainLoader = DataLoader(dataset = dataSet, batch_size=64)
-    sum = 0
-    for batch_idx, (img0, img1, du, dw, dtrans) in enumerate(trainLoader):
-        img0 = img0.data.numpy()
-        img1 = img1.data.numpy()
-        sum += img0.shape[0]
+    for batch_idx, (acc, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(trainLoader):
+        print(acc.shape)
+        print(pr_dtr_gnd.shape)
+        print(dtr_cv_gnd.shape)
+        print(gt_dtr_gnd.shape)
+        print(gt_dtr_gnd_init.shape)
 
-        for i in range (img0.shape[0]):
-            img_t0 = img0[i,:]
-            img_t1 = img1[i,:]
-            img_t0 = np.reshape(img_t0, (360, 720, 3))
-            img_t1 = np.reshape(img_t1, (360, 720, 3))
-            imgcon = img_t1 - img_t0
-            cv2.imshow('img0', img_t0)
-            cv2.imshow('img1', img_t1)
-            cv2.imshow('imgcon', imgcon)
-            cv2.waitKey(1)
+

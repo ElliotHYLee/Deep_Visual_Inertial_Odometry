@@ -7,7 +7,7 @@ from MyPyTorchAPI.CustomLoss import MahalanobisLoss
 #from tkinter import *
 import sys
 
-class ModelContainer_CNN():
+class ModelContainer_RNN_KF():
     def __init__(self, net_model):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         print(torch.cuda.device)
@@ -19,10 +19,10 @@ class ModelContainer_CNN():
         self.current_val_loss = 10**5
         self.min_val_loss = 10**5
 
-    def compile(self, loss=None, optimizer=None):
-        self.loss = MahalanobisLoss(series_Len=0)#nn.modules.loss.L1Loss()
-        #self.optimizer = optim.SGD(self.model.parameters(), lr=10**-2, weight_decay=0.01)
-        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-4, weight_decay=10**-4)
+    def compile(self):
+        self.loss = nn.modules.loss.L1Loss()
+        #self.optimizer = optim.SGD(self.model.parameters(), lr=10**-2, weight_decay=0)
+        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-3, weight_decay=0)
 
     def fit(self, train, validation=None, batch_size=1, epochs=1, shuffle=True, wName='weight.pt', checkPointFreq = 1):
         self.checkPointFreq = checkPointFreq
@@ -75,27 +75,19 @@ class ModelContainer_CNN():
     def runEpoch(self, epoch):
         epoch_loss = 0
         self.model.train(True)
-        for batch_idx, (img0, img1, du, dw, dtr, dtr_gnd, rotM) in enumerate(self.train_loader):
-            img0 = img0.to(self.device)
-            img1 = img1.to(self.device)
-            du = du.to(self.device)
-            dw = dw.to(self.device)
-            dtr = dtr.to(self.device)
-            dtr_gnd = dtr_gnd.to(self.device)
-            rotM = rotM.to(self.device)
+        for batch_idx, (acc, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(self.train_loader):
+            dt = dt.to(self.device)
+            acc = acc.to(self.device)
+            acc_stand = acc_stand.to(self.device)
+            pr_dtr_gnd = pr_dtr_gnd.to(self.device)
+            dtr_cv_gnd = dtr_cv_gnd.to(self.device)
+            gt_dtr_gnd = gt_dtr_gnd.to(self.device)
+            gt_dtr_gnd_init = gt_dtr_gnd_init.to(self.device)
 
             # forward pass and calc loss
-            pr_du, pr_du_cov, \
-            pr_dw, pr_dw_cov, \
-            pr_dtr, pr_dtr_cov, \
-            pr_dtr_gnd = self.model(img0, img1, dw, rotM)
+            acc_cov, corr_vel = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
 
-
-            batch_loss = self.loss(pr_du, du, pr_du_cov) + \
-                         self.loss(pr_dw, dw, pr_dw_cov) + \
-                         self.loss(pr_dtr, dtr, pr_dtr_cov) + \
-                         self.loss(pr_dtr_gnd, dtr_gnd, pr_dtr_cov, rotM)
-
+            batch_loss = self.loss(corr_vel, gt_dtr_gnd)
             epoch_loss += batch_loss.item()
 
             # update weights
@@ -127,61 +119,38 @@ class ModelContainer_CNN():
         return loss
 
     def predict(self, data_incoming, isValidation=False, isTarget=True):
-        data_loader = data_incoming if isValidation else DataLoader(dataset=data_incoming, batch_size=16, shuffle=False)
-        du_list, dw_list, dtr_list, du_cov_list, dw_cov_list, dtr_cov_list = [], [], [], [], [], []
-        dtr_gnd_list = []
+        data_loader = data_incoming if isValidation else DataLoader(dataset=data_incoming, batch_size=1, shuffle=False)
+        acc_cov_list, corr_vel_list = [], []
         loss = 0
-        for batch_idx, (img0, img1, du, dw, dtr, dtr_gnd, rotM) in enumerate(data_loader):
-            img0 = img0.to(self.device)
-            img1 = img1.to(self.device)
-            du = du.to(self.device)
-            dw = dw.to(self.device)
-            dtr = dtr.to(self.device)
-            dtr_gnd = dtr_gnd.to(self.device)
-            rotM = rotM.to(self.device)
+        for batch_idx, (acc, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(data_loader):
+            dt = dt.to(self.device)
+            acc = acc.to(self.device)
+            acc_stand = acc_stand.to(self.device)
+            pr_dtr_gnd = pr_dtr_gnd.to(self.device)
+            dtr_cv_gnd = dtr_cv_gnd.to(self.device)
+            gt_dtr_gnd = gt_dtr_gnd.to(self.device)
+            gt_dtr_gnd_init = gt_dtr_gnd_init.to(self.device)
 
             with torch.no_grad():
-                pr_du, pr_du_cov, \
-                pr_dw, pr_dw_cov, \
-                pr_dtr, pr_dtr_cov, \
-                pr_dtr_gnd = self.model(img0, img1, dw, rotM)
+                acc_cov, corr_vel = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
 
                 if not isValidation:
-                    du_list.append(pr_du.cpu().data.numpy())
-                    du_cov_list.append(pr_du_cov.cpu().data.numpy())
-                    dw_list.append(pr_dw.cpu().data.numpy())
-                    dw_cov_list.append(pr_dw_cov.cpu().data.numpy())
-                    dtr_list.append(pr_dtr.cpu().data.numpy())
-                    dtr_cov_list.append(pr_dtr_cov.cpu().data.numpy())
-                    dtr_gnd_list.append(pr_dtr_gnd.cpu().data.numpy())
-                    #dtr_gnd_cov_list.append(pr_dtr_gnd_Q.cpu().data.numpy())
+                    acc_cov_list.append(acc_cov.cpu().data.numpy())
+                    corr_vel_list.append(corr_vel.cpu().data.numpy())
 
                 if isTarget:
-                    batch_loss = self.loss(pr_du, du, pr_du_cov) +\
-                                 self.loss(pr_dw, dw, pr_dw_cov) + \
-                                 self.loss(pr_dtr, dtr, pr_dtr_cov) + \
-                                 self.loss(pr_dtr_gnd, dtr_gnd, pr_dtr_cov, rotM)
-
+                    batch_loss = self.loss(corr_vel, gt_dtr_gnd)
                     loss += batch_loss.item()
 
         mae = loss / len(data_loader)
         if isValidation:
             return mae
         else:
-            pr_du = np.concatenate(du_list, axis=0)
-            du_cov = np.concatenate(du_cov_list, axis=0)
-            pr_dw = np.concatenate(dw_list, axis=0)
-            dw_cov = np.concatenate(dw_cov_list, axis=0)
-            pr_dtr = np.concatenate(dtr_list, axis=0)
-            dtr_cov = np.concatenate(dtr_cov_list, axis=0)
-            pr_dtr_gnd = np.concatenate(dtr_gnd_list, axis=0)
-            #dtr_gnd_cov = np.concatenate(dtr_gnd_cov_list, axis=0)
+            acc_cov = np.concatenate(acc_cov_list, axis=0)
+            corr_vel_list = np.concatenate(corr_vel_list, axis=0)
 
-            return pr_du, du_cov, \
-                   pr_dw, dw_cov, \
-                   pr_dtr, dtr_cov, \
-                   pr_dtr_gnd, \
-                   mae
+
+            return acc_cov, corr_vel_list, mae
 
 if __name__ == '__main__':
     pass

@@ -1,68 +1,119 @@
-from VODataSet import VODataSetManager_CNN
+from VODataSet import VODataSetManager_RNN_KF
 import matplotlib.pyplot as plt
-from Model_CNN_0 import Model_CNN_0
-
-from ModelContainer_CNN import ModelContainer_CNN
+from Model_RNN_KF import Model_RNN_KF
+from VODataSet import DataLoader
+from ModelContainer_RNN_KF import ModelContainer_RNN_KF
 import numpy as np
 import time
+import torch.nn as nn
 from git_branch_param import *
+import torch
 
+delay = 100
 def train(dsName, subType, seq):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
-    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=seq, isTrain=True)
+    dm = VODataSetManager_RNN_KF(dsName=dsName, subType=subType, seq=seq, isTrain=True, delay=delay)
     train, val = dm.trainSet, dm.valSet
-    mc = ModelContainer_CNN(Model_CNN_0(dsName))
+    mc = ModelContainer_RNN_KF(Model_RNN_KF(dsName, delay=delay))
     #mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=64, epochs=40, wName=wName, checkPointFreq=1)
+    mc.fit(train, val, batch_size=512, epochs=64, wName=wName, checkPointFreq=1)
 
-def test(dsName, subType, seqRange):
+def test(dsName, subType, seqList):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
-    for seq in range(seqRange[0], seqRange[1]):
-        commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
-        dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
-        dataset = dm.testSet
+    seq = seqList[0]
+    commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
 
-        mc = ModelContainer_CNN(Model_CNN_0(dsName))
-        mc.load_weights(wName+'_best', train=False)
+    dm = VODataSetManager_RNN_KF(dsName=dsName, subType=subType, seq=[seq], isTrain=False, delay=delay)
+    dataset = dm.testSet
+    data_loader = DataLoader(dataset=dataset, batch_size=1, shuffle=False)
 
-        pr_du, du_cov, \
-        pr_dw, dw_cov, \
-        pr_dtr, dtr_cov, \
-        pr_dtr_gnd, \
-        mae = mc.predict(dataset)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    mc = Model_RNN_KF(dsName, delay=delay)
+    mc = nn.DataParallel(mc).to(device)
 
-        np.savetxt(commName + '_du.txt', pr_du)
-        np.savetxt(commName + '_du_cov.txt', du_cov)
-        np.savetxt(commName + '_dw.txt', pr_dw)
-        np.savetxt(commName + '_dw_cov.txt', dw_cov)
-        np.savetxt(commName + '_dtr.txt', pr_dtr)
-        np.savetxt(commName + '_dtr_cov.txt', dtr_cov)
-        np.savetxt(commName + '_dtr_gnd.txt', pr_dtr_gnd)
+    checkPoint = torch.load(wName + '_best' + '.pt')
+    mc.load_state_dict(checkPoint['model_state_dict'])
 
-def runTrainTest(dsName, subType, seq, seqRange):
-    runTrain(dsName, subType, seq, seqRange)
-    runTest(dsName, subType, seq, seqRange)
+    print(device)
+    corr_vel_list = []
+    gt_dtr_gnd_list = []
+    init_list = []
+    for batch_idx, (acc, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(data_loader):
+        dt = dt.to(device)
+        acc = acc.to(device)
+        acc_stand = acc_stand.to(device)
+        pr_dtr_gnd = pr_dtr_gnd.to(device)
+        dtr_cv_gnd = dtr_cv_gnd.to(device)
+        #gt_dtr_gnd = gt_dtr_gnd.to(device)
+        gt_dtr_gnd_list.append(gt_dtr_gnd)
+        gt_dtr_gnd_init = gt_dtr_gnd_init.to(device)
 
-def runTrain(dsName, subType, seq, seqRange):
-    s = time.time()
-    train(dsName, subType, seq)
-    print(time.time() - s)
+        # if batch_idx > 0:
+        #     gt_dtr_gnd_init = corr_vel[:,  0, :]
 
-def runTest(dsName, subType, seq, seqRange):
-    test(dsName, subType, seqRange)
+        init_list.append(gt_dtr_gnd_init.cpu().data.numpy())
+
+        with torch.no_grad():
+            acc_cov, corr_vel = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
+            corr_vel_list.append(corr_vel.cpu().data.numpy())
+    corr_vel = np.concatenate(corr_vel_list, axis = 0)
+    gt_dtr_gnd = np.concatenate(gt_dtr_gnd_list, axis = 0)
+    init_list = np.concatenate(init_list, axis = 0)
+    print(gt_dtr_gnd.shape)
+
+    N = 1479
+    gtdumm = np.zeros((N-delay,3))
+    for i in range(0, N-delay):
+        gtdumm[i, :] = gt_dtr_gnd[i,0,:]
+
+    skip = 0.5
+    plt.figure()
+    plt.subplot(311)
+    plt.plot(gtdumm[:, 0], 'r.', markersize='5')
+    #plt.plot(init_list[:,0], 'g.', markersize='2')
+    for idx in range(0, N, int(delay*skip)):
+        plt.plot(np.arange(idx, idx + delay, 1), corr_vel[idx, :, 0], 'b.', markersize='1')
+
+    plt.subplot(312)
+    plt.plot(gtdumm[:, 1], 'r.', markersize='5')
+    for idx in range(0, N, int(delay*skip)):
+        plt.plot(np.arange(idx, idx + delay, 1), corr_vel[idx, :, 1], 'b.', markersize='1')
+
+
+    plt.subplot(313)
+    plt.plot(gtdumm[:, 2], 'r.', markersize='5')
+    for idx in range(0, N, int(delay*skip)):
+        plt.plot(np.arange(idx, idx + delay, 1), corr_vel[idx, :, 2], 'b.', markersize='1')
+
+
+
+
+    # dumm = np.zeros((N-delay,3))
+    # gtdumm = np.zeros((N-delay,3))
+    # for i in range(0, N-delay):
+    #     dumm[i, :] = corr_vel[i,delay-1,:]
+    #     gtdumm[i, :] = gt_dtr_gnd[i,delay-1,:]
+    #
+    # plt.figure()
+    # plt.subplot(311)
+    # plt.plot(gtdumm[:, 0], 'r.', markersize=5)
+    # plt.plot(dumm[:, 0], 'b.-', markersize=1)
+    # plt.subplot(312)
+    # plt.plot(gtdumm[:, 1], 'r.', markersize=5)
+    # plt.plot(dumm[:, 1], 'b.-', markersize=1)
+    # plt.subplot(313)
+    # plt.plot(gtdumm[:, 2], 'r.', markersize=5)
+    # plt.plot(dumm[:, 2], 'b.-', markersize=1)
+
+    plt.show()
 
 if __name__ == '__main__':
-    dsName = 'airsim'
-    seq = [0]
-    seqRange = [0, 3]
-    # runTrainTest(dsName, 'mr', seq, seqRange)
-    # runTrainTest(dsName, 'mrseg', seq, seqRange)
-    runTrainTest(dsName, 'bar', seq, seqRange)
-    runTrainTest(dsName, 'pin', seq, seqRange)
-
-    # runTrainTest('euroc', 'none', seq=[1, 2, 5, 3], seqRange=[1, 6])
-    # runTrainTest('kitti', 'none', seq=[0, 2, 4, 6], seqRange=[0, 11])
+    dsName = 'euroc'
+    subType = 'mr'
+    seq = [5]
+    train(dsName, subType, seq)
+    test(dsName, subType, seq)
 
 
 

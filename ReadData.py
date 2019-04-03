@@ -20,7 +20,7 @@ class ReadData():
             self.gt_rotM_b2g[i, :, :] = np.reshape(self.gt_linR[i, :], (3, 3))
         self.pos_gnd = pd.read_csv(self.gt_path + 'pos.txt', sep=',', header=None).values.astype(np.float32)
         self.acc_gnd = pd.read_csv(self.gt_path + 'acc_gnd.txt', sep=',', header=None).values.astype(np.float32)
-        #self.acc_gnd = np.multiply(self.acc_gnd, self.gt_dt)
+        self.acc_gnd = np.multiply(self.acc_gnd, self.gt_dt)
         self.numData = self.gt_du.shape[0]
         # cnn outputs
         self.pr_path = getPrPath(dsName, seq, subType)
@@ -45,44 +45,51 @@ class ReadData():
         for i in range(0, self.numData):
             self.pr_dtr_std_gnd[i,:] = np.sqrt(np.diag(self.pr_dtr_cov_gnd[i,:]))
 
-
-        print(self.numData)
-        print(self.gt_dtr_gnd.shape)
-        print(self.acc_gnd.shape)
-        print(self.gt_du.shape)
-        print(self.pr_dtr_gnd.shape)
-        print(self.pr_dtr_cov.shape)
-        print(self.pr_dtr_cov_gnd.shape)
+        # print(self.numData)
+        # print(self.gt_dtr_gnd.shape)
+        # print(self.acc_gnd.shape)
+        # print(self.gt_du.shape)
+        # print(self.pr_dtr_gnd.shape)
+        # print(self.pr_dtr_cov.shape)
+        # print(self.pr_dtr_cov_gnd.shape)
 
 if __name__ == '__main__':
-    d = ReadData(dsName='euroc', subType='mr', seq=4)
+    d = ReadData(dsName='airsim', subType='mr', seq=2)
     print(d.acc_gnd.shape)
     print(d.gt_dt.shape)
-    ve = integrate.cumtrapz(d.acc_gnd, dx=d.gt_dt)
+    # vel_imu = np.zeros((d.gt_dt.shape[0]+1, 3))
+    # for i in range(0, d.gt_dt.shape[0]):
+    #     vel_imu[i+1] = vel_imu[i] + d.gt_dt[i]*d.acc_gnd[i,:]
+    dummy = d.gt_dt * d.acc_gnd
+    print(dummy.shape)
+    vel_imu = np.cumsum(dummy, axis=0)
+    vel_imu = vel_imu[1:]
 
-    plt.figure()
-    plt.plot(ve)
-
-
+    print(vel_imu.shape)
 
     plt.figure()
     plt.subplot(311)
     plt.plot(d.gt_dtr_gnd[:,0], 'r.', markersize=5)
     plt.plot(d.pr_dtr_gnd[:, 0], 'b.', markersize=2)
+    plt.plot(vel_imu[:, 0], 'g.', markersize=1)
+
     plt.subplot(312)
     plt.plot(d.gt_dtr_gnd[:, 1], 'r.', markersize=5)
     plt.plot(d.pr_dtr_gnd[:, 1], 'b.', markersize=2)
+    plt.plot(vel_imu[:, 1], 'g.', markersize=1)
+
     plt.subplot(313)
     plt.plot(d.gt_dtr_gnd[:, 2], 'r.', markersize=5)
     plt.plot(d.pr_dtr_gnd[:, 2], 'b.', markersize=2)
+    plt.plot(vel_imu[:, 2], 'g.', markersize=1)
 
-    plt.figure()
-    plt.subplot(311)
-    plt.plot(d.pr_dtr_std_gnd[:, 0], 'r.', markersize=5)
-    plt.subplot(312)
-    plt.plot(d.pr_dtr_std_gnd[:, 1], 'r.', markersize=5)
-    plt.subplot(313)
-    plt.plot(d.pr_dtr_std_gnd[:, 2], 'r.', markersize=5)
+    # plt.figure()
+    # plt.subplot(311)
+    # plt.plot(d.pr_dtr_std_gnd[:, 0], 'r.', markersize=5)
+    # plt.subplot(312)
+    # plt.plot(d.pr_dtr_std_gnd[:, 1], 'r.', markersize=5)
+    # plt.subplot(313)
+    # plt.plot(d.pr_dtr_std_gnd[:, 2], 'r.', markersize=5)
 
 
 
