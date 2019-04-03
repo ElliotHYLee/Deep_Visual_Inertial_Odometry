@@ -11,7 +11,7 @@ import torch
 from PrepData import DataManager
 import pandas as pd
 
-delay = 50
+delay = 100
 def train(dsName, subType, seq):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     dm = VODataSetManager_RNN_KF(dsName=dsName, subType=subType, seq=seq, isTrain=True, delay=delay)
@@ -34,7 +34,7 @@ def shiftUp(states):
 def test(dsName, subType, seqList):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
-    seq = 4#seqList[0]
+    seq = 5#seqList[0]
     commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
 
     dm = VODataSetManager_RNN_KF(dsName=dsName, subType=subType, seq=[seq], isTrain=False, delay=delay)
@@ -50,6 +50,7 @@ def test(dsName, subType, seqList):
 
     corr_vel_list = []
     gt_dtr_gnd_list = []
+    imu_bias_list = []
     states = torch.zeros((delay, delay, 3)).cuda()
     for batch_idx, (acc, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(data_loader):
         dt = dt.to(device)
@@ -74,65 +75,110 @@ def test(dsName, subType, seqList):
             states[delay-1, :, :] = corr_vel
 
         with torch.no_grad():
-            acc_cov, _, corr_vel = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
+            acc_cov, corr_vel = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
 
         corr_vel_list.append(corr_vel.cpu().data.numpy())
 
     corr_vel = np.concatenate(corr_vel_list, axis = 0)
+    #imu_bais = np.concatenate(imu_bias_list, axis = 0)
     data = DataManager()
     gt_dtr_gnd = data.gt_dtr_gnd#np.concatenate(gt_dtr_gnd_list, axis = 0)
     print(gt_dtr_gnd.shape)
 
-    N = 1479
-    gtdumm =gt_dtr_gnd#np.zeros((N-delay,3))
-
+    N = 2600
 
     velKF = pd.read_csv('velKF.txt', sep=',', header=None).values.astype(np.float32)
 
 
     skip = 0.5
-    plt.figure()
-    plt.subplot(311)
-    plt.plot(gtdumm[:, 0], 'r.', markersize='5')
-    #plt.plot(velKF[:,0], 'g.', markersize='2')
-    for idx in range(0, N, int(delay*skip)):
-        plt.plot(np.arange(idx, idx + delay, 1), corr_vel[idx, :, 0], 'b.', markersize='1')
+    # plt.figure()
+    # plt.subplot(311)
+    # plt.plot(gt_dtr_gnd[:, 0], 'r.', markersize='5')
+    # #plt.plot(velKF[:,0], 'g.', markersize='2')
+    # for idx in range(0, N, int(delay*skip)):
+    #     plt.plot(np.arange(idx, idx + delay, 1), corr_vel[idx, :, 0], 'b.', markersize='1')
+    # plt.subplot(312)
+    # plt.plot(gt_dtr_gnd[:, 1], 'r.', markersize='5')
+    # #plt.plot(velKF[:, 1], 'g.', markersize='2')
+    # for idx in range(0, N, int(delay*skip)):
+    #     plt.plot(np.arange(idx, idx + delay, 1), corr_vel[idx, :, 1], 'b.', markersize='1')
+    #
+    # plt.subplot(313)
+    # plt.plot(gt_dtr_gnd[:, 2], 'r.', markersize='5')
+    # #plt.plot(velKF[:, 2], 'g.', markersize='2')
+    # for idx in range(0, N, int(delay*skip)):
+    #     plt.plot(np.arange(idx, idx + delay, 1), corr_vel[idx, :, 2], 'b.', markersize='1')
 
-    plt.subplot(312)
-    plt.plot(gtdumm[:, 1], 'r.', markersize='5')
-    #plt.plot(velKF[:, 1], 'g.', markersize='2')
-    for idx in range(0, N, int(delay*skip)):
-        plt.plot(np.arange(idx, idx + delay, 1), corr_vel[idx, :, 1], 'b.', markersize='1')
+    print(corr_vel.shape)
+    var = np.zeros((2760, 3))
+    for i in range(corr_vel.shape[0]):
+        if i == 0:
+            var[:delay, :] = corr_vel[0,:,:]
+        else:
+            var[delay+i,:] = corr_vel[i,delay-1, :]
 
-    plt.subplot(313)
-    plt.plot(gtdumm[:, 2], 'r.', markersize='5')
-    #plt.plot(velKF[:, 2], 'g.', markersize='2')
-    for idx in range(0, N, int(delay*skip)):
-        plt.plot(np.arange(idx, idx + delay, 1), corr_vel[idx, :, 2], 'b.', markersize='1')
+    print(var.shape)
 
     corr_vel = np.concatenate((np.zeros((delay, delay, 3)), corr_vel), axis=0)
     plt.figure()
     plt.subplot(311)
-    plt.plot(gtdumm[:, 0], 'r.', markersize='5')
+    plt.plot(gt_dtr_gnd[:, 0], 'r.', markersize='5')
     plt.plot(velKF[:, 0], 'g.', markersize='2')
-    plt.plot(corr_vel[:, delay-1, 0], 'b.', markersize='1')
+    plt.plot(var[:, 0], 'b.', markersize='1')
 
     plt.subplot(312)
-    plt.plot(gtdumm[:, 1], 'r.', markersize='5')
+    plt.plot(gt_dtr_gnd[:, 1], 'r.', markersize='5')
     plt.plot(velKF[:, 1], 'g.', markersize='2')
-    plt.plot(corr_vel[:, delay - 1, 1], 'b.', markersize='1')
+    plt.plot(var[:, 1], 'b.', markersize='1')
 
     plt.subplot(313)
-    plt.plot(gtdumm[:, 2], 'r.', markersize='5')
+    plt.plot(gt_dtr_gnd[:, 2], 'r.', markersize='5')
     plt.plot(velKF[:, 2], 'g.', markersize='2')
-    plt.plot(corr_vel[:, delay - 1, 2], 'b.', markersize='1')
+    plt.plot(var[:, 2], 'b.', markersize='1')
+
+    corr_pos = np.cumsum(var, axis=0)
+    gt_pos = np.cumsum(gt_dtr_gnd, axis=0)
+    gt_KF = np.cumsum(velKF, axis=0)
+
+
+    plt.figure()
+    plt.subplot(311)
+    plt.plot(gt_pos[:, 0], gt_pos[:, 1], 'r')
+    plt.plot(gt_KF[:, 0], gt_KF[:, 1], 'g')
+    plt.plot(corr_pos[:, 0], corr_pos[:, 1], 'b')
+
+    plt.subplot(312)
+    plt.plot(gt_pos[:, 0], gt_pos[:, 2], 'r')
+    plt.plot(gt_KF[:, 0], gt_KF[:, 2], 'g')
+    plt.plot(corr_pos[:, 0], corr_pos[:, 2], 'b')
+
+    plt.subplot(313)
+    plt.plot(gt_pos[:, 1], gt_pos[:, 2], 'r')
+    plt.plot(gt_KF[:, 1], gt_KF[:, 2], 'g')
+    plt.plot(corr_pos[:, 1], corr_pos[:, 2], 'b')
+
+    plt.figure()
+    plt.subplot(311)
+    plt.plot(gt_pos[:, 0], 'r')
+    plt.plot(gt_KF[:, 0], 'g')
+    plt.plot(corr_pos[:, 0], 'b')
+
+    plt.subplot(312)
+    plt.plot(gt_pos[:, 1], 'r')
+    plt.plot(gt_KF[:, 1], 'g')
+    plt.plot(corr_pos[:, 1], 'b')
+
+    plt.subplot(313)
+    plt.plot(gt_pos[:, 2], 'r')
+    plt.plot(gt_KF[:, 2], 'g')
+    plt.plot(corr_pos[:, 2], 'b')
 
     plt.show()
 
 if __name__ == '__main__':
-    dsName = 'euroc'
-    subType = 'none'
-    seq = [1,2,3,5]
+    dsName = 'kitti'
+    subType = ''
+    seq = [0, 2, 4, 6]
     train(dsName, subType, seq)
     test(dsName, subType, seq)
 

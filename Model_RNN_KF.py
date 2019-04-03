@@ -36,15 +36,15 @@ class Model_RNN_KF(nn.Module):
         # print(gt_dtr_gnd_init.shape)
         #vel_imu = torch.add(vel_imu, gt_dtr_gnd_init)
 
-        vel_imu_bais = self.acc_pattern(vel_imu)
-        vel_imu_bais = self.fc0(vel_imu_bais)
-        vel_imu = vel_imu - vel_imu_bais
+        # vel_imu_bais = self.acc_pattern(vel_imu)
+        # vel_imu_bais = self.fc0(vel_imu_bais)
+        # vel_imu = vel_imu - vel_imu_bais
 
-        vel_cnn_err = self.cnn_pattern(pr_dtr_gnd)
-        vel_cnn_err = self.fc1(vel_cnn_err)
-        vel_cnn = pr_dtr_gnd - vel_cnn_err
+        # vel_cnn_err = self.cnn_pattern(pr_dtr_gnd)
+        # vel_cnn_err = self.fc1(vel_cnn_err)
+        # vel_cnn = pr_dtr_gnd - vel_cnn_err
 
-        vel = vel_imu + vel_cnn
+        vel = vel_imu + pr_dtr_gnd
         vel = self.vel_lstm(vel)
         vel = self.fc2(vel)
         # vel_cnn = self.cnn_pattern(pr_dtr_gnd)
@@ -56,7 +56,7 @@ class Model_RNN_KF(nn.Module):
         #vel_input = vel_imu + vel_cnn
         #corr_vel = self.vel_lstm(vel_input)
 
-        return vel_imu, vel_cnn, vel, vel_imu_bais
+        return vel_imu, vel
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
