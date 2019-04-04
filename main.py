@@ -11,7 +11,7 @@ import torch
 from PrepData import DataManager
 import pandas as pd
 
-delay = 100
+delay = 10
 def train(dsName, subType, seq):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     dm = VODataSetManager_RNN_KF(dsName=dsName, subType=subType, seq=seq, isTrain=True, delay=delay)
@@ -31,6 +31,14 @@ def shiftUp(states):
     dummy[:-1, :, :] = states[1:, :, :]
     return dummy
 
+# def getStd(serCov, batch_idx):
+#     bn = serCov.shape[0]
+#     sig2 =
+#     if batch_idx == 0:
+#         var = np.zeros((delay, 3))
+#         var =
+
+
 def test(dsName, subType, seqList):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
@@ -48,9 +56,9 @@ def test(dsName, subType, seqList):
     checkPoint = torch.load(wName + '_best' + '.pt')
     mc.load_state_dict(checkPoint['model_state_dict'])
 
+
     corr_vel_list = []
-    gt_dtr_gnd_list = []
-    imu_bias_list = []
+    acc_std_list = []
     states = torch.zeros((delay, delay, 3)).cuda()
     for batch_idx, (acc, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(data_loader):
         dt = dt.to(device)
@@ -67,19 +75,20 @@ def test(dsName, subType, seqList):
             gt_dtr_gnd_init = torch.sum(states[:, 0, :], dim=0).unsqueeze(0)/batch_idx
             #print(gt_dtr_gnd_init.shape)
             states = shiftLeft(states)
-            states[batch_idx, :, :] = corr_vel
+            states[batch_idx, :, :] = velRNNKF
         else:
             gt_dtr_gnd_init = torch.sum(states[:, 0, :], dim=0).unsqueeze(0)/delay
             states = shiftUp(states)
             states = shiftLeft(states)
-            states[delay-1, :, :] = corr_vel
+            states[delay-1, :, :] = velRNNKF
 
         with torch.no_grad():
-            acc_cov, corr_vel = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
+            velRNNKF, acc_cov = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
 
-        corr_vel_list.append(corr_vel.cpu().data.numpy())
+        #acc_std_list.append(getStd(acc_cov), batch_idx)
+        corr_vel_list.append(velRNNKF.cpu().data.numpy())
 
-    corr_vel = np.concatenate(corr_vel_list, axis = 0)
+    velRNNKF = np.concatenate(corr_vel_list, axis = 0)
     #imu_bais = np.concatenate(imu_bias_list, axis = 0)
     data = DataManager()
     gt_dtr_gnd = data.gt_dtr_gnd#np.concatenate(gt_dtr_gnd_list, axis = 0)
@@ -96,30 +105,30 @@ def test(dsName, subType, seqList):
     # plt.plot(gt_dtr_gnd[:, 0], 'r.', markersize='5')
     # #plt.plot(velKF[:,0], 'g.', markersize='2')
     # for idx in range(0, N, int(delay*skip)):
-    #     plt.plot(np.arange(idx, idx + delay, 1), corr_vel[idx, :, 0], 'b.', markersize='1')
+    #     plt.plot(np.arange(idx, idx + delay, 1), velRNNKF[idx, :, 0], 'b.', markersize='1')
     # plt.subplot(312)
     # plt.plot(gt_dtr_gnd[:, 1], 'r.', markersize='5')
     # #plt.plot(velKF[:, 1], 'g.', markersize='2')
     # for idx in range(0, N, int(delay*skip)):
-    #     plt.plot(np.arange(idx, idx + delay, 1), corr_vel[idx, :, 1], 'b.', markersize='1')
+    #     plt.plot(np.arange(idx, idx + delay, 1), velRNNKF[idx, :, 1], 'b.', markersize='1')
     #
     # plt.subplot(313)
     # plt.plot(gt_dtr_gnd[:, 2], 'r.', markersize='5')
     # #plt.plot(velKF[:, 2], 'g.', markersize='2')
     # for idx in range(0, N, int(delay*skip)):
-    #     plt.plot(np.arange(idx, idx + delay, 1), corr_vel[idx, :, 2], 'b.', markersize='1')
+    #     plt.plot(np.arange(idx, idx + delay, 1), velRNNKF[idx, :, 2], 'b.', markersize='1')
 
-    print(corr_vel.shape)
+    print(velRNNKF.shape)
     var = np.zeros((2760, 3))
-    for i in range(corr_vel.shape[0]):
+    for i in range(velRNNKF.shape[0]):
         if i == 0:
-            var[:delay, :] = corr_vel[0,:,:]
+            var[:delay, :] = velRNNKF[0,:,:]
         else:
-            var[delay+i,:] = corr_vel[i,delay-1, :]
+            var[delay+i,:] = velRNNKF[i,delay-1, :]
 
     print(var.shape)
 
-    corr_vel = np.concatenate((np.zeros((delay, delay, 3)), corr_vel), axis=0)
+    velRNNKF = np.concatenate((np.zeros((delay, delay, 3)), velRNNKF), axis=0)
     plt.figure()
     plt.subplot(311)
     plt.plot(gt_dtr_gnd[:, 0], 'r.', markersize='5')
@@ -177,9 +186,9 @@ def test(dsName, subType, seqList):
 
 if __name__ == '__main__':
     dsName = 'kitti'
-    subType = ''
+    subType = 'none'
     seq = [0, 2, 4, 6]
-    train(dsName, subType, seq)
+    #train(dsName, subType, seq)
     test(dsName, subType, seq)
 
 

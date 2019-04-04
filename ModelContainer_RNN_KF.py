@@ -85,9 +85,9 @@ class ModelContainer_RNN_KF():
             gt_dtr_gnd_init = gt_dtr_gnd_init.to(self.device)
 
             # forward pass and calc loss
-            vel_imu, corr_vel = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
+            velRNNKF, acc_cov = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
 
-            batch_loss = self.loss(corr_vel, gt_dtr_gnd) + self.loss(vel_imu, gt_dtr_gnd)
+            batch_loss = self.loss(velRNNKF, gt_dtr_gnd)
             epoch_loss += batch_loss.item()
 
             # update weights
@@ -120,7 +120,7 @@ class ModelContainer_RNN_KF():
 
     def predict(self, data_incoming, isValidation=False, isTarget=True):
         data_loader = data_incoming if isValidation else DataLoader(dataset=data_incoming, batch_size=1, shuffle=False)
-        vel_imu_list, corr_vel_list, imu_bias_list = [], [], []
+        velRNNKF_list, corr_vel_list, imu_bias_list = [], [], []
         loss = 0
         for batch_idx, (acc, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(data_loader):
             dt = dt.to(self.device)
@@ -132,25 +132,22 @@ class ModelContainer_RNN_KF():
             gt_dtr_gnd_init = gt_dtr_gnd_init.to(self.device)
 
             with torch.no_grad():
-                vel_imu, corr_vel = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
+                velRNNKF, acc_cov = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
 
                 if not isValidation:
-                    vel_imu_list.append(vel_imu.cpu().data.numpy())
-                    corr_vel_list.append(corr_vel.cpu().data.numpy())
-                    #imu_bias_list.append(vel_imu_bais.cpu().data.numpy())
+                    velRNNKF_list.append(velRNNKF.cpu().data.numpy())
 
                 if isTarget:
-                    batch_loss = self.loss(corr_vel, gt_dtr_gnd) + self.loss(vel_imu, gt_dtr_gnd)
+                    batch_loss = self.loss(velRNNKF, gt_dtr_gnd)
                     loss += batch_loss.item()
 
         mae = loss / len(data_loader)
         if isValidation:
             return mae
         else:
-            vel_imu = np.concatenate(vel_imu_list, axis=0)
-            corr_vel = np.concatenate(corr_vel_list, axis=0)
+            velRNNKF = np.concatenate(velRNNKF_list, axis=0)
 
-            return vel_imu, corr_vel,  mae
+            return velRNNKF, mae
 
 if __name__ == '__main__':
     pass

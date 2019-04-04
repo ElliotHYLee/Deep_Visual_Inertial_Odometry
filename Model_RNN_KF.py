@@ -9,38 +9,59 @@ from MyPyTorchAPI.MatOp import *
 class Model_RNN_KF(nn.Module):
     def __init__(self, dsName='airsim', delay=10):
         super(Model_RNN_KF, self).__init__()
+        self.delay = delay
 
-        self.acc_pattern = LSTM(3, 1, 200)
-        self.cnn_pattern = LSTM(3, 1, 200)
-        self.vel_lstm = LSTM(3, 1, 200)
+        self.acc_cov_chol_lstm = LSTM(3, 1, 20)
+        self.fc0 = nn.Sequential(nn.Linear(40, 40), nn.PReLU(),
+                                 nn.Linear(40, 6))
+        self.get33Cov = GetCovMatFromChol_Sequence(self.delay)
+        self.mat33vec3 = Batch33MatVec3Mul()
 
-        self.fc0 = nn.Sequential(nn.Linear(400, 200), nn.PReLU(),
-                                 nn.Linear(200, 3))
+    def initVelImu(self, bn, init):
+        var = torch.zeros((bn, self.delay, 3))
+        var[:, 0, :] = init
+        if torch.cuda.is_available():
+            var = var.cuda()
+        return var
 
-        self.fc1 = nn.Sequential(nn.Linear(400, 200), nn.PReLU(),
-                                 nn.Linear(200, 3))
-
-        self.fc2 = nn.Sequential(nn.Linear(400, 200), nn.PReLU(),
-                                 nn.Linear(200, 3))
-
-        self.sig0 = Sigmoid(0.1, 10)
-        self.sig1 = Sigmoid(0.1, 10)
-
-
-    def initVelImu(self, gt):
-        torch.zeros
+    def initSysCov(self, bn, init=None):
+        var = torch.zeros((bn, self.delay, 3, 3))
+        #var[:, 0, :] = init
+        if torch.cuda.is_available():
+            var = var.cuda()
+        return var
 
     def forward(self, dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init):
-        vel_imu = torch.mul(dt, acc)
-        vel_imu[:,0,:] = vel_imu[:,0,:] + gt_dtr_gnd_init
-        #vel_imu = vel_imu.cumsum(1)
+        # init values
+        bn = dt.shape[0]
         delay = acc.shape[1]
+        vel = self.initVelImu(bn, gt_dtr_gnd_init)
+        sysCov = self.initSysCov(bn)
 
-        for i in range(0, delay):
-            d
+        acc_cov_chol = self.acc_cov_chol_lstm(acc_stand)
+        acc_cov_chol = self.fc0(acc_cov_chol)
+        acc_cov = self.get33Cov(acc_cov_chol)
 
+        accdt = torch.mul(dt, acc)
+        for i in range(1, delay):
+            # KF prediction step
+            prVel = vel[:, i-1, :] + accdt[:, i, :]
+            prCov = sysCov[:, i-1, :, :] + acc_cov[:, i, :, :]
 
-        return vel_imu, None
+            # KF correction step
+            mCov = dtr_cv_gnd[:, i, :]
+            z = pr_dtr_gnd[:, i, :]
+            temp = torch.inverse(prCov + mCov)
+            K = torch.bmm(prCov, temp)
+            innov = z - prVel
+            nextVel = prVel + self.mat33vec3(K, innov)
+            nextCov = prCov - torch.bmm(K, prCov)
+
+            # KF update
+            vel[:, i, :] = nextVel
+            sysCov[:, i, :, :] = nextCov
+
+        return vel, acc_cov
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
