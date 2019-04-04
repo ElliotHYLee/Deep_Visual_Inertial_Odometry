@@ -24,19 +24,22 @@ class Model_RNN_KF(nn.Module):
             var = var.cuda()
         return var
 
-    def initSysCov(self, bn, init=None):
+    def initSysCov(self, bn, sysCovInit=None):
         var = torch.zeros((bn, self.delay, 3, 3))
-        #var[:, 0, :] = init
+        if sysCovInit is not None:
+            var[:, 0, :] = sysCovInit
+            pass
+
         if torch.cuda.is_available():
             var = var.cuda()
         return var
 
-    def forward(self, dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init):
+    def forward(self, dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init, sysCovInit=None):
         # init values
         bn = dt.shape[0]
         delay = acc.shape[1]
         vel = self.initVelImu(bn, gt_dtr_gnd_init)
-        sysCov = self.initSysCov(bn)
+        sysCov = self.initSysCov(bn, sysCovInit)
 
         acc_cov_chol = self.acc_cov_chol_lstm(acc_stand)
         acc_cov_chol = self.fc0(acc_cov_chol)
@@ -61,7 +64,7 @@ class Model_RNN_KF(nn.Module):
             vel[:, i, :] = nextVel
             sysCov[:, i, :, :] = nextCov
 
-        return vel, acc_cov
+        return vel, acc_cov, sysCov
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

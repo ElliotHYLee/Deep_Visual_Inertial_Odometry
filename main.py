@@ -42,7 +42,7 @@ def shiftUp(states):
 def test(dsName, subType, seqList):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
-    seq = 5#seqList[0]
+    seq = 2#seqList[0]
     commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
 
     dm = VODataSetManager_RNN_KF(dsName=dsName, subType=subType, seq=[seq], isTrain=False, delay=delay)
@@ -71,6 +71,7 @@ def test(dsName, subType, seqList):
 
         if batch_idx == 0 :
             gt_dtr_gnd_init = gt_dtr_gnd_init.to(device) # 1 by 3
+
         elif batch_idx < delay - 1:
             gt_dtr_gnd_init = torch.sum(states[:, 0, :], dim=0).unsqueeze(0)/batch_idx
             #print(gt_dtr_gnd_init.shape)
@@ -82,8 +83,13 @@ def test(dsName, subType, seqList):
             states = shiftLeft(states)
             states[delay-1, :, :] = velRNNKF
 
+        if batch_idx == 0:
+            sysCovInit = None
+        else:
+            sysCovInit = sysCov[:, 0, :]
+
         with torch.no_grad():
-            velRNNKF, acc_cov = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
+            velRNNKF, acc_cov, sysCov = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init, sysCovInit)
 
         #acc_std_list.append(getStd(acc_cov), batch_idx)
         corr_vel_list.append(velRNNKF.cpu().data.numpy())
@@ -94,7 +100,7 @@ def test(dsName, subType, seqList):
     gt_dtr_gnd = data.gt_dtr_gnd#np.concatenate(gt_dtr_gnd_list, axis = 0)
     print(gt_dtr_gnd.shape)
 
-    N = 2600
+    N = 7500
 
     velKF = pd.read_csv('velKF.txt', sep=',', header=None).values.astype(np.float32)
 
@@ -119,7 +125,7 @@ def test(dsName, subType, seqList):
     #     plt.plot(np.arange(idx, idx + delay, 1), velRNNKF[idx, :, 2], 'b.', markersize='1')
 
     print(velRNNKF.shape)
-    var = np.zeros((2760, 3))
+    var = np.zeros((velRNNKF.shape[0]+delay, 3))
     for i in range(velRNNKF.shape[0]):
         if i == 0:
             var[:delay, :] = velRNNKF[0,:,:]
@@ -185,10 +191,10 @@ def test(dsName, subType, seqList):
     plt.show()
 
 if __name__ == '__main__':
-    dsName = 'kitti'
-    subType = 'none'
-    seq = [0, 2, 4, 6]
-    #train(dsName, subType, seq)
+    dsName = 'airsim'
+    subType = 'mr'
+    seq = [0]
+    train(dsName, subType, seq)
     test(dsName, subType, seq)
 
 

@@ -85,7 +85,7 @@ class ModelContainer_RNN_KF():
             gt_dtr_gnd_init = gt_dtr_gnd_init.to(self.device)
 
             # forward pass and calc loss
-            velRNNKF, acc_cov = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
+            velRNNKF, acc_cov, sysCov = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
 
             batch_loss = self.loss(velRNNKF, gt_dtr_gnd)
             epoch_loss += batch_loss.item()
@@ -132,7 +132,7 @@ class ModelContainer_RNN_KF():
             gt_dtr_gnd_init = gt_dtr_gnd_init.to(self.device)
 
             with torch.no_grad():
-                velRNNKF, acc_cov = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
+                velRNNKF, acc_cov, sysCov = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
 
                 if not isValidation:
                     velRNNKF_list.append(velRNNKF.cpu().data.numpy())

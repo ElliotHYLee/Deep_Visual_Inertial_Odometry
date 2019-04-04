@@ -42,11 +42,23 @@ class DataManager(Singleton):
         self.dtr_cov_gnd = np.concatenate([dataObj[i].pr_dtr_cov_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         print('done numeric data concat')
 
+    def standardize(self, isTrain):
         print('standardizing acc')
-        accMean = np.mean(self.acc_gnd, axis=0)
-        accStd = np.std(self.acc_gnd, axis=0)
+        normPath = 'Norms/' + branchName() + '_' + self.dsName + '_' + self.subType
+        if isTrain:
+            accMean = np.mean(self.acc_gnd, axis=0)
+            accStd = np.std(self.acc_gnd, axis=0)
+            np.savetxt(normPath + '_img_accMean.txt', accMean)
+            np.savetxt(normPath + '_img_accStd.txt', accStd)
+        else:
+            accMean = np.loadtxt(normPath + '_img_accMean.txt')
+            accStd = np.loadtxt(normPath + '_img_accStd.txt')
+            if self.dsName == 'euroc':
+                accMean = np.reshape(accMean, (1, 1))
+                accStd = np.reshape(accStd, (1, 1))
         self.acc_gnd_standard = self.acc_gnd - accMean
         self.acc_gnd_standard = np.divide(self.acc_gnd_standard, accStd).astype(np.float32)
+
 
 
 

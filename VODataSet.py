@@ -9,7 +9,7 @@ class VODataSetManager_RNN_KF():
     def __init__(self, dsName='airsim', subType='mr', seq=[0], isTrain=True, split=0.2, delay = 10):
         data = DataManager()
         data.initHelper(dsName, subType, seq)
-
+        data.standardize(isTrain)
         print(data.numDataCum)
         idxList = []
         for i in range(0, data.numDataset):
