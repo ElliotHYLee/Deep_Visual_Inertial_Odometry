@@ -193,8 +193,8 @@ def test(dsName, subType, seqList):
 if __name__ == '__main__':
     dsName = 'airsim'
     subType = 'mr'
-    seq = [0]
-    train(dsName, subType, seq)
+    seq = [2]
+    #train(dsName, subType, seq)
     test(dsName, subType, seq)
 
 

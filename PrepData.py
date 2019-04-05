@@ -53,9 +53,6 @@ class DataManager(Singleton):
         else:
             accMean = np.loadtxt(normPath + '_img_accMean.txt')
             accStd = np.loadtxt(normPath + '_img_accStd.txt')
-            if self.dsName == 'euroc':
-                accMean = np.reshape(accMean, (1, 1))
-                accStd = np.reshape(accStd, (1, 1))
         self.acc_gnd_standard = self.acc_gnd - accMean
         self.acc_gnd_standard = np.divide(self.acc_gnd_standard, accStd).astype(np.float32)
 
