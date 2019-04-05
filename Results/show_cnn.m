@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'euroc';
-subType = '';
-seq = 4;
+dsName = 'airsim';
+subType = 'mr';
+seq = 2;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
@@ -223,6 +223,9 @@ plot(gt_dtr_gnd(:,3),'ro')
 plot(pr_dtr_gnd(:,3), 'b.')
 grid on 
 grid minor
+
+
+
 
 function[pltIndex] = mysubplot(gt, pr, index)
     hold on

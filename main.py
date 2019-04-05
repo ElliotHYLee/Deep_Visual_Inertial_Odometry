@@ -58,7 +58,8 @@ def test(dsName, subType, seqList):
 
 
     corr_vel_list = []
-    acc_std_list = []
+    acc_cov_list = []
+    sys_cov_list = []
     states = torch.zeros((delay, delay, 3)).cuda()
     for batch_idx, (acc, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(data_loader):
         dt = dt.to(device)
@@ -89,22 +90,24 @@ def test(dsName, subType, seqList):
             sysCovInit = sysCov[:, 0, :]
 
         with torch.no_grad():
-            velRNNKF, acc_cov, sysCov = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init, sysCovInit)
+            velRNNKF, accCov, sysCov = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init, sysCovInit)
 
-        #acc_std_list.append(getStd(acc_cov), batch_idx)
         corr_vel_list.append(velRNNKF.cpu().data.numpy())
+        if batch_idx == 0:
+            sys_cov_list.append(np.reshape(sysCov.cpu().data.numpy()[:, :], (delay, 3, 3)))
+            acc_cov_list.append(np.reshape(accCov.cpu().data.numpy()[:, :], (delay, 3, 3)))
+        else:
+            sys_cov_list.append(sysCov.cpu().data.numpy()[:, -1])
+            acc_cov_list.append(accCov.cpu().data.numpy()[:, -1])
 
     velRNNKF = np.concatenate(corr_vel_list, axis = 0)
-    #imu_bais = np.concatenate(imu_bias_list, axis = 0)
     data = DataManager()
     gt_dtr_gnd = data.gt_dtr_gnd#np.concatenate(gt_dtr_gnd_list, axis = 0)
     print(gt_dtr_gnd.shape)
 
-    N = 7500
+    N = 3000
 
     velKF = pd.read_csv('velKF.txt', sep=',', header=None).values.astype(np.float32)
-
-
     skip = 0.5
     # plt.figure()
     # plt.subplot(311)
@@ -124,7 +127,6 @@ def test(dsName, subType, seqList):
     # for idx in range(0, N, int(delay*skip)):
     #     plt.plot(np.arange(idx, idx + delay, 1), velRNNKF[idx, :, 2], 'b.', markersize='1')
 
-    print(velRNNKF.shape)
     var = np.zeros((velRNNKF.shape[0]+delay, 3))
     for i in range(velRNNKF.shape[0]):
         if i == 0:
@@ -132,7 +134,16 @@ def test(dsName, subType, seqList):
         else:
             var[delay+i,:] = velRNNKF[i,delay-1, :]
 
-    print(var.shape)
+    sysCov = np.concatenate(sys_cov_list, axis=0)
+    sysStd = np.zeros((sysCov.shape[0], 3))
+
+    accCov = np.concatenate(acc_cov_list, axis=0)
+    accStd = np.zeros((accCov.shape[0], 3))
+
+    for i in range(0, sysCov.shape[0]):
+        sysStd[i,:] = np.sqrt(np.diag(sysCov[i]))
+        accStd[i, :] = np.sqrt(np.diag(accCov[i]))
+
 
     velRNNKF = np.concatenate((np.zeros((delay, delay, 3)), velRNNKF), axis=0)
     plt.figure()
@@ -154,7 +165,6 @@ def test(dsName, subType, seqList):
     corr_pos = np.cumsum(var, axis=0)
     gt_pos = np.cumsum(gt_dtr_gnd, axis=0)
     gt_KF = np.cumsum(velKF, axis=0)
-
 
     plt.figure()
     plt.subplot(311)
@@ -188,13 +198,32 @@ def test(dsName, subType, seqList):
     plt.plot(gt_KF[:, 2], 'g')
     plt.plot(corr_pos[:, 2], 'b')
 
+    plt.figure()
+    plt.title('KF Uncertainty')
+    plt.subplot(311)
+    plt.plot(sysStd[:, 0], 'b')
+    plt.subplot(312)
+    plt.plot(sysStd[:, 1], 'b')
+    plt.subplot(313)
+    plt.plot(sysStd[:, 2], 'b')
+
+
+    plt.figure()
+    plt.title('Estimated Acc Uncertainty')
+    plt.subplot(311)
+    plt.plot(accStd[:, 0], 'b')
+    plt.subplot(312)
+    plt.plot(accStd[:, 1], 'b')
+    plt.subplot(313)
+    plt.plot(accStd[:, 2], 'b')
+
     plt.show()
 
 if __name__ == '__main__':
     dsName = 'airsim'
     subType = 'mr'
-    seq = [2]
-    #train(dsName, subType, seq)
+    seq = [0]
+    train(dsName, subType, seq)
     test(dsName, subType, seq)
 
 

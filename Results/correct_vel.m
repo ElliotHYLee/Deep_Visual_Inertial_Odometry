@@ -72,7 +72,7 @@ velKF = [0 0 0];
 A = eye(3);
 H = eye(3);
 P{1} = eye(3)*10^-10;
-R = [10^0 0 0; 0 1 0; 0 0 10^0]*10^-2
+R = [10^0 0 0; 0 1 0; 0 0 10^0]*10^-4
 for i=1:1:N
     velKF(i+1,:) = A*velKF(i,:)' + 0.5*dt(i)*acc_gnd(i,:)';
     pp = A*P{i}*A' + R;
@@ -258,8 +258,10 @@ legend('gt', 'cnn', 'imu', 'kf')
 
 figure
 hold on
-plot(gt_pos(:,1), gt_pos(:,3), 'ro')
-plot(pos_intKF(:,1), pos_intKF(:,3), 'b.')
+plot(gt_pos(:,1), gt_pos(:,2), 'ro')
+plot(pos_intKF(:,1), pos_intKF(:,2), 'b.')
+
+
 
 
 dlmwrite('../velKF.txt', velKF)
@@ -282,23 +284,4 @@ function[pltIndex] = mysubplot2D(gt1, gt2, pr1, pr2, index)
     hold off
     pltIndex = index + 1;
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

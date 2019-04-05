@@ -43,13 +43,13 @@ class Model_RNN_KF(nn.Module):
 
         acc_cov_chol = self.acc_cov_chol_lstm(acc_stand)
         acc_cov_chol = self.fc0(acc_cov_chol)
-        acc_cov = self.get33Cov(acc_cov_chol)
+        accCov = self.get33Cov(acc_cov_chol)
 
         accdt = torch.mul(dt, acc)
         for i in range(1, delay):
             # KF prediction step
             prVel = vel[:, i-1, :] + accdt[:, i, :]
-            prCov = sysCov[:, i-1, :, :] + acc_cov[:, i, :, :]
+            prCov = sysCov[:, i-1, :, :] + accCov[:, i, :, :]
 
             # KF correction step
             mCov = dtr_cv_gnd[:, i, :]
@@ -64,7 +64,7 @@ class Model_RNN_KF(nn.Module):
             vel[:, i, :] = nextVel
             sysCov[:, i, :, :] = nextCov
 
-        return vel, acc_cov, sysCov
+        return vel, accCov, sysCov
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
