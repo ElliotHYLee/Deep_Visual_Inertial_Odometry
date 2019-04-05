@@ -1,8 +1,8 @@
 from VODataSet import VODataSetManager_RNN_KF
 import matplotlib.pyplot as plt
-from Model_RNN_KF import Model_RNN_KF
+from Model_RNN_Ensemble import Model_RNN_Ensemble
 from VODataSet import DataLoader
-from ModelContainer_RNN_KF import ModelContainer_RNN_KF
+from ModelContainer_RNN_Ensemble import ModelContainer_RNN_Ensemble
 import numpy as np
 import time
 import torch.nn as nn
@@ -11,12 +11,13 @@ import torch
 from PrepData import DataManager
 import pandas as pd
 
+
 delay = 10
 def train(dsName, subType, seq):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     dm = VODataSetManager_RNN_KF(dsName=dsName, subType=subType, seq=seq, isTrain=True, delay=delay)
     train, val = dm.trainSet, dm.valSet
-    mc = ModelContainer_RNN_KF(Model_RNN_KF(dsName, delay=delay))
+    mc = ModelContainer_RNN_Ensemble(Model_RNN_Ensemble(dsName, delay=delay))
     #mc.load_weights(wName, train=True)
     mc.fit(train, val, batch_size=512, epochs=64, wName=wName, checkPointFreq=1)
 
@@ -50,7 +51,7 @@ def test(dsName, subType, seqList):
     data_loader = DataLoader(dataset=dataset, batch_size=1, shuffle=False)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    mc = Model_RNN_KF(dsName, delay=delay)
+    mc = Model_RNN_Ensemble(dsName, delay=delay)
     mc = nn.DataParallel(mc).to(device)
 
     checkPoint = torch.load(wName + '_best' + '.pt')
@@ -90,7 +91,7 @@ def test(dsName, subType, seqList):
             sysCovInit = sysCov[:, 0, :]
 
         with torch.no_grad():
-            velRNNKF, accCov, sysCov = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init, sysCovInit)
+            velRNNKF, accCov, sysCov, _ = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init, sysCovInit)
 
         corr_vel_list.append(velRNNKF.cpu().data.numpy())
         if batch_idx == 0:

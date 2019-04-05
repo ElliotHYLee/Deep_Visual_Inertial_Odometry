@@ -7,7 +7,7 @@ from MyPyTorchAPI.CustomLoss import MahalanobisLoss
 #from tkinter import *
 import sys
 
-class ModelContainer_RNN_KF():
+class ModelContainer_RNN_Ensemble():
     def __init__(self, net_model):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         print(torch.cuda.device)
@@ -85,9 +85,9 @@ class ModelContainer_RNN_KF():
             gt_dtr_gnd_init = gt_dtr_gnd_init.to(self.device)
 
             # forward pass and calc loss
-            velRNNKF, acc_cov, sysCov = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
+            velEns, acc_cov, sysCov, velKF = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
 
-            batch_loss = self.loss(velRNNKF, gt_dtr_gnd)
+            batch_loss = self.loss(velEns, gt_dtr_gnd) + self.loss(velKF, gt_dtr_gnd)
             epoch_loss += batch_loss.item()
 
             # update weights
@@ -132,22 +132,22 @@ class ModelContainer_RNN_KF():
             gt_dtr_gnd_init = gt_dtr_gnd_init.to(self.device)
 
             with torch.no_grad():
-                velRNNKF, acc_cov, sysCov = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
+                velEns, acc_cov, sysCov, velKF = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
 
                 if not isValidation:
-                    velRNNKF_list.append(velRNNKF.cpu().data.numpy())
+                    velRNNKF_list.append(velEns.cpu().data.numpy())
 
                 if isTarget:
-                    batch_loss = self.loss(velRNNKF, gt_dtr_gnd)
+                    batch_loss = self.loss(velEns, gt_dtr_gnd)
                     loss += batch_loss.item()
 
         mae = loss / len(data_loader)
         if isValidation:
             return mae
         else:
-            velRNNKF = np.concatenate(velRNNKF_list, axis=0)
+            velEns = np.concatenate(velRNNKF_list, axis=0)
 
-            return velRNNKF, mae
+            return velEns, mae
 
 if __name__ == '__main__':
     pass

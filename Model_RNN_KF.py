@@ -8,7 +8,7 @@ from MyPyTorchAPI.MatOp import *
 
 class Model_RNN_KF(nn.Module):
     def __init__(self, dsName='airsim', delay=10):
-        super(Model_RNN_KF, self).__init__()
+        super().__init__()
         self.delay = delay
 
         self.acc_cov_chol_lstm = LSTM(3, 1, 20)
