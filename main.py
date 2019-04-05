@@ -176,10 +176,10 @@ def test(dsName, subType, seqList):
     plt.show()
 
 if __name__ == '__main__':
-    dsName = 'kitti'
+    dsName = 'euroc'
     subType = ''
-    seq = [0, 2, 4, 6]
-    train(dsName, subType, seq)
+    seq = [1,2, 3, 5]
+    #train(dsName, subType, seq)
     test(dsName, subType, seq)
 
 
