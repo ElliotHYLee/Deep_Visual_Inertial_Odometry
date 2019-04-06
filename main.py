@@ -144,7 +144,6 @@ def test(dsName, subType, seqList):
         sysStd[i,:] = np.sqrt(np.diag(sysCov[i]))
         accStd[i, :] = np.sqrt(np.diag(accCov[i]))
 
-
     velRNNKF = np.concatenate((np.zeros((delay, delay, 3)), velRNNKF), axis=0)
 
     plt.figure()
