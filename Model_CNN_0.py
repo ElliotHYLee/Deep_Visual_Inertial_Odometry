@@ -7,7 +7,7 @@ from MyPyTorchAPI.MatOp import Batch33MatVec3Mul, GetCovMatFromChol
 
 class Model_CNN_0(nn.Module):
     def __init__(self, dsName='airsim'):
-        super(Model_CNN_0, self).__init__()
+        super().__init__()
         input_channel = 2 if dsName.lower() == 'euroc' else 6
         input_size = (input_channel, 360, 720)
         seq1 = MySeqModel(input_size, [
