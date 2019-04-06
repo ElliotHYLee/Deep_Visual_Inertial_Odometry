@@ -42,7 +42,7 @@ def shiftUp(states):
 def test(dsName, subType, seqList):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
-    seq = 2#seqList[0]
+    seq = 1#seqList[0]
     commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
 
     dm = VODataSetManager_RNN_KF(dsName=dsName, subType=subType, seq=[seq], isTrain=False, delay=delay)
@@ -146,6 +146,7 @@ def test(dsName, subType, seqList):
 
 
     velRNNKF = np.concatenate((np.zeros((delay, delay, 3)), velRNNKF), axis=0)
+
     plt.figure()
     plt.subplot(311)
     plt.plot(gt_dtr_gnd[:, 0], 'r.', markersize='5')
@@ -223,7 +224,7 @@ if __name__ == '__main__':
     dsName = 'airsim'
     subType = 'mr'
     seq = [0]
-    train(dsName, subType, seq)
+    #train(dsName, subType, seq)
     test(dsName, subType, seq)
 
 
