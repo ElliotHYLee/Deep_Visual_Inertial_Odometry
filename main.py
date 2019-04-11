@@ -58,13 +58,13 @@ def runTest(dsName, subType, seq, seqRange):
     test(dsName, subType, seqRange)
 
 if __name__ == '__main__':
-    # dsName = 'airsim'
-    # seq = [0]
-    # seqRange = [0, 3]
-    # runTrainTest(dsName, 'mr', seq, seqRange)
-    # runTrainTest(dsName, 'mrseg', seq, seqRange)
+    dsName = 'airsim'
+    seq = [0]
+    seqRange = [0, 3]
+    #runTrainTest(dsName, 'mr', seq, seqRange)
+    runTrainTest(dsName, 'mrseg', seq, seqRange)
     # runTrainTest(dsName, 'bar', seq, seqRange)
     # runTrainTest(dsName, 'pin', seq, seqRange)
 
-    runTrainTest('euroc', 'none', seq=[1, 2, 5, 3], seqRange=[1, 6])
+    #runTrainTest('euroc', 'none', seq=[1, 2, 5, 3], seqRange=[1, 6])
     #runTrainTest('kitti', 'none', seq=[0, 2, 4, 6], seqRange=[0, 11])
