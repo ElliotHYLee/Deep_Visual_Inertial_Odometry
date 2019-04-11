@@ -8,9 +8,18 @@ function[path] = getGTPath(dsName, subType, seq)
         elseif strcmp(subType, 'mrseg')
             path = strcat('D:/DLData/Airsim/', 'mrseg', int2str(seq), '/');
         end
+    elseif strcmp(dsName,'myroom')
+        if strcmp(subType, 'none') || strcmp(subType, '')
+            path = strcat('D:/DLData/MyRoom/data', int2str(seq), '/');
+        end
+    elseif strcmp(dsName,'mycar')
+        if strcmp(subType, 'none') || strcmp(subType, '')
+            path = strcat('D:/DLData/MyCar/data', int2str(seq), '/');
+        end
     elseif strcmp(dsName,'euroc')
-       path = strcat('D:/DLData/EuRoc/mh_', subType, int2str(seq), '/'); 
+       path = strcat('D:/DLData/EuRoc/mh_',  int2str(seq), '/'); 
     elseif strcmp(dsName, 'kitti')
+        subType='';
         if seq < 10
             path = strcat('D:\DLData\KITTI\odom\dataset\sequences\0', subType, int2str(seq), '/'); 
         else

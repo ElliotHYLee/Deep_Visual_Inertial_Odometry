@@ -22,7 +22,7 @@ class ModelContainer_CNN():
     def compile(self, loss=None, optimizer=None):
         self.loss = MahalanobisLoss(series_Len=0)#nn.modules.loss.L1Loss()
         #self.optimizer = optim.SGD(self.model.parameters(), lr=10**-2, weight_decay=0.01)
-        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-4, weight_decay=10**-4)
+        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-3, weight_decay=10**-4)
 
     def fit(self, train, validation=None, batch_size=1, epochs=1, shuffle=True, wName='weight.pt', checkPointFreq = 1):
         self.checkPointFreq = checkPointFreq
@@ -32,6 +32,8 @@ class ModelContainer_CNN():
 
         for epoch in range(0, epochs):
             train_loss, val_loss = self.runEpoch(epoch)
+            if val_loss < 2:
+                self.optimizer = optim.RMSprop(self.model.parameters(), lr=10 ** -4, weight_decay=10 ** -4)
             self.current_val_loss = val_loss
             self.train_loss.append(train_loss)
             self.val_loss.append(val_loss)

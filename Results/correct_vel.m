@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'kitti';
-subType = '';
-seq = 5;
+dsName = 'mycar';
+subType = 'none';
+seq = 1;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
@@ -72,18 +72,17 @@ velKF = [0 0 0];
 A = eye(3);
 H = eye(3);
 P{1} = eye(3)*10^-10;
-R = [1 0 0; 0 1 0; 0 0 1]*10^-4
+R = [1 0 0; 0 1 0; 0 0 1]*10^-1
 for i=1:1:N
-    velKF(i+1,:) = A*velKF(i,:)' + 0.5*dt(i)*acc_gnd(i,:)';
+    velKF(i+1,:) = A*velKF(i,:)' + dt(i)*acc_gnd(i,:)';
     pp = A*P{i}*A' + R;
-%     P{i+1} = pp;
+%    P{i+1} = pp;
     mCov = dtr_Q_gnd{i};
-    %mCov = eye(3)*10^-1;
+%     mCov = eye(3)*10^-1;
     K = pp*H'*inv(H*pp*H' + mCov)
     z = pr_dtr_gnd(i,:)';
-    velKF(i+1,:) = (velKF(i,:)' + K*(z-H*velKF(i,:)'))';
+    velKF(i+1,:) = (velKF(i+1,:)' + K*(z-H*velKF(i+1,:)'))';
     P{i+1} = pp - K*H*pp;
-    
 end
 
 for i =1:1:N
@@ -254,8 +253,8 @@ legend('gt', 'cnn', 'imu', 'kf')
 
 figure
 hold on
-plot(gt_pos(:,1), gt_pos(:,3), 'ro')
-plot(pos_intKF(:,1), pos_intKF(:,3), 'b.')
+plot(-gt_pos(:,2), gt_pos(:,1), 'ro')
+plot(-pos_intKF(:,2), pos_intKF(:,1), 'b.')
 
 function[pltIndex] = mysubplot(gt, pr, index)
     hold on

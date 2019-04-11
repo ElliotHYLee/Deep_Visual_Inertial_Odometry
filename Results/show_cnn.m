@@ -1,11 +1,11 @@
 clc, clear, close all
-dsName = 'airsim';
-subType = 'mr';
-seq = 2;
+dsName = 'mycar';
+subType = 'none';
+seq = 1;
 
 %% Get Ground Truth Info.
-gtPath = getGTPath(dsName,subType, seq);
-gt_dtName = strcat(gtPath, 'dt.txt');
+gtPath = getGTPath(dsName,subType, seq)
+gt_dtName = strcat(gtPath, 'dt.txt')
 gt_duName = strcat(gtPath, '\du.txt');
 gt_dwName = strcat(gtPath, '\dw.txt');
 gt_dtrName = strcat(gtPath, '\dtrans.txt');
@@ -205,22 +205,22 @@ grid minor
 
 subplot(4,3,7)
 hold on
-plot(gt_dtr_gnd(:,1),'ro')
-plot(pr_dtr_gnd(:,1), 'b.')
+plot(gt_dtr_gnd(:,1),'r.')
+plot(pr_dtr_gnd(:,1), 'b-.')
 grid on 
 grid minor
 
 subplot(4,3,8)
 hold on
-plot(gt_dtr_gnd(:,2),'ro')
-plot(pr_dtr_gnd(:,2), 'b.')
+plot(gt_dtr_gnd(:,2),'r.')
+plot(pr_dtr_gnd(:,2), 'b-.')
 grid on 
 grid minor
 
 subplot(4,3,9)
 hold on
-plot(gt_dtr_gnd(:,3),'ro')
-plot(pr_dtr_gnd(:,3), 'b.')
+plot(gt_dtr_gnd(:,3),'r.')
+plot(pr_dtr_gnd(:,3), 'b-.')
 grid on 
 grid minor
 

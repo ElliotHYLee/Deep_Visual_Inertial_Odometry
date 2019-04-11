@@ -23,7 +23,7 @@ def show(dsName, subType):
     plt.show()
 
 if __name__ == '__main__':
-    dsName = 'kitti'
+    dsName = 'euroc'
     subType='none'
     show(dsName, subType)
 

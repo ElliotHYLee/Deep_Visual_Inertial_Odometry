@@ -8,7 +8,7 @@ class ReadData():
         self.path = getPath(dsName, seq=seq, subType=subType)
 
         # non images
-        if dsName == 'airsim':
+        if dsName == 'airsim' or dsName == 'myroom' or dsName=='mycar':
             #print(self.path)
             self.data = pd.read_csv(self.path + 'data.txt', sep=' ', header=None)
             self.time_stamp = self.data.iloc[:, 0].values
@@ -74,7 +74,7 @@ class ReadData():
 
 if __name__ == '__main__':
     s = time.time()
-    d = ReadData(dsName='kitti', subType='none', seq=5)
+    d = ReadData(dsName='euroc', subType='none', seq=1)
     print(time.time() - s)
 
     for i in range(0, d.numImgs):

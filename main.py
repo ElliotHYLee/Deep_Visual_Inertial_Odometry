@@ -13,13 +13,13 @@ def train(dsName, subType, seq):
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
     #mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=64, epochs=40, wName=wName, checkPointFreq=1)
+    mc.fit(train, val, batch_size=64, epochs=60, wName=wName, checkPointFreq=1)
 
 def test(dsName, subType, seqRange):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
     for seq in range(seqRange[0], seqRange[1]):
-        commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
+        commName = resName + subType + str(seq) #if dsName == 'airsim' else resName + str(seq)
         dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
         dataset = dm.testSet
 
@@ -53,16 +53,20 @@ def runTest(dsName, subType, seq, seqRange):
     test(dsName, subType, seqRange)
 
 if __name__ == '__main__':
-    dsName = 'airsim'
+    dsName = 'myroom'
     seq = [0]
     seqRange = [0, 3]
     # runTrainTest(dsName, 'mr', seq, seqRange)
     # runTrainTest(dsName, 'mrseg', seq, seqRange)
-    runTrainTest(dsName, 'bar', seq, seqRange)
-    runTrainTest(dsName, 'pin', seq, seqRange)
+    #runTrainTest(dsName, 'bar', seq, seqRange)
+    #runTrainTest(dsName, 'pin', seq, seqRange)
 
-    # runTrainTest('euroc', 'none', seq=[1, 2, 5, 3], seqRange=[1, 6])
+    #runTrainTest('euroc', 'none', seq=[1, 2, 3, 5], seqRange=[1, 6])
+    #runTrainTest('euroc', 'edge', seq=[2, 3, 4, 5], seqRange=[1, 6])
     # runTrainTest('kitti', 'none', seq=[0, 2, 4, 6], seqRange=[0, 11])
+    #runTrainTest('kitti', 'edge', seq=[0, 2, 4, 6], seqRange=[0, 11])
+
+    runTrainTest('mycar', 'none', seq=[0, 2], seqRange=[0,3])
 
 
 

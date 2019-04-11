@@ -38,6 +38,12 @@ def getPathWin(dsName = 'AirSim', seq = 0, subType='mr'):
         path = 'D:/DLData/KITTI/odom/dataset/sequences/'
         path += '0'+str(seq) if seq<10 else str(seq)
         path += '/'
+    elif dsName == 'myroom':
+        if subType == 'none':
+            path = 'D:/DLData/MyRoom/data' + str(seq) + '/'
+    elif dsName == 'mycar':
+        if subType == 'none':
+            path = 'D:/DLData/MyCar/data' + str(seq) + '/'
     return path
 
 def getImgNames(path, dsName='AirSim', ts=None, subType=''):
@@ -55,12 +61,30 @@ def getImgNames(path, dsName='AirSim', ts=None, subType=''):
                 imgNames.append(path + 'images_pin/img_' + str(ts[i]) + '.png')
     elif dsName =='euroc':
         imgNames = (pd.read_csv(path + 'fName.txt', sep=' ', header=None)).iloc[:, 0]
+        idx = (pd.read_csv(path + 'idx.txt', sep=' ', header=None)).iloc[:, 0].values
+        imgNames = imgNames[idx].values
         for i in range(0, len(imgNames)):
             imgNames[i] = path + 'cam0/data/' + imgNames[i]
     elif dsName =='kitti':
         imgNames = (pd.read_csv(path + 'fNames.txt', sep=' ', header=None)).iloc[:, 0]
-        for i in range(0, len(imgNames)):
-            imgNames[i] = path + 'image_2/' + imgNames[i]
+        if subType == 'none':
+            for i in range(0, len(imgNames)):
+                imgNames[i] = path + 'image_2/' + imgNames[i]
+        elif subType == 'edge':
+            for i in range(0, len(imgNames)):
+                imgNames[i] = path + 'edge/' + imgNames[i]
+
+    elif dsName == 'myroom':
+        if subType == 'none':
+            for i in range(0, ts.shape[0]):
+                imgNames.append(path + 'images/' + str(ts[i]) + '.png')
+
+    elif dsName == 'mycar':
+        idx = (pd.read_csv(path + 'idx.txt', sep=' ', header=None)).iloc[:, 0].values
+        if subType == 'none':
+            for i in range(0, idx.shape[0]):
+                imgNames.append(path + 'images/' + str(ts[idx[i]]) + '.png')
+
     return imgNames
 
 def getEnd(start, N, totalN):
