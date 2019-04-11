@@ -19,14 +19,13 @@ class ReadData():
         self.dtr = pd.read_csv(self.path + 'dtrans.txt', sep=',', header=None).values.astype(np.float32)
         self.dtr_gnd = pd.read_csv(self.path + 'dtrans_gnd.txt', sep=',', header=None).values.astype(np.float32)
         self.linR = pd.read_csv(self.path + 'linR.txt', sep=',', header=None).values.astype(np.float32)
+        self.pos_gnd = pd.read_csv(self.path + 'pos.txt', sep=',', header=None).values.astype(np.float32)
         self.rotM_bdy2gnd = np.zeros((self.linR.shape[0], 3, 3), dtype=np.float32)
         for i in range(0, self.linR.shape[0]):
             self.rotM_bdy2gnd[i, :, :] = np.reshape(self.linR[i, :], (3, 3))
 
         self.numData = self.du.shape[0]
-        self.pos_gnd = pd.read_csv(self.path + 'pos.txt', sep=',', header=None).values.astype(np.float32)
         self.acc_gnd = pd.read_csv(self.path + 'acc_gnd.txt', sep=',', header=None).values.astype(np.float32)
-
 
         # images
         self.imgNames = getImgNames(self.path, dsName, ts = self.time_stamp, subType=subType)

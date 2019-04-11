@@ -19,10 +19,12 @@ class DataManager(Singleton):
         self.numChannel = 3 if self.dsName is not 'euroc' else 1
         self.subType = subType
         self.numDataset = len(seq)
+
         dataObj = [ReadData(dsName, subType, seq[i]) for i in range(0, self.numDataset)]
 
         # get number of data points
         self.numDataList = [dataObj[i].numData for i in range(0, self.numDataset)]
+        self.numDataCum = np.cumsum(self.numDataList)
         self.numTotalData = np.sum(self.numDataList)
         self.numTotalImgData = np.sum([dataObj[i].numImgs for i in range(0, self.numDataset)])
         print(self.numDataList)

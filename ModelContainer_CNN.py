@@ -75,12 +75,14 @@ class ModelContainer_CNN():
     def runEpoch(self, epoch):
         epoch_loss = 0
         self.model.train(True)
-        for batch_idx, (img0, img1, du, dw, dtr) in enumerate(self.train_loader):
+        for batch_idx, (img0, img1, du, dw, dtr, pos_init, pos) in enumerate(self.train_loader):
             img0 = img0.to(self.device)
             img1 = img1.to(self.device)
             du = du.to(self.device)
             dw = dw.to(self.device)
             dtr = dtr.to(self.device)
+            pos = pos.to(self.device)
+            pos_init = pos_init.to(self.device)
 
             # forward pass and calc loss
             pr_du, pr_du_cov, \
@@ -88,7 +90,7 @@ class ModelContainer_CNN():
             pr_dtr, pr_dtr_cov, \
             pr_du_rnn, pr_du_rnn_cov, \
             pr_dw_rnn, pr_dw_rnn_cov, \
-            pr_dtr_rnn, pr_dtr_rnn_cov = self.model(img0, img1, dw)
+            pr_dtr_rnn, pr_dtr_rnn_cov = self.model(img0, img1, dw, pos_init)
 
             batch_loss = self.loss(pr_du, du, pr_du_cov) + \
                          self.loss(pr_dw, dw, pr_dw_cov) + \
@@ -135,12 +137,14 @@ class ModelContainer_CNN():
         dtr_rnn_list, dtr_cov_rnn_list = [], []
 
         loss = 0
-        for batch_idx, (img0, img1, du, dw, dtr) in enumerate(data_loader):
+        for batch_idx, (img0, img1, du, dw, dtr, pos_init, pos) in enumerate(data_loader):
             img0 = img0.to(self.device)
             img1 = img1.to(self.device)
             du = du.to(self.device)
             dw = dw.to(self.device)
             dtr = dtr.to(self.device)
+            pos_init = pos_init.to(self.device)
+            pos = pos.to(self.device)
 
             with torch.no_grad():
                 pr_du, pr_du_cov, \
@@ -148,7 +152,7 @@ class ModelContainer_CNN():
                 pr_dtr, pr_dtr_cov, \
                 pr_du_rnn, pr_du_rnn_cov, \
                 pr_dw_rnn, pr_dw_rnn_cov, \
-                pr_dtr_rnn, pr_dtr_rnn_cov = self.model(img0, img1, dw)
+                pr_dtr_rnn, pr_dtr_rnn_cov = self.model(img0, img1, dw, pos_init)
 
                 if not isValidation: #if test
                     du_list.append(pr_du.cpu().data.numpy())

@@ -26,6 +26,8 @@ class MyLSTM(nn.Module):
 
     def forward(self, x):
         bn = x.shape[0]
+        if torch.cuda.is_available():
+            self.lstm.flatten_parameters()
         x, (h, c) = self.lstm(x, self.init_hidden(bn))
         return x
 

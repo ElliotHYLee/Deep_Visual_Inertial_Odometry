@@ -79,23 +79,26 @@ class Model_CNN_0(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-    def forward(self, x1, x2, dw_gt):
+    def forward(self, x1, x2, dw_gt, pos_init):
+        if x1.shape[0] != 1:
+            print('error: batch size gotta be 1 per gpu')
+            exit(1)
         # do CNN for the batch as series
-        input = torch.cat((x1, x2), 1)
-        x = self.encoder(input)
-        x = x.view(x.size(0), -1)
+        input = torch.cat((x1, x2), 2) #(1, delay, 6, 360, 720)
+        x = self.encoder(input[0])
+        x = x.view(x.size(0), -1) # (delay, 432)
         du_cnn = self.fc_du(x)
+
         dw_cnn = self.fc_dw(x)
         du_cnn_cov = self.fc_du_cov(x)
         dw_cnn_cov = self.fc_dw_cov(x)
-        dtr_cnn = self.fc_dtr(du_cnn, dw_gt)
+        dtr_cnn = self.fc_dtr(du_cnn, dw_gt[0])
         dtr_cnn_cov = self.fc_dtr_cov(x)
 
         # prep for RNN
         xSer = x.unsqueeze(0)
-
         # process dw_gt for RNN
-        dw_gt_proc = self.proc_dw_gt(dw_gt)
+        dw_gt_proc = self.proc_dw_gt(dw_gt[0])
         dw_gtSer = dw_gt_proc.unsqueeze(0)
 
         # LSTM
@@ -110,7 +113,7 @@ class Model_CNN_0(nn.Module):
         dw_rnn = self.fc_dw_rnn(lstm_out)
         dw_rnn_cov = self.fc_dw_cov_rnn(lstm_out)
 
-        dtr_rnn = self.fc_dtr(du_rnn, dw_gt)
+        dtr_rnn = self.fc_dtr(du_rnn, dw_gt[0])
         dtr_rnn_cov = self.fc_dtr_cov_rnn(lstm_out)
 
         return du_cnn, du_cnn_cov, \
@@ -122,15 +125,17 @@ class Model_CNN_0(nn.Module):
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    m = nn.DataParallel(Model_CNN_0(), device_ids=[0]).to(device)
-    img1 = torch.zeros((10, 3, 360, 720), dtype=torch.float).cuda()
+    m = nn.DataParallel(Model_CNN_0(), device_ids=[0, 1]).to(device)
+    img1 = torch.zeros((2, 10, 3, 360, 720), dtype=torch.float).cuda()
     img2 = img1
-    dw_gt = torch.zeros((10, 3), dtype=torch.float).cuda()
+    dw_gt = torch.zeros((2, 10, 3), dtype=torch.float).cuda()
+    pos_init = torch.zeros((2, 3), dtype=torch.float).cuda()
     du_cnn, du_cnn_cov, \
     dw_cnn, dw_cnn_cov, \
     dtr_cnn, dtr_cnn_cov, \
     du_rnn, du_rnn_cov, \
-    dw_rnn, dw_rnn_cov = m.forward(img1, img2, dw_gt)
+    dw_rnn, dw_rnn_cov, \
+    dtr_rnn, dtr_rnn_cov= m.forward(img1, img2, dw_gt, pos_init)
     # print(m)
 
 
