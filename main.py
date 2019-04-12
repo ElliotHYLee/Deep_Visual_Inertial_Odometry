@@ -13,7 +13,7 @@ def train(dsName, subType, seq):
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
     #mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=2, epochs=40, wName=wName, checkPointFreq=1)
+    mc.fit(train, val, batch_size=10, epochs=40, wName=wName, checkPointFreq=1)
 
 def test(dsName, subType, seqRange):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
@@ -59,7 +59,7 @@ def runTest(dsName, subType, seq, seqRange):
 
 if __name__ == '__main__':
     dsName = 'airsim'
-    seq = [0]
+    seq = [2]
     seqRange = [0, 3]
     #runTrainTest(dsName, 'mr', seq, seqRange)
     runTrainTest(dsName, 'mrseg', seq, seqRange)

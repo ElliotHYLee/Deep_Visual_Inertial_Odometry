@@ -37,9 +37,9 @@ class VODataSet_RCNN(Dataset):
     def __getitem__(self, i):
         index = self.idxList[i]
         try:
-            return self.dm.imgs[index:index+self.delay], self.dm.imgs[index+1:index+1+self.delay],\
-                   self.dm.du[index:index+self.delay], self.dm.dw[index:index+self.delay], \
-                   self.dm.dtr[index:index+self.delay]
+            return self.dm.imgs[index], self.dm.imgs[index+1],\
+                   self.dm.du[index], self.dm.dw[index], \
+                   self.dm.dtr[index]
         except:
             print('this is an error @ VODataSet_CNN of VODataSet.py')
             print(self.dm.imgs.shape)

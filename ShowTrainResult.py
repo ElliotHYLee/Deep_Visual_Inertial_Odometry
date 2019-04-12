@@ -23,8 +23,8 @@ def show(dsName, subType):
     plt.show()
 
 if __name__ == '__main__':
-    dsName = 'euroc'
-    subType='none'
+    dsName = 'airsim'
+    subType='mr'
     show(dsName, subType)
 
 
