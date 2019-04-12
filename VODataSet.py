@@ -22,7 +22,7 @@ class VODataSetManager_RCNN():
 
         idx = np.concatenate(idxList)
         possibleN = idx.shape[0]
-        print(idx)
+        #print(idx)
 
         if isTrain:
             idx = shuffle(idx)
@@ -68,7 +68,9 @@ if __name__ == '__main__':
     trainLoader = DataLoader(dataset = trainSet, batch_size=2)
     sum = 0
     for batch_idx, (img0, img1, du, dw, dtrans, pos_init, pos) in enumerate(trainLoader):
-        print(img0.shape)
+        print(dtrans.shape)
+        print(pos_init.shape)
+        print(pos.shape)
         img0 = img0.data.numpy()
         img1 = img1.data.numpy()
         sum += img0.shape[0]

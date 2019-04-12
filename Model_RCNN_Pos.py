@@ -7,9 +7,9 @@ from LSTMFC import LSTMFC
 from CNNFC import CNNFC
 from MyLSTM import MyLSTM
 
-class Model_CNN_0(nn.Module):
+class Model_RCNN_Pos(nn.Module):
     def __init__(self, dsName='airsim'):
-        super(Model_CNN_0, self).__init__()
+        super(Model_RCNN_Pos, self).__init__()
         input_channel = 2 if dsName.lower() == 'euroc' else 6
         input_size = (input_channel, 360, 720)
         seq1 = MySeqModel(input_size, [
@@ -57,6 +57,8 @@ class Model_CNN_0(nn.Module):
 
         self.fc_dtr_cov_rnn = nn.Sequential(CNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
 
+        self.fc_pos_cov_rnn = nn.Sequential(CNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
+
     def init_hidden(self, batch_size=8):
         h_t = torch.zeros([self.num_layers * self.num, batch_size, self.hiddenSize], dtype=torch.float32)
         c_t = torch.zeros([self.num_layers * self.num, batch_size, self.hiddenSize], dtype=torch.float32)
@@ -79,6 +81,9 @@ class Model_CNN_0(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
+    # x1, x2: images: (1, delay, 3, 360, 720)
+    # dw_gt: dRotation, (1, delay, 3)
+    # pos_init: initial pos, (1, 3)
     def forward(self, x1, x2, dw_gt, pos_init):
         if x1.shape[0] != 1:
             print('error: batch size gotta be 1 per gpu')
@@ -87,16 +92,18 @@ class Model_CNN_0(nn.Module):
         input = torch.cat((x1, x2), 2) #(1, delay, 6, 360, 720)
         x = self.encoder(input[0])
         x = x.view(x.size(0), -1) # (delay, 432)
-        du_cnn = self.fc_du(x)
 
-        dw_cnn = self.fc_dw(x)
-        du_cnn_cov = self.fc_du_cov(x)
-        dw_cnn_cov = self.fc_dw_cov(x)
-        dtr_cnn = self.fc_dtr(du_cnn, dw_gt[0])
-        dtr_cnn_cov = self.fc_dtr_cov(x)
+        # process CNN output
+        du_cnn = self.fc_du(x) #(delay, 3)
+        dw_cnn = self.fc_dw(x) #(delay, 3)
+        du_cnn_cov = self.fc_du_cov(x) #(delay, 6)
+        dw_cnn_cov = self.fc_dw_cov(x) #(delay, 6)
+        dtr_cnn = self.fc_dtr(du_cnn, dw_gt[0]) #(delay, 3)
+        dtr_cnn_cov = self.fc_dtr_cov(x) #(delay, 6)
 
         # prep for RNN
-        xSer = x.unsqueeze(0)
+        xSer = x.unsqueeze(0) #(1, delay, 432)
+
         # process dw_gt for RNN
         dw_gt_proc = self.proc_dw_gt(dw_gt[0])
         dw_gtSer = dw_gt_proc.unsqueeze(0)
@@ -104,28 +111,34 @@ class Model_CNN_0(nn.Module):
         # LSTM
         lstm_input = torch.cat((xSer, dw_gtSer), dim=2)
         lstm_out = self.lstm(lstm_input)
-        lstm_out = lstm_out.squeeze(0)
+        lstm_out = lstm_out.squeeze(0) #(delay, 432)
 
         # LSTM processed batch is ready
-        du_rnn = self.fc_du_rnn(lstm_out)
-        du_rnn_cov = self.fc_du_cov_rnn(lstm_out)
+        du_rnn = self.fc_du_rnn(lstm_out) #(delay, 3)
+        du_rnn_cov = self.fc_du_cov_rnn(lstm_out) #(delay, 6)
 
-        dw_rnn = self.fc_dw_rnn(lstm_out)
-        dw_rnn_cov = self.fc_dw_cov_rnn(lstm_out)
+        dw_rnn = self.fc_dw_rnn(lstm_out) #(delay, 3)
+        dw_rnn_cov = self.fc_dw_cov_rnn(lstm_out) #(delay, 6)
 
-        dtr_rnn = self.fc_dtr(du_rnn, dw_gt[0])
-        dtr_rnn_cov = self.fc_dtr_cov_rnn(lstm_out)
+        dtr_rnn = self.fc_dtr(du_rnn, dw_gt[0]) #(delay, 3)
+        dtr_rnn_cov = self.fc_dtr_cov_rnn(lstm_out)#(delay, 6)
 
-        return du_cnn, du_cnn_cov, \
-               dw_cnn, dw_cnn_cov, \
-               dtr_cnn, dtr_cnn_cov,\
-               du_rnn, du_rnn_cov, \
-               dw_rnn, dw_rnn_cov, \
-               dtr_rnn, dtr_rnn_cov
+        # calculate position through series
+        dtr_rnn[0, :] = dtr_rnn[None, 0, :] + pos_init
+        pos_rnn = torch.cumsum(dtr_rnn, dim=0) #(delay,3)
+        pos_cov_rnn = self.fc_pos_cov_rnn(lstm_out)
+
+        return du_cnn.unsqueeze(0), du_cnn_cov.unsqueeze(0), \
+               dw_cnn.unsqueeze(0), dw_cnn_cov.unsqueeze(0), \
+               dtr_cnn.unsqueeze(0), dtr_cnn_cov.unsqueeze(0), \
+               du_rnn.unsqueeze(0), du_rnn_cov.unsqueeze(0), \
+               dw_rnn.unsqueeze(0), dw_rnn_cov.unsqueeze(0), \
+               dtr_rnn.unsqueeze(0), dtr_rnn_cov.unsqueeze(0), \
+               pos_rnn.unsqueeze(0), pos_cov_rnn.unsqueeze(0)
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    m = nn.DataParallel(Model_CNN_0(), device_ids=[0, 1]).to(device)
+    m = nn.DataParallel(Model_RCNN_Pos(), device_ids=[0, 1]).to(device)
     img1 = torch.zeros((2, 10, 3, 360, 720), dtype=torch.float).cuda()
     img2 = img1
     dw_gt = torch.zeros((2, 10, 3), dtype=torch.float).cuda()
@@ -135,7 +148,9 @@ if __name__ == '__main__':
     dtr_cnn, dtr_cnn_cov, \
     du_rnn, du_rnn_cov, \
     dw_rnn, dw_rnn_cov, \
-    dtr_rnn, dtr_rnn_cov= m.forward(img1, img2, dw_gt, pos_init)
-    # print(m)
+    dtr_rnn, dtr_rnn_cov, \
+    pos= m.forward(img1, img2, dw_gt, pos_init)
+    print(dtr_rnn.shape)
+    print(pos.shape)
 
 
