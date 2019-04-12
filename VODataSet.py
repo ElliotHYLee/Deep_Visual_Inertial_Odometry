@@ -5,41 +5,35 @@ import cv2
 import time
 from sklearn.utils import shuffle
 
-class VODataSetManager_RCNN():
+class VODataSetManager_CNN():
     def __init__(self, dsName='airsim', subType='mr', seq=[0], isTrain=True, split=0.2):
         data = DataManager()
         data.initHelper(dsName, subType, seq)
         data.standardizeImgs(isTrain)
 
-        delay = 10
+        idx = np.arange(0, data.numTotalData, 1)
         N = data.numTotalData
-        possibleN = N - delay
-        idx = np.arange(0, possibleN, 1)
-
         if isTrain:
-            idx = shuffle(idx)
-            valN = int(possibleN * split)
-            trainN = possibleN - valN
+            #idx = shuffle(idx)
+            valN = int(N * split)
+            trainN = N - valN
             trainIdx = idx[0:trainN]
             valIdx = idx[trainN:]
-            self.trainSet = VODataSet_RCNN(trainN, trainIdx)
-            self.valSet = VODataSet_RCNN(valN, valIdx)
+            self.trainSet = VODataSet_CNN(trainN, trainIdx)
+            self.valSet = VODataSet_CNN(valN, valIdx)
         else:
-            self.testSet = VODataSet_RCNN(possibleN, idx)
+            self.testSet = VODataSet_CNN(N, idx)
 
-class VODataSet_RCNN(Dataset):
+class VODataSet_CNN(Dataset):
     def __init__(self, N, idxList):
         self.dm = DataManager()
         self.N = N
         self.idxList = idxList
-        self.delay = 10
 
     def __getitem__(self, i):
         index = self.idxList[i]
         try:
-            return self.dm.imgs[index], self.dm.imgs[index+1],\
-                   self.dm.du[index], self.dm.dw[index], \
-                   self.dm.dtr[index]
+            return self.dm.imgs[index], self.dm.imgs[index+1], self.dm.du[index], self.dm.dw[index], self.dm.dtr[index]
         except:
             print('this is an error @ VODataSet_CNN of VODataSet.py')
             print(self.dm.imgs.shape)
@@ -51,7 +45,7 @@ class VODataSet_RCNN(Dataset):
 
 if __name__ == '__main__':
     start = time.time()
-    dm = VODataSetManager_RCNN(dsName='airsim', subType='mr', seq=[2], isTrain=False)
+    dm = VODataSetManager_CNN(dsName='airsim', subType='mrseg', seq=[0], isTrain=False)
     print(time.time() - start)
     #trainSet, valSet = dm.trainSet, dm.valSet
     dataSet = dm.testSet

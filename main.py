@@ -1,4 +1,4 @@
-from VODataSet import VODataSetManager_RCNN
+from VODataSet import VODataSetManager_CNN
 import matplotlib.pyplot as plt
 from Model_CNN_0 import Model_CNN_0
 
@@ -9,7 +9,7 @@ from git_branch_param import *
 
 def train(dsName, subType, seq):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
-    dm = VODataSetManager_RCNN(dsName=dsName, subType=subType, seq=seq, isTrain=True)
+    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=seq, isTrain=True)
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
     #mc.load_weights(wName, train=True)
@@ -18,9 +18,9 @@ def train(dsName, subType, seq):
 def test(dsName, subType, seqRange):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
-    for seq in range(seqRange[0],seqRange[1]):
+    for seq in range(0,3):
         commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
-        dm = VODataSetManager_RCNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
+        dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
         dataset = dm.testSet
 
         mc = ModelContainer_CNN(Model_CNN_0(dsName))
@@ -63,8 +63,11 @@ if __name__ == '__main__':
     seqRange = [0, 3]
     #runTrainTest(dsName, 'mr', seq, seqRange)
     runTrainTest(dsName, 'mrseg', seq, seqRange)
-    # runTrainTest(dsName, 'bar', seq, seqRange)
-    # runTrainTest(dsName, 'pin', seq, seqRange)
+    #runTrainTest(dsName, 'bar', seq, seqRange)
+    #runTrainTest(dsName, 'pin', seq, seqRange)
 
-    #runTrainTest('euroc', 'none', seq=[1, 2, 5, 3], seqRange=[1, 6])
-    #runTrainTest('kitti', 'none', seq=[0, 2, 4, 6], seqRange=[0, 11])
+    # dsName = 'euroc'
+    # runTrainTest(dsName, 'none', seq=[1, 2, 3, 5], seqRange=[1, 6])
+    #
+    # dsName = 'kitti'
+    # runTrainTest(dsName, 'none', seq=[0, 2, 4, 6], seqRange=[0, 11])

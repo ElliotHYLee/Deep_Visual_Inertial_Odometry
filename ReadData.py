@@ -17,17 +17,15 @@ class ReadData():
         self.du = pd.read_csv(self.path + 'du.txt', sep=',', header=None).values.astype(np.float32)
         self.dw = pd.read_csv(self.path + 'dw.txt', sep=',', header=None).values.astype(np.float32)
         self.dtr = pd.read_csv(self.path + 'dtrans.txt', sep=',', header=None).values.astype(np.float32)
+        self.numData = self.du.shape[0]
         self.dtr_gnd = pd.read_csv(self.path + 'dtrans_gnd.txt', sep=',', header=None).values.astype(np.float32)
         self.linR = pd.read_csv(self.path + 'linR.txt', sep=',', header=None).values.astype(np.float32)
         self.rotM_bdy2gnd = np.zeros((self.linR.shape[0], 3, 3), dtype=np.float32)
         for i in range(0, self.linR.shape[0]):
             self.rotM_bdy2gnd[i, :, :] = np.reshape(self.linR[i, :], (3, 3))
 
-        self.numData = self.du.shape[0]
         self.pos_gnd = pd.read_csv(self.path + 'pos.txt', sep=',', header=None).values.astype(np.float32)
         self.acc_gnd = pd.read_csv(self.path + 'acc_gnd.txt', sep=',', header=None).values.astype(np.float32)
-
-
         # images
         self.imgNames = getImgNames(self.path, dsName, ts = self.time_stamp, subType=subType)
         self.numImgs = len(self.imgNames)
@@ -68,13 +66,13 @@ class ReadData():
 
 if __name__ == '__main__':
     s = time.time()
-    d = ReadData(dsName='airsim', subType='mr', seq=0)
+    d = ReadData(dsName='airsim', subType='mr', seq=1)
     print(time.time() - s)
 
-    # for i in range(0, d.numImgs):
-    #     img = d.imgs[i,:]
-    #     img = np.reshape(img, (360, 720, d.numChannel))
-    #     cv2.imshow('asdf', img)
-    #     cv2.waitKey(1)
+    for i in range(0, d.numImgs):
+        img = d.imgs[i,:]
+        img = np.reshape(img, (360, 720, d.numChannel))
+        cv2.imshow('asdf', img)
+        cv2.waitKey(1)
 
 

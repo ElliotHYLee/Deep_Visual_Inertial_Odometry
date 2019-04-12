@@ -38,8 +38,8 @@ class DataManager(Singleton):
         self.pos_gnd = np.concatenate([dataObj[i].pos_gnd for i in range(0, self.numDataset)], axis=0)
         self.rotM_bdy2gnd = np.concatenate([dataObj[i].rotM_bdy2gnd for i in range(0, self.numDataset)], axis=0)
         self.acc_gnd = np.concatenate([dataObj[i].acc_gnd for i in range(0, self.numDataset)], axis=0)
+        print(self.du.shape)
         print('done numeric data concat')
-
 
         # img data
         print('img data concat')
