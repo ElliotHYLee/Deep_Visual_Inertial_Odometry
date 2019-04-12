@@ -80,6 +80,11 @@ class Model_CNN_0(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x1, x2, dw_gt):
+        # x1 = x1.squeeze(0)
+        # x2 = x2.squeeze(0)
+        # dw_gt = dw_gt.squeeze(0)
+
+
         # do CNN for the batch as series
         input = torch.cat((x1, x2), 1)
         x = self.encoder(input)
@@ -114,9 +119,16 @@ class Model_CNN_0(nn.Module):
         dtr_rnn_cov = self.fc_dtr_cov_rnn(lstm_out)
 
 
+        # return du_cnn.unsqueeze(0), du_cnn_cov.unsqueeze(0), \
+        #        dw_cnn.unsqueeze(0), dw_cnn_cov.unsqueeze(0), \
+        #        dtr_cnn.unsqueeze(0), dtr_cnn_cov.unsqueeze(0),\
+        #        du_rnn.unsqueeze(0), du_rnn_cov.unsqueeze(0), \
+        #        dw_rnn.unsqueeze(0), dw_rnn_cov.unsqueeze(0), \
+        #        dtr_rnn.unsqueeze(0), dtr_rnn_cov.unsqueeze(0)
+
         return du_cnn, du_cnn_cov, \
                dw_cnn, dw_cnn_cov, \
-               dtr_cnn, dtr_cnn_cov,\
+               dtr_cnn, dtr_cnn_cov, \
                du_rnn, du_rnn_cov, \
                dw_rnn, dw_rnn_cov, \
                dtr_rnn, dtr_rnn_cov

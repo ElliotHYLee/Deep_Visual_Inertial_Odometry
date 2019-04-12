@@ -15,7 +15,7 @@ def train(dsName, subType, seq):
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
     #mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=10, epochs=10, wName=wName, checkPointFreq=1)
+    mc.fit(train, val, batch_size=1, epochs=3, wName=wName, checkPointFreq=1)
 
 def test(dsName, subType, seqRange):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
@@ -25,14 +25,15 @@ def test(dsName, subType, seqRange):
 
     dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
     dataset = dm.testSet
-    data_loader = DataLoader(dataset=dataset, batch_size=10, shuffle=False)
+
+    data_loader = DataLoader(dataset=dm.testSet, batch_size=1, shuffle=False)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     mc = Model_CNN_0(dsName)
-    mc = nn.DataParallel(mc).to(device)
-
+    mc = nn.DataParallel(mc , device_ids=[0]).to(device)
     checkPoint = torch.load(wName + '_best' + '.pt')
     mc.load_state_dict(checkPoint['model_state_dict'])
+    mc.eval()
 
     pr_du_list = []
     du_list = []
@@ -43,6 +44,7 @@ def test(dsName, subType, seqRange):
         dw = dw.to(device)
         dtr = dtr.to(device)
 
+
         pr_du, pr_du_cov, \
         pr_dw, pr_dw_cov, \
         pr_dtr, pr_dtr_cov, \
@@ -50,18 +52,18 @@ def test(dsName, subType, seqRange):
         pr_dw_rnn, pr_dw_rnn_cov, \
         pr_dtr_rnn, pr_dtr_rnn_cov = mc(img0, img1, dw)
 
-        # pr_du = pr_du.squeeze(0)
+        pr_du = pr_du.squeeze(0)
         pr_du_list.append(pr_du.cpu().data.numpy())
+        du = du.squeeze(0)
         du_list.append(du.cpu().data.numpy())
-    pr_du = np.concatenate(pr_du_list)
-    du = np.concatenate(du_list)
+
+    pr_du = np.concatenate(pr_du_list, axis=0)
+    du = np.concatenate(du_list, axis=0)
+
     plt.figure()
     plt.plot(du[:,0], 'r')
     plt.plot(pr_du[:,0], 'b.')
     plt.show()
-
-
-
 
 
     # for seq in range(0,3):

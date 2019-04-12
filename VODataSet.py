@@ -97,8 +97,17 @@ class VODataSetManager_CNN():
         data.initHelper(dsName, subType, seq)
         data.standardizeImgs(isTrain)
 
-        idx = np.arange(0, data.numTotalData, 1)
-        N = data.numTotalData
+        delay = 10
+        idxList = []
+        for i in range(0, data.numDataset):
+            if i == 0:
+                idxList.append(np.arange(0, data.numDataCum[i] - delay, delay))
+            else:
+                idxList.append(np.arange(data.numDataCum[i - 1], data.numDataCum[i] - delay, delay))
+        idx = np.concatenate(idxList)
+
+        N = idx.shape[0]
+
         if isTrain:
             #idx = shuffle(idx)
             valN = int(N * split)
@@ -113,11 +122,16 @@ class VODataSetManager_CNN():
 class VODataSet_CNN(Dataset):
     def __init__(self, N, idxList):
         self.dm = DataManager()
-        self.N = N
+        self.N = idxList.shape[0]
         self.idxList = idxList
 
     def __getitem__(self, i):
         index = self.idxList[i]
+        delay = 10
+        # try:
+        #     return self.dm.imgs[index:index+delay], self.dm.imgs[index+1:index+1+delay], \
+        #            self.dm.du[index:index+delay], self.dm.dw[index:index+delay], self.dm.dtr[index:index+delay]
+
         try:
             return self.dm.imgs[index], self.dm.imgs[index+1], \
                    self.dm.du[index], self.dm.dw[index], self.dm.dtr[index]
@@ -132,13 +146,17 @@ class VODataSet_CNN(Dataset):
 
 if __name__ == '__main__':
     start = time.time()
-    dm = VODataSetManager_CNN(dsName='airsim', subType='mr', seq=[0], isTrain=False)
+    dm = VODataSetManager_CNN(dsName='airsim', subType='mr', seq=[0], isTrain=True)
     print(time.time() - start)
-    #trainSet, valSet = dm.trainSet, dm.valSet
-    dataSet = dm.testSet
-    trainLoader = DataLoader(dataset = dataSet, batch_size=64)
+    trainSet, valSet = dm.trainSet, dm.valSet
+    print(len(trainSet))
+    print(len(valSet))
+    #dataSet = dm.testSet
+    trainLoader = DataLoader(dataset = trainSet, batch_size=1)
     sum = 0
     for batch_idx, (img0, img1, du, dw, dtrans) in enumerate(trainLoader):
+        img0 = img0.squeeze(0)
+        img1 = img1.squeeze(0)
         img0 = img0.data.numpy()
         img1 = img1.data.numpy()
         sum += img0.shape[0]
