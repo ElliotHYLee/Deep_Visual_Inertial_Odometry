@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
-from Model_RCNN import Model_RCNN
+from Model_CNN_0 import Model_CNN_0
 
-from ModelContainer_RCNN import ModelContainer_RCNN
+from ModelContainer_CNN import ModelContainer_CNN
 import numpy as np
 from git_branch_param import *
 
 def show(dsName, subType):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
-    mc = ModelContainer_RCNN(Model_RCNN(dsName))
+    mc = ModelContainer_CNN(Model_CNN_0(dsName))
     mc.load_weights(wName, train=False)
     train_loss, val_loss = mc.getLossHistory()
     plt.figure()

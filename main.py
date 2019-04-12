@@ -1,49 +1,95 @@
 from VODataSet import VODataSetManager_CNN
 import matplotlib.pyplot as plt
-from Model_RCNN import Model_RCNN
-
-from ModelContainer_RCNN import ModelContainer_RCNN
+from Model_CNN_0 import Model_CNN_0
+from VODataSet import DataLoader
+from ModelContainer_CNN import ModelContainer_CNN
 import numpy as np
 import time
 from git_branch_param import *
-
+import torch
+import torch.nn as nn
+delay = 10
 def train(dsName, subType, seq):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=seq, isTrain=True)
     train, val = dm.trainSet, dm.valSet
-    mc = ModelContainer_RCNN(Model_RCNN(dsName))
+    mc = ModelContainer_CNN(Model_CNN_0(dsName))
     #mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=10, epochs=40, wName=wName, checkPointFreq=1)
+    mc.fit(train, val, batch_size=10, epochs=10, wName=wName, checkPointFreq=1)
 
 def test(dsName, subType, seqRange):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
-    for seq in range(0,3):
-        commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
-        dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
-        dataset = dm.testSet
+    seq = 2  # seqList[0]
+    commName = resName + subType + str(seq)
 
-        mc = ModelContainer_RCNN(Model_RCNN(dsName))
-        mc.load_weights(wName+'_best', train=False)
+    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
+    dataset = dm.testSet
+    data_loader = DataLoader(dataset=dataset, batch_size=10, shuffle=False)
 
-        pr_du, du_cov, \
-        pr_dw, dw_cov, \
-        pr_dtr, dtr_cov, \
-        pr_du_rnn, pr_du_cov_rnn, \
-        pr_dw_rnn, pr_dw_cov_rnn, \
-        pr_dtr_rnn, pr_dtr_cov_rnn, \
-        mae = mc.predict(dataset)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    mc = Model_CNN_0(dsName)
+    mc = nn.DataParallel(mc).to(device)
 
-        np.savetxt(commName + '_du.txt', pr_du)
-        np.savetxt(commName + '_du_cov.txt', du_cov)
-        np.savetxt(commName + '_dw.txt', pr_dw)
-        np.savetxt(commName + '_dw_cov.txt', dw_cov)
-        np.savetxt(commName + '_dtr.txt', pr_dtr)
-        np.savetxt(commName + '_dtr_cov.txt', dtr_cov)
-        np.savetxt(commName + '_du_rnn.txt', pr_du_rnn)
-        np.savetxt(commName + '_du_cov_rnn.txt', pr_du_cov_rnn)
-        np.savetxt(commName + '_dw_rnn.txt', pr_dw_rnn)
-        np.savetxt(commName + '_dw_cov_rnn.txt', pr_dw_cov_rnn)
+    checkPoint = torch.load(wName + '_best' + '.pt')
+    mc.load_state_dict(checkPoint['model_state_dict'])
+
+    pr_du_list = []
+    du_list = []
+    for batch_idx, (img0, img1, du, dw, dtr) in enumerate(data_loader):
+        img0 = img0.to(device)
+        img1 = img1.to(device)
+        du = du.to(device)
+        dw = dw.to(device)
+        dtr = dtr.to(device)
+
+        pr_du, pr_du_cov, \
+        pr_dw, pr_dw_cov, \
+        pr_dtr, pr_dtr_cov, \
+        pr_du_rnn, pr_du_rnn_cov, \
+        pr_dw_rnn, pr_dw_rnn_cov, \
+        pr_dtr_rnn, pr_dtr_rnn_cov = mc(img0, img1, dw)
+
+        # pr_du = pr_du.squeeze(0)
+        pr_du_list.append(pr_du.cpu().data.numpy())
+        du_list.append(du.cpu().data.numpy())
+    pr_du = np.concatenate(pr_du_list)
+    du = np.concatenate(du_list)
+    plt.figure()
+    plt.plot(du[:,0], 'r')
+    plt.plot(pr_du[:,0], 'b.')
+    plt.show()
+
+
+
+
+
+    # for seq in range(0,3):
+    #     commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
+    #     dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
+    #     dataset = dm.testSet
+    #
+    #     mc = ModelContainer_CNN(Model_CNN_0(dsName))
+    #     mc.load_weights(wName+'_best', train=False)
+    #
+    #     pr_du, du_cov, \
+    #     pr_dw, dw_cov, \
+    #     pr_dtr, dtr_cov, \
+    #     pr_du_rnn, pr_du_cov_rnn, \
+    #     pr_dw_rnn, pr_dw_cov_rnn, \
+    #     pr_dtr_rnn, pr_dtr_cov_rnn, \
+    #     mae = mc.predict(dataset)
+    #
+    #     np.savetxt(commName + '_du.txt', pr_du)
+    #     np.savetxt(commName + '_du_cov.txt', du_cov)
+    #     np.savetxt(commName + '_dw.txt', pr_dw)
+    #     np.savetxt(commName + '_dw_cov.txt', dw_cov)
+    #     np.savetxt(commName + '_dtr.txt', pr_dtr)
+    #     np.savetxt(commName + '_dtr_cov.txt', dtr_cov)
+    #     np.savetxt(commName + '_du_rnn.txt', pr_du_rnn)
+    #     np.savetxt(commName + '_du_cov_rnn.txt', pr_du_cov_rnn)
+    #     np.savetxt(commName + '_dw_rnn.txt', pr_dw_rnn)
+    #     np.savetxt(commName + '_dw_cov_rnn.txt', pr_dw_cov_rnn)
 
 def runTrainTest(dsName, subType, seq, seqRange):
     runTrain(dsName, subType, seq, seqRange)
@@ -63,9 +109,9 @@ if __name__ == '__main__':
     seqRange = [0, 3]
     #runTrainTest(dsName, 'mr', seq, seqRange)
     runTrainTest(dsName, 'mrseg', seq, seqRange)
-    #runTrainTest(dsName, 'bar', seq, seqRange)
-    #runTrainTest(dsName, 'pin', seq, seqRange)
-
+    # runTrainTest(dsName, 'bar', seq, seqRange)
+    # runTrainTest(dsName, 'pin', seq, seqRange)
+    #
     # dsName = 'euroc'
     # runTrainTest(dsName, 'none', seq=[1, 2, 3, 5], seqRange=[1, 6])
     #

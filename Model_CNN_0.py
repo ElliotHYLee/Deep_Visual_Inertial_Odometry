@@ -7,9 +7,9 @@ from LSTMFC import LSTMFC
 from CNNFC import CNNFC
 from MyLSTM import MyLSTM
 
-class Model_RCNN(nn.Module):
+class Model_CNN_0(nn.Module):
     def __init__(self, dsName='airsim'):
-        super(Model_RCNN, self).__init__()
+        super(Model_CNN_0, self).__init__()
         input_channel = 2 if dsName.lower() == 'euroc' else 6
         input_size = (input_channel, 360, 720)
         seq1 = MySeqModel(input_size, [
@@ -113,6 +113,7 @@ class Model_RCNN(nn.Module):
         dtr_rnn = self.fc_dtr(du_rnn, dw_gt)
         dtr_rnn_cov = self.fc_dtr_cov_rnn(lstm_out)
 
+
         return du_cnn, du_cnn_cov, \
                dw_cnn, dw_cnn_cov, \
                dtr_cnn, dtr_cnn_cov,\
@@ -122,7 +123,7 @@ class Model_RCNN(nn.Module):
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    m = nn.DataParallel(Model_RCNN(), device_ids=[0]).to(device)
+    m = nn.DataParallel(Model_CNN_0(), device_ids=[0]).to(device)
     img1 = torch.zeros((10, 3, 360, 720), dtype=torch.float).cuda()
     img2 = img1
     dw_gt = torch.zeros((10, 3), dtype=torch.float).cuda()
@@ -130,7 +131,8 @@ if __name__ == '__main__':
     dw_cnn, dw_cnn_cov, \
     dtr_cnn, dtr_cnn_cov, \
     du_rnn, du_rnn_cov, \
-    dw_rnn, dw_rnn_cov = m.forward(img1, img2, dw_gt)
+    dw_rnn, dw_rnn_cov, \
+    dtr_rnn, dtr_rnn_cov = m.forward(img1, img2, dw_gt)
     # print(m)
 
 

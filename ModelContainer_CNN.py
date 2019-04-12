@@ -7,7 +7,7 @@ from MyPyTorchAPI.CustomLoss import MahalanobisLoss
 #from tkinter import *
 import sys
 
-class ModelContainer_RCNN():
+class ModelContainer_CNN():
     def __init__(self, net_model):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         print(torch.cuda.device)
@@ -22,7 +22,7 @@ class ModelContainer_RCNN():
     def compile(self, loss=None, optimizer=None):
         self.loss = MahalanobisLoss(series_Len=0)#nn.modules.loss.L1Loss()
         # self.optimizer = optim.SGD(self.model.parameters(), lr=10**-2, weight_decay=0.01)
-        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-4, weight_decay=10**-4)
+        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-3, weight_decay=10**-4)
 
     def fit(self, train, validation=None, batch_size=1, epochs=1, shuffle=True, wName='weight.pt', checkPointFreq = 1):
         self.checkPointFreq = checkPointFreq
@@ -31,6 +31,8 @@ class ModelContainer_RCNN():
         self.valid_loader = DataLoader(dataset=validation, batch_size=batch_size, shuffle=shuffle)
 
         for epoch in range(0, epochs):
+            if epoch > 0:
+                self.optimizer = optim.RMSprop(self.model.parameters(), lr=10 ** -4, weight_decay=10 ** -4)
             train_loss, val_loss = self.runEpoch(epoch)
             self.current_val_loss = val_loss
             self.train_loss.append(train_loss)
@@ -72,10 +74,34 @@ class ModelContainer_RCNN():
     def getLossHistory(self):
         return np.array(self.train_loss), np.array(self.val_loss)
 
+    def getBatchLoss(self, pr_du, pr_du_cov, du,
+                           pr_dw, pr_dw_cov, dw,
+                           pr_dtr, pr_dtr_cov, dtr,
+                           pr_du_rnn, pr_du_rnn_cov,
+                           pr_dw_rnn, pr_dw_rnn_cov,
+                           pr_dtr_rnn, pr_dtr_rnn_cov):
+        # batch_loss = self.loss(pr_du.unsqueeze(0), du.unsqueeze(0), pr_du_cov.unsqueeze(0)) + \
+        #              self.loss(pr_dw.unsqueeze(0), dw.unsqueeze(0), pr_dw_cov.unsqueeze(0)) + \
+        #              self.loss(pr_dtr.unsqueeze(0), dtr.unsqueeze(0), pr_dtr_cov.unsqueeze(0)) + \
+        #              self.loss(pr_du_rnn.unsqueeze(0), du.unsqueeze(0), pr_du_rnn_cov.unsqueeze(0)) + \
+        #              self.loss(pr_dw_rnn.unsqueeze(0), dw.unsqueeze(0), pr_dw_rnn_cov.unsqueeze(0)) + \
+        #              self.loss(pr_dtr_rnn.unsqueeze(0), dtr.unsqueeze(0), pr_dtr_rnn_cov.unsqueeze(0))
+
+        batch_loss = self.loss(pr_du, du, pr_du_cov) + \
+                     self.loss(pr_dw, dw, pr_dw_cov) + \
+                     self.loss(pr_dtr, dtr, pr_dtr_cov) + \
+                     self.loss(pr_du_rnn, du, pr_du_rnn_cov) + \
+                     self.loss(pr_dw_rnn, dw, pr_dw_rnn_cov) + \
+                     self.loss(pr_dtr_rnn, dtr, pr_dtr_rnn_cov)
+
+        return batch_loss
+
     def runEpoch(self, epoch):
         epoch_loss = 0
         self.model.train(True)
         for batch_idx, (img0, img1, du, dw, dtr) in enumerate(self.train_loader):
+            if img0.shape[0] != 10:
+                continue
             img0 = img0.to(self.device)
             img1 = img1.to(self.device)
             du = du.to(self.device)
@@ -90,12 +116,18 @@ class ModelContainer_RCNN():
             pr_dw_rnn, pr_dw_rnn_cov, \
             pr_dtr_rnn, pr_dtr_rnn_cov = self.model(img0, img1, dw)
 
-            batch_loss = self.loss(pr_du, du, pr_du_cov) + \
-                         self.loss(pr_dw, dw, pr_dw_cov) + \
-                         self.loss(pr_dtr, dtr, pr_dtr_cov) + \
-                         self.loss(pr_du_rnn, du, pr_du_rnn_cov) + \
-                         self.loss(pr_dw_rnn, dw, pr_dw_rnn_cov) + \
-                         self.loss(pr_dtr_rnn, dtr, pr_dtr_rnn_cov)
+            batch_loss = self.getBatchLoss(pr_du, pr_du_cov, du,
+                           pr_dw, pr_dw_cov, dw,
+                           pr_dtr, pr_dtr_cov, dtr,
+                           pr_du_rnn, pr_du_rnn_cov,
+                           pr_dw_rnn, pr_dw_rnn_cov,
+                           pr_dtr_rnn, pr_dtr_rnn_cov)
+            # self.loss(pr_du.unsqueeze(0), du.unsqueeze(0), pr_du_cov.unsqueeze(0)) + \
+            #              self.loss(pr_dw.unsqueeze(0), dw.unsqueeze(0), pr_dw_cov.unsqueeze(0)) + \
+            #              self.loss(pr_dtr.unsqueeze(0), dtr.unsqueeze(0), pr_dtr_cov.unsqueeze(0)) + \
+            #              self.loss(pr_du_rnn.unsqueeze(0), du.unsqueeze(0), pr_du_rnn_cov.unsqueeze(0)) + \
+            #              self.loss(pr_dw_rnn.unsqueeze(0), dw.unsqueeze(0), pr_dw_rnn_cov.unsqueeze(0)) + \
+            #              self.loss(pr_dtr_rnn.unsqueeze(0), dtr.unsqueeze(0), pr_dtr_rnn_cov.unsqueeze(0))
 
 
             epoch_loss += batch_loss.item()
@@ -129,13 +161,15 @@ class ModelContainer_RCNN():
         return loss
 
     def predict(self, data_incoming, isValidation=False, isTarget=True):
-        data_loader = data_incoming if isValidation else DataLoader(dataset=data_incoming, batch_size=16, shuffle=False)
+        data_loader = data_incoming if isValidation else DataLoader(dataset=data_incoming, batch_size=10, shuffle=False)
         du_list, dw_list, dtr_list, du_cov_list, dw_cov_list, dtr_cov_list = [], [], [], [], [], []
         du_rnn_list, du_cov_rnn_list, dw_rnn_list, dw_cov_rnn_list = [], [], [], []
         dtr_rnn_list, dtr_cov_rnn_list = [], []
 
         loss = 0
         for batch_idx, (img0, img1, du, dw, dtr) in enumerate(data_loader):
+            if img0.shape[0] != 10:
+                continue
             img0 = img0.to(self.device)
             img1 = img1.to(self.device)
             du = du.to(self.device)
@@ -165,12 +199,18 @@ class ModelContainer_RCNN():
                     dtr_cov_rnn_list.append((pr_dtr_rnn_cov.cpu()).data.numpy())
 
                 if isTarget: # if test or validation with available ground truth
-                    batch_loss = self.loss(pr_du, du, pr_du_cov) + \
-                                 self.loss(pr_dw, dw, pr_dw_cov) + \
-                                 self.loss(pr_dtr, dtr, pr_dtr_cov) + \
-                                 self.loss(pr_du_rnn, du, pr_du_rnn_cov) + \
-                                 self.loss(pr_dw_rnn, dw, pr_dw_rnn_cov) + \
-                                 self.loss(pr_dtr_rnn, dtr, pr_dtr_rnn_cov)
+                    batch_loss = batch_loss = self.getBatchLoss(pr_du, pr_du_cov, du,
+                           pr_dw, pr_dw_cov, dw,
+                           pr_dtr, pr_dtr_cov, dtr,
+                           pr_du_rnn, pr_du_rnn_cov,
+                           pr_dw_rnn, pr_dw_rnn_cov,
+                           pr_dtr_rnn, pr_dtr_rnn_cov)
+                    # batch_loss = self.loss(pr_du.unsqueeze(0), du.unsqueeze(0), pr_du_cov.unsqueeze(0)) + \
+                    #      self.loss(pr_dw.unsqueeze(0), dw.unsqueeze(0), pr_dw_cov.unsqueeze(0)) + \
+                    #      self.loss(pr_dtr.unsqueeze(0), dtr.unsqueeze(0), pr_dtr_cov.unsqueeze(0)) + \
+                    #      self.loss(pr_du_rnn.unsqueeze(0), du.unsqueeze(0), pr_du_rnn_cov.unsqueeze(0)) + \
+                    #      self.loss(pr_dw_rnn.unsqueeze(0), dw.unsqueeze(0), pr_dw_rnn_cov.unsqueeze(0)) + \
+                    #      self.loss(pr_dtr_rnn.unsqueeze(0), dtr.unsqueeze(0), pr_dtr_rnn_cov.unsqueeze(0))
 
                     loss += batch_loss.item()
 
