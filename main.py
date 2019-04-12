@@ -1,8 +1,8 @@
 from VODataSet import VODataSetManager_CNN
 import matplotlib.pyplot as plt
-from Model_CNN_0 import Model_CNN_0
+from Model_RCNN import Model_RCNN
 
-from ModelContainer_CNN import ModelContainer_CNN
+from ModelContainer_RCNN import ModelContainer_RCNN
 import numpy as np
 import time
 from git_branch_param import *
@@ -11,7 +11,7 @@ def train(dsName, subType, seq):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=seq, isTrain=True)
     train, val = dm.trainSet, dm.valSet
-    mc = ModelContainer_CNN(Model_CNN_0(dsName))
+    mc = ModelContainer_RCNN(Model_RCNN(dsName))
     #mc.load_weights(wName, train=True)
     mc.fit(train, val, batch_size=10, epochs=40, wName=wName, checkPointFreq=1)
 
@@ -23,7 +23,7 @@ def test(dsName, subType, seqRange):
         dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
         dataset = dm.testSet
 
-        mc = ModelContainer_CNN(Model_CNN_0(dsName))
+        mc = ModelContainer_RCNN(Model_RCNN(dsName))
         mc.load_weights(wName+'_best', train=False)
 
         pr_du, du_cov, \
@@ -59,7 +59,7 @@ def runTest(dsName, subType, seq, seqRange):
 
 if __name__ == '__main__':
     dsName = 'airsim'
-    seq = [2]
+    seq = [0]
     seqRange = [0, 3]
     #runTrainTest(dsName, 'mr', seq, seqRange)
     runTrainTest(dsName, 'mrseg', seq, seqRange)

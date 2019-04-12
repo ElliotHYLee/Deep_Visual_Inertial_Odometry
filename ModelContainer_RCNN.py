@@ -7,7 +7,7 @@ from MyPyTorchAPI.CustomLoss import MahalanobisLoss
 #from tkinter import *
 import sys
 
-class ModelContainer_CNN():
+class ModelContainer_RCNN():
     def __init__(self, net_model):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         print(torch.cuda.device)

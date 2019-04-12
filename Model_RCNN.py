@@ -7,9 +7,9 @@ from LSTMFC import LSTMFC
 from CNNFC import CNNFC
 from MyLSTM import MyLSTM
 
-class Model_CNN_0(nn.Module):
+class Model_RCNN(nn.Module):
     def __init__(self, dsName='airsim'):
-        super(Model_CNN_0, self).__init__()
+        super(Model_RCNN, self).__init__()
         input_channel = 2 if dsName.lower() == 'euroc' else 6
         input_size = (input_channel, 360, 720)
         seq1 = MySeqModel(input_size, [
@@ -122,7 +122,7 @@ class Model_CNN_0(nn.Module):
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    m = nn.DataParallel(Model_CNN_0(), device_ids=[0]).to(device)
+    m = nn.DataParallel(Model_RCNN(), device_ids=[0]).to(device)
     img1 = torch.zeros((10, 3, 360, 720), dtype=torch.float).cuda()
     img2 = img1
     dw_gt = torch.zeros((10, 3), dtype=torch.float).cuda()

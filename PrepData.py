@@ -24,9 +24,8 @@ class DataManager(Singleton):
         # get number of data points
         self.numDataList = [dataObj[i].numData for i in range(0, self.numDataset)]
         self.numTotalData = np.sum(self.numDataList)
+        self.numDataCum = np.cumsum(self.numDataList)
         self.numTotalImgData = np.sum([dataObj[i].numImgs for i in range(0, self.numDataset)])
-        print(self.numDataList)
-        print(self.numTotalData)
 
         # numeric data
         print('numeric data concat')
