@@ -15,7 +15,7 @@ def train(dsName, subType, seq):
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
     #mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=1, epochs=3, wName=wName, checkPointFreq=1)
+    mc.fit(train, val, batch_size=20, epochs=5, wName=wName, checkPointFreq=1)
 
 def test(dsName, subType, seqRange):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
@@ -26,7 +26,7 @@ def test(dsName, subType, seqRange):
     dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
     dataset = dm.testSet
 
-    data_loader = DataLoader(dataset=dm.testSet, batch_size=1, shuffle=False)
+    data_loader = DataLoader(dataset=dm.testSet, batch_size=10, shuffle=False)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     mc = Model_CNN_0(dsName)

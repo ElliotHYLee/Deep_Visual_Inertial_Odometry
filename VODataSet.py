@@ -98,13 +98,14 @@ class VODataSetManager_CNN():
         data.standardizeImgs(isTrain)
 
         delay = 10
-        idxList = []
-        for i in range(0, data.numDataset):
-            if i == 0:
-                idxList.append(np.arange(0, data.numDataCum[i] - delay, delay))
-            else:
-                idxList.append(np.arange(data.numDataCum[i - 1], data.numDataCum[i] - delay, delay))
-        idx = np.concatenate(idxList)
+        idx = np.arange(0, data.numTotalData, 1)
+        # idxList = []
+        # for i in range(0, data.numDataset):
+        #     if i == 0:
+        #         idxList.append(np.arange(0, data.numDataCum[i] - delay, delay))
+        #     else:
+        #         idxList.append(np.arange(data.numDataCum[i - 1], data.numDataCum[i] - delay, delay))
+        # idx = np.concatenate(idxList)
 
         N = idx.shape[0]
 
@@ -129,7 +130,8 @@ class VODataSet_CNN(Dataset):
         index = self.idxList[i]
         delay = 10
         # try:
-        #     return self.dm.imgs[index:index+delay], self.dm.imgs[index+1:index+1+delay], \
+        #     return [index, index+delay], \
+        #            self.dm.imgs[index:index+delay], self.dm.imgs[index+1:index+1+delay], \
         #            self.dm.du[index:index+delay], self.dm.dw[index:index+delay], self.dm.dtr[index:index+delay]
 
         try:

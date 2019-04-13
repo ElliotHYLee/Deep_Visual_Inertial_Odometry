@@ -6,6 +6,7 @@ from torch.autograd import Variable
 from LSTMFC import LSTMFC
 from CNNFC import CNNFC
 from MyLSTM import MyLSTM
+from RNNFC import RNNFC
 
 class Model_CNN_0(nn.Module):
     def __init__(self, dsName='airsim'):
@@ -41,31 +42,21 @@ class Model_CNN_0(nn.Module):
         self.init_w()
 
         # RNNs
-        self.fc_du_rnn = CNNFC(NN_size, 3)
-        self.fc_du_cov_rnn = nn.Sequential(CNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
+        self.lstm = MyLSTM(NN_size + 64, 1, NN_size)
 
-        self.fc_dw_rnn = CNNFC(NN_size, 3)
-        self.fc_dw_cov_rnn = nn.Sequential(CNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
+        self.fc_du_rnn = RNNFC(NN_size, 3)
+        self.fc_du_cov_rnn = nn.Sequential(RNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
+
+        self.fc_dw_rnn = RNNFC(NN_size, 3)
+        self.fc_dw_cov_rnn = nn.Sequential(RNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
 
         self.proc_dw_gt = nn.Sequential(nn.Linear(3, 64),
                                         nn.PReLU(),
-                                        nn.BatchNorm1d(64),
                                         nn.Linear(64, 64),
                                         nn.PReLU())
 
-        self.lstm = MyLSTM(NN_size+64, 2, NN_size)
+        self.fc_dtr_cov_rnn = nn.Sequential(RNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
 
-        self.fc_dtr_cov_rnn = nn.Sequential(CNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
-
-    def init_hidden(self, batch_size=8):
-        h_t = torch.zeros([self.num_layers * self.num, batch_size, self.hiddenSize], dtype=torch.float32)
-        c_t = torch.zeros([self.num_layers * self.num, batch_size, self.hiddenSize], dtype=torch.float32)
-        if torch.cuda.is_available():
-            h_t = h_t.cuda()
-            c_t = c_t.cuda()
-        h_t = Variable(h_t)
-        c_t = Variable(c_t)
-        return (h_t, c_t)
 
     def init_w(self):
         for m in self.modules():
@@ -80,11 +71,6 @@ class Model_CNN_0(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x1, x2, dw_gt):
-        # x1 = x1.squeeze(0)
-        # x2 = x2.squeeze(0)
-        # dw_gt = dw_gt.squeeze(0)
-
-
         # do CNN for the batch as series
         input = torch.cat((x1, x2), 1)
         x = self.encoder(input)
@@ -97,38 +83,30 @@ class Model_CNN_0(nn.Module):
         dtr_cnn_cov = self.fc_dtr_cov(x)
 
         # prep for RNN
-        xSer = x.unsqueeze(0)
+        #xSer = x.unsqueeze(0)
 
         # process dw_gt for RNN
-        dw_gt_proc = self.proc_dw_gt(dw_gt)
-        dw_gtSer = dw_gt_proc.unsqueeze(0)
+        # dw_gt_proc = self.proc_dw_gt(dw_gt)
+        # dw_gtSer = dw_gt_proc.unsqueeze(0)
 
         # LSTM
-        lstm_input = torch.cat((xSer, dw_gtSer), dim=2)
-        lstm_out = self.lstm(lstm_input)
-        lstm_out = lstm_out.squeeze(0)
+        # lstm_input = torch.cat((xSer, dw_gtSer), dim=2)
+        # lstm_out = self.lstm(lstm_input)
+        # lstm_out = lstm_out.squeeze(0)
 
         # LSTM processed batch is ready
-        du_rnn = self.fc_du_rnn(lstm_out)
-        du_rnn_cov = self.fc_du_cov_rnn(lstm_out)
+        du_rnn = None#self.fc_du_rnn(lstm_out)
+        du_rnn_cov = None#self.fc_du_cov_rnn(lstm_out)
 
-        dw_rnn = self.fc_dw_rnn(lstm_out)
-        dw_rnn_cov = self.fc_dw_cov_rnn(lstm_out)
+        dw_rnn = None#self.fc_dw_rnn(lstm_out)
+        dw_rnn_cov = None#.fc_dw_cov_rnn(lstm_out)
 
-        dtr_rnn = self.fc_dtr(du_rnn, dw_gt)
-        dtr_rnn_cov = self.fc_dtr_cov_rnn(lstm_out)
-
-
-        # return du_cnn.unsqueeze(0), du_cnn_cov.unsqueeze(0), \
-        #        dw_cnn.unsqueeze(0), dw_cnn_cov.unsqueeze(0), \
-        #        dtr_cnn.unsqueeze(0), dtr_cnn_cov.unsqueeze(0),\
-        #        du_rnn.unsqueeze(0), du_rnn_cov.unsqueeze(0), \
-        #        dw_rnn.unsqueeze(0), dw_rnn_cov.unsqueeze(0), \
-        #        dtr_rnn.unsqueeze(0), dtr_rnn_cov.unsqueeze(0)
+        dtr_rnn =None# self.fc_dtr(du_rnn, dw_gt)
+        dtr_rnn_cov = None#self.fc_dtr_cov_rnn(lstm_out)
 
         return du_cnn, du_cnn_cov, \
                dw_cnn, dw_cnn_cov, \
-               dtr_cnn, dtr_cnn_cov, \
+               dtr_cnn, dtr_cnn_cov,\
                du_rnn, du_rnn_cov, \
                dw_rnn, dw_rnn_cov, \
                dtr_rnn, dtr_rnn_cov
@@ -143,8 +121,7 @@ if __name__ == '__main__':
     dw_cnn, dw_cnn_cov, \
     dtr_cnn, dtr_cnn_cov, \
     du_rnn, du_rnn_cov, \
-    dw_rnn, dw_rnn_cov, \
-    dtr_rnn, dtr_rnn_cov = m.forward(img1, img2, dw_gt)
+    dw_rnn, dw_rnn_cov = m.forward(img1, img2, dw_gt)
     # print(m)
 
 
