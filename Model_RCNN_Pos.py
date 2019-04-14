@@ -59,15 +59,6 @@ class Model_RCNN_Pos(nn.Module):
 
         self.fc_pos_cov_rnn = nn.Sequential(CNNFC(NN_size, 6), Sigmoid(a=sigIncln, max=sigMax))
 
-    def init_hidden(self, batch_size=8):
-        h_t = torch.zeros([self.num_layers * self.num, batch_size, self.hiddenSize], dtype=torch.float32)
-        c_t = torch.zeros([self.num_layers * self.num, batch_size, self.hiddenSize], dtype=torch.float32)
-        if torch.cuda.is_available():
-            h_t = h_t.cuda()
-            c_t = c_t.cuda()
-        h_t = Variable(h_t)
-        c_t = Variable(c_t)
-        return (h_t, c_t)
 
     def init_w(self):
         for m in self.modules():
