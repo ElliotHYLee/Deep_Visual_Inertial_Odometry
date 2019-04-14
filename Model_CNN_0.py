@@ -26,7 +26,9 @@ class Model_CNN_0(nn.Module):
         sigmoidInclination = 0.1
 
         # fc_du
-        self.fc_du = CNNFC(NN_size, 3)
+        self.fc_du = CNNFC(NN_size + 100, 3)
+        self.fc_dw_preproc = nn.Sequential(nn.Linear(3, 100), nn.Tanh(),
+                                           nn.Linear(100, 100, nn.Tanh()))
 
         # fc_dw
         self.fc_dw = CNNFC(NN_size, 3)
@@ -73,13 +75,15 @@ class Model_CNN_0(nn.Module):
         x = self.encoder(input)
         x = x.view(x.size(0), -1)
 
-        pr_du = self.fc_du(x)
+        dw_gt_pre = self.fc_dw_preproc(dw_gt)
+        xdw = torch.cat((x, dw_gt_pre), dim=1)
+        pr_du = self.fc_du(xdw)
         pr_du_cov = self.fc_du_cov(x)
 
         pr_dw = self.fc_dw(x)
         pr_dw_cov = self.fc_dw_cov(x)
 
-        pr_dtr = self.fc_dtr(pr_du, dw_gt)
+        pr_dtr = self.fc_dtr(pr_du, dw_gt_pre)
         pr_dtr_cov = self.fc_dtr_cov(x)
 
         pr_dtr_gnd = self.fc_dtr_gnd(rotM, pr_dtr)

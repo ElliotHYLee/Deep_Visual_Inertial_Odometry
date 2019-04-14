@@ -32,7 +32,7 @@ class ModelContainer_CNN():
 
         for epoch in range(0, epochs):
             train_loss, val_loss = self.runEpoch(epoch)
-            if val_loss < 2:
+            if val_loss < 7:
                 self.optimizer = optim.RMSprop(self.model.parameters(), lr=10 ** -4, weight_decay=10 ** -4)
             self.current_val_loss = val_loss
             self.train_loss.append(train_loss)
