@@ -20,7 +20,7 @@ class ModelContainer_CNN():
         self.min_val_loss = 10**5
 
     def compile(self, loss=None, optimizer=None):
-        self.loss = MahalanobisLoss(series_Len=0)#nn.modules.loss.L1Loss()
+        self.loss = MahalanobisLoss(isSeries=False)#nn.modules.loss.L1Loss()
         #self.optimizer = optim.SGD(self.model.parameters(), lr=10**-2, weight_decay=0.01)
         self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-3, weight_decay=10**-4)
 
