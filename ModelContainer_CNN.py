@@ -31,9 +31,9 @@ class ModelContainer_CNN():
         self.valid_loader = DataLoader(dataset = validation, batch_size=batch_size, shuffle=shuffle)
 
         for epoch in range(0, epochs):
-            train_loss, val_loss = self.runEpoch(epoch)
-            if val_loss < 7:
+            if epoch == 10:
                 self.optimizer = optim.RMSprop(self.model.parameters(), lr=10 ** -4, weight_decay=10 ** -4)
+            train_loss, val_loss = self.runEpoch(epoch)
             self.current_val_loss = val_loss
             self.train_loss.append(train_loss)
             self.val_loss.append(val_loss)
