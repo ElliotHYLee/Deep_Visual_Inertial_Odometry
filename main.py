@@ -9,7 +9,7 @@ from git_branch_param import *
 
 def train(dsName, subType, seq):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
-    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=seq, isTrain=True)
+    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=seq, isTrain=True, split=0.01)
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
     #mc.load_weights(wName, train=True)
@@ -24,7 +24,7 @@ def test(dsName, subType, seqRange):
         dataset = dm.testSet
 
         mc = ModelContainer_CNN(Model_CNN_0(dsName))
-        mc.load_weights(wName+'_best', train=False)
+        mc.load_weights(wName +'_best', train=False)
 
         pr_du, du_cov, \
         pr_dw, dw_cov, \
@@ -44,7 +44,7 @@ def runTrainTest(dsName, subType, seq, seqRange):
     runTrain(dsName, subType, seq, seqRange)
     runTest(dsName, subType, seq, seqRange)
 
-def runTrain(dsName, subType, seq, seqRange):
+def runTrain(dsName, subType, seq, seqRange=None):
     s = time.time()
     train(dsName, subType, seq)
     print(time.time() - s)
@@ -56,18 +56,18 @@ if __name__ == '__main__':
     dsName = 'airsim'
     seq = [0]
     seqRange = [0, 3]
-    runTrainTest(dsName, 'mr', seq, seqRange)
-    runTrainTest(dsName, 'mrseg', seq, seqRange)
-    runTrainTest(dsName, 'bar', seq, seqRange)
-    runTrainTest(dsName, 'pin', seq, seqRange)
+    # runTrainTest(dsName, 'mr', seq, seqRange)
+    # runTrainTest(dsName, 'mrseg', seq, seqRange)
+    # runTrainTest(dsName, 'bar', seq, seqRange)
+    # runTrainTest(dsName, 'pin', seq, seqRange)
 
-    runTrainTest('euroc', 'none', seq=[1, 2, 3, 5], seqRange=[1, 6])
-    runTrainTest('euroc', 'edge', seq=[2, 3, 4, 5], seqRange=[1, 6])
-    runTrainTest('kitti', 'none', seq=[0, 2, 4, 6], seqRange=[0, 11])
-    runTrainTest('kitti', 'edge', seq=[0, 2, 4, 6], seqRange=[0, 11])
-
-    runTrainTest('mycar', 'none', seq=[0, 2], seqRange=[0,3])
-
+    #runTrainTest('euroc', 'none', seq=[1, 2, 3, 5], seqRange=[1, 6])
+    #runTrainTest('euroc', 'edge', seq=[1, 2, 3, 5], seqRange=[1, 6])
+    # runTrainTest('kitti', 'none', seq=[0, 2, 4, 6], seqRange=[0, 11])
+    # runTrainTest('kitti', 'edge', seq=[0, 2, 4, 6], seqRange=[0, 11])
+    #
+    # runTrainTest('mycar', 'none', seq=[0, 2], seqRange=[0,3])
+    runTrainTest('agz', 'none', seq=[0], seqRange=[0,1])
 
 
 

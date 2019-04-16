@@ -35,7 +35,7 @@ class ReadData():
 
         # images
         self.imgNames = getImgNames(self.path, dsName, ts = self.time_stamp, subType=subType)
-        #print(self.imgNames)
+        print(len(self.imgNames))
         self.numImgs = len(self.imgNames)
         self.numChannel = 3 if self.dsName is not 'euroc' else 1
         self.imgs = np.zeros((self.numImgs, self.numChannel, 360, 720), dtype=np.float32)
@@ -74,7 +74,7 @@ class ReadData():
 
 if __name__ == '__main__':
     s = time.time()
-    d = ReadData(dsName='euroc', subType='none', seq=1)
+    d = ReadData(dsName='agz', subType='none', seq=0)
     print(time.time() - s)
 
     for i in range(0, d.numImgs):

@@ -11,8 +11,11 @@ class VODataSetManager_CNN():
         data.initHelper(dsName, subType, seq)
         data.standardizeImgs(isTrain)
 
-        idx = np.arange(0, data.numTotalData, 1)
-        N = data.numTotalData
+        if dsName == 'agz' and isTrain:
+            idx = np.arange(0, 2000, 1)
+        else:
+            idx = np.arange(0, data.numTotalData, 1)
+        N = idx.shape[0]
         if isTrain:
             idx = shuffle(idx)
             valN = int(N * split)

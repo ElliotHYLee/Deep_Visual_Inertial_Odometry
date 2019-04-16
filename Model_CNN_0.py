@@ -83,7 +83,7 @@ class Model_CNN_0(nn.Module):
         pr_dw = self.fc_dw(x)
         pr_dw_cov = self.fc_dw_cov(x)
 
-        pr_dtr = self.fc_dtr(pr_du, dw_gt_pre)
+        pr_dtr = self.fc_dtr(pr_du, dw_gt)
         pr_dtr_cov = self.fc_dtr_cov(x)
 
         pr_dtr_gnd = self.fc_dtr_gnd(rotM, pr_dtr)

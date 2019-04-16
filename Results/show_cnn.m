@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'airsim';
-subType = 'mr';
-seq = 2;
+dsName = 'kitti';
+subType = 'none';
+seq = 5;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq)
@@ -10,6 +10,7 @@ gt_duName = strcat(gtPath, '\du.txt');
 gt_dwName = strcat(gtPath, '\dw.txt');
 gt_dtrName = strcat(gtPath, '\dtrans.txt');
 gt_dtr_gndName = strcat(gtPath, '\dtrans_gnd.txt');
+gt_pos_gndName = strcat(gtPath, '\pos.txt');
 linRName = strcat(gtPath, '\linR.txt');
 
 dt = importdata(gt_dtName);
