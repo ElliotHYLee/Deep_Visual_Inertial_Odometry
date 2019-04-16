@@ -2,4 +2,4 @@ def branchName():
     return 'rnn3'
 
 def refBranchName():
-    return 'master'
+    return 'master_candidate'
