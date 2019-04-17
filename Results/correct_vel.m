@@ -1,11 +1,11 @@
 clc, clear, close all
-dsName = 'airsim';
-subType = 'mr';
-seq = 1;
+dsName = 'kitti';
+subType = 'edge';
+seq = 5;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
-gt_dtName = strcat(gtPath, 'dt.txt');
+gt_dtName = strcat(gtPath, 'dt.txt')
 gt_duName = strcat(gtPath, '\du.txt');
 gt_dwName = strcat(gtPath, '\dw.txt');
 gt_dtrName = strcat(gtPath, '\dtrans.txt');
@@ -26,7 +26,7 @@ acc_gnd = importdata(acc_gndName);
 
 %% Get Prediction Info.
 prPath = ['Data\',getPRPath(dsName, subType, seq)];
-pr_duName = strcat(prPath, '_du.txt');
+pr_duName = strcat(prPath, '_du.txt')
 pr_dwName = strcat(prPath, '_dw.txt');
 pr_dtr_gndName = strcat(prPath, '_dtr_gnd.txt');
 pr_duCovName = strcat(prPath, '_du_cov.txt');
@@ -72,9 +72,9 @@ velKF = [0 0 0];
 A = eye(3);
 H = eye(3);
 P{1} = eye(3)*10^-10;
-R = [10^0 0 0; 0 1 0; 0 0 10^0]*10^-4
+R = [10^0 0 0; 0 1 0; 0 0 10^1]*10^-5
 for i=1:1:N
-    velKF(i+1,:) = A*velKF(i,:)' + 0.5*dt(i)*acc_gnd(i,:)';
+    velKF(i+1,:) = A*velKF(i,:)' + dt(i)*acc_gnd(i,:)';
     pp = A*P{i}*A' + R;
 %     P{i+1} = pp;
     mCov = dtr_Q_gnd{i};
@@ -82,7 +82,7 @@ for i=1:1:N
     if (mod(i, 100))
         K = pp*H'*inv(H*pp*H' + mCov)
         z = pr_dtr_gnd(i,:)';
-        velKF(i+1,:) = (velKF(i,:)' + K*(z-H*velKF(i,:)'))';
+        velKF(i+1,:) = (velKF(i+1,:)' + K*(z-H*velKF(i+1,:)'))';
         P{i+1} = pp - K*H*pp;
     else
         P{i+1} = pp;
@@ -258,10 +258,16 @@ legend('gt', 'cnn', 'imu', 'kf')
 
 figure
 hold on
-plot(gt_pos(:,1), gt_pos(:,2), 'ro')
-plot(pos_intKF(:,1), pos_intKF(:,2), 'b.')
+plot(gt_pos(:,1), gt_pos(:,3), 'ro')
+plot(pos_intKF(:,1), pos_intKF(:,3), 'b.')
 
-
+figure
+subplot(3,1,1)
+plot(acc_gnd(:,1))
+subplot(3,1,2)
+plot(acc_gnd(:,2))
+subplot(3,1,3)
+plot(acc_gnd(:,3))
 
 
 dlmwrite('../velKF.txt', velKF)

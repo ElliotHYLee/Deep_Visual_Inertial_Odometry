@@ -14,6 +14,7 @@ class Model_RNN_KF(nn.Module):
         self.acc_cov_chol_lstm = LSTM(3, 1, 20)
         self.fc0 = nn.Sequential(nn.Linear(40, 40), nn.PReLU(),
                                  nn.Linear(40, 6))
+
         self.get33Cov = GetCovMatFromChol_Sequence(self.delay)
         self.mat33vec3 = Batch33MatVec3Mul()
 
@@ -28,8 +29,6 @@ class Model_RNN_KF(nn.Module):
         var = torch.zeros((bn, self.delay, 3, 3))
         if sysCovInit is not None:
             var[:, 0, :] = sysCovInit
-            pass
-
         if torch.cuda.is_available():
             var = var.cuda()
         return var

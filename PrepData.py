@@ -38,6 +38,7 @@ class DataManager(Singleton):
         self.pos_gnd = np.concatenate([dataObj[i].pos_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         self.rotM_bdy2gnd = np.concatenate([dataObj[i].gt_rotM_b2g for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         self.acc_gnd = np.concatenate([dataObj[i].acc_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.accdt_gnd = np.concatenate([dataObj[i].accdt_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         self.pr_dtr_gnd = np.concatenate([dataObj[i].pr_dtr_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         self.dtr_cov_gnd = np.concatenate([dataObj[i].pr_dtr_cov_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         print('done numeric data concat')
@@ -46,14 +47,14 @@ class DataManager(Singleton):
         print('standardizing acc')
         normPath = 'Norms/' + branchName() + '_' + self.dsName + '_' + self.subType
         if isTrain:
-            accMean = np.mean(self.acc_gnd, axis=0)
-            accStd = np.std(self.acc_gnd, axis=0)
+            accMean = np.mean(self.accdt_gnd, axis=0)
+            accStd = np.std(self.accdt_gnd, axis=0)
             np.savetxt(normPath + '_img_accMean.txt', accMean)
             np.savetxt(normPath + '_img_accStd.txt', accStd)
         else:
             accMean = np.loadtxt(normPath + '_img_accMean.txt')
             accStd = np.loadtxt(normPath + '_img_accStd.txt')
-        self.acc_gnd_standard = self.acc_gnd - accMean
+        self.acc_gnd_standard = self.accdt_gnd - accMean
         self.acc_gnd_standard = np.divide(self.acc_gnd_standard, accStd).astype(np.float32)
 
 

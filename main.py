@@ -18,7 +18,7 @@ def train(dsName, subType, seq):
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_RNN_KF(Model_RNN_KF(dsName, delay=delay))
     #mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=512, epochs=64, wName=wName, checkPointFreq=1)
+    mc.fit(train, val, batch_size=512, epochs=20, wName=wName, checkPointFreq=1)
 
 
 def shiftLeft(states):
@@ -42,7 +42,7 @@ def shiftUp(states):
 def test(dsName, subType, seqList):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
-    seq = 1#seqList[0]
+    seq = 5#seqList[0]
     commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
 
     dm = VODataSetManager_RNN_KF(dsName=dsName, subType=subType, seq=[seq], isTrain=False, delay=delay)
@@ -55,7 +55,6 @@ def test(dsName, subType, seqList):
 
     checkPoint = torch.load(wName + '_best' + '.pt')
     mc.load_state_dict(checkPoint['model_state_dict'])
-
 
     corr_vel_list = []
     acc_cov_list = []
@@ -77,17 +76,17 @@ def test(dsName, subType, seqList):
             gt_dtr_gnd_init = torch.sum(states[:, 0, :], dim=0).unsqueeze(0)/batch_idx
             #print(gt_dtr_gnd_init.shape)
             states = shiftLeft(states)
-            states[batch_idx, :, :] = velRNNKF
+            states[batch_idx, :, :] = velRNNKF.data
         else:
             gt_dtr_gnd_init = torch.sum(states[:, 0, :], dim=0).unsqueeze(0)/delay
             states = shiftUp(states)
             states = shiftLeft(states)
-            states[delay-1, :, :] = velRNNKF
+            states[delay-1, :, :] = velRNNKF.data
 
         if batch_idx == 0:
             sysCovInit = None
         else:
-            sysCovInit = sysCov[:, 0, :]
+            sysCovInit = sysCov[:, 0, :].data
 
         with torch.no_grad():
             velRNNKF, accCov, sysCov = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init, sysCovInit)
@@ -220,10 +219,10 @@ def test(dsName, subType, seqList):
     plt.show()
 
 if __name__ == '__main__':
-    dsName = 'airsim'
-    subType = 'mr'
-    seq = [0]
-    #train(dsName, subType, seq)
+    dsName = 'kitti'
+    subType = 'edge'
+    seq = [0, 2, 4, 6]
+    train(dsName, subType, seq)
     test(dsName, subType, seq)
 
 

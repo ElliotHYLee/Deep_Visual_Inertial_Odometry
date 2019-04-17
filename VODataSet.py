@@ -41,7 +41,7 @@ class VODataSet_RNN(Dataset):
     def __getitem__(self, i):
         index = self.idxList[i]
         try:
-            return self.dm.acc_gnd[index:index + self.delay], \
+            return self.dm.accdt_gnd[index:index + self.delay], \
                    self.dm.acc_gnd_standard[index:index + self.delay], \
                    self.dm.dt[index:index + self.delay], \
                    self.dm.pr_dtr_gnd[index:index + self.delay], \

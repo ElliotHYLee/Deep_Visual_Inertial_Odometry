@@ -1,3 +1,3 @@
 function[branchName] = getRefBranchName()
-    branchName = 'master';
+    branchName = 'master_candidate';
 end
