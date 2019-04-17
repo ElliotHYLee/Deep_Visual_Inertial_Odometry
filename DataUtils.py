@@ -73,7 +73,7 @@ def getEnd(start, N, totalN):
 
 def getPrPath(dsName, seq, subType):
     resName = 'Results/Data/' + refBranchName() + '_' + dsName + '_'
-    path = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
+    path = resName + subType + str(seq) #if dsName == 'airsim' else resName + str(seq)
     return path
 
 

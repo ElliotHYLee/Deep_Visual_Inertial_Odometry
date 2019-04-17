@@ -12,7 +12,7 @@ class Model_RNN_KF(nn.Module):
 
         self.acc_pattern = LSTM(3, 1, 200)
         self.cnn_pattern = LSTM(3, 1, 200)
-        self.vel_lstm = LSTM(3, 1, 200)
+        self.vel_lstm = LSTM(6, 1, 200)
 
         self.fc0 = nn.Sequential(nn.Linear(400, 200), nn.PReLU(),
                                  nn.Linear(200, 3))
@@ -44,12 +44,10 @@ class Model_RNN_KF(nn.Module):
         # vel_cnn_err = self.fc1(vel_cnn_err)
         # vel_cnn = pr_dtr_gnd - vel_cnn_err
 
-        vel = vel_imu + pr_dtr_gnd
+        vel = torch.cat((vel_imu, pr_dtr_gnd), dim=2)
+        #vel = vel_imu + pr_dtr_gnd
         vel = self.vel_lstm(vel)
         vel = self.fc2(vel)
-        # vel_cnn = self.cnn_pattern(pr_dtr_gnd)
-        # vel_cnn = self.fc1(vel_cnn)
-        #vel_imu = pr_dtr_gnd
 
 
         #vel_input = torch.cat((vel_imu, vel_cnn), dim=2)

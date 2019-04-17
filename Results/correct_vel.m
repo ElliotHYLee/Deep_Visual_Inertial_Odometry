@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'kitti';
-subType = '';
-seq = 5;
+dsName = 'airsim';
+subType = 'mr';
+seq = 2;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
@@ -72,9 +72,10 @@ velKF = [0 0 0];
 A = eye(3);
 H = eye(3);
 P{1} = eye(3)*10^-10;
+% R = [1 0 0; 0 1 0; 0 0 10]*10^-5
 R = [1 0 0; 0 1 0; 0 0 1]*10^-4
 for i=1:1:N
-    velKF(i+1,:) = A*velKF(i,:)' + 0.5*dt(i)*acc_gnd(i,:)';
+    velKF(i+1,:) = A*velKF(i,:)' + dt(i)*acc_gnd(i,:)';
     pp = A*P{i}*A' + R;
 %     P{i+1} = pp;
     mCov = dtr_Q_gnd{i};
@@ -82,7 +83,7 @@ for i=1:1:N
     if (mod(i, 100))
         K = pp*H'*inv(H*pp*H' + mCov)
         z = pr_dtr_gnd(i,:)';
-        velKF(i+1,:) = (velKF(i,:)' + K*(z-H*velKF(i,:)'))';
+        velKF(i+1,:) = (velKF(i+1,:)' + K*(z-H*velKF(i+1,:)'))';
         P{i+1} = pp - K*H*pp;
     else
         P{i+1} = pp;
