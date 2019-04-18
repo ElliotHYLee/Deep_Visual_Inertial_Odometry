@@ -35,6 +35,9 @@ def getPathWin(dsName = 'AirSim', seq = 0, subType='mr'):
             path = 'D:/DLData/Airsim/mr' + str(seq) + '/'
     elif dsName == 'euroc':
         path = 'D:/DLData/EuRoc/mh_' + str(seq) +'/'
+    elif dsName == 'mycar':
+        if subType == 'none':
+            path = 'D:/DLData/MyCar/data' + str(seq) + '/'
     elif dsName == 'kitti':
         path = 'D:/DLData/KITTI/odom/dataset/sequences/'
         path += '0'+str(seq) if seq<10 else str(seq)
