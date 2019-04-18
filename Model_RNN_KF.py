@@ -16,15 +16,15 @@ class Model_RNN_KF(nn.Module):
 
         self.fc0 = nn.Sequential(nn.Linear(400, 200), nn.PReLU(),
                                  nn.Linear(200, 3))
-
-        self.fc1 = nn.Sequential(nn.Linear(400, 200), nn.PReLU(),
-                                 nn.Linear(200, 3))
-
-        self.fc2 = nn.Sequential(nn.Linear(400, 200), nn.PReLU(),
-                                 nn.Linear(200, 3))
-
-        self.sig0 = Sigmoid(0.1, 10)
-        self.sig1 = Sigmoid(0.1, 10)
+        #
+        # self.fc1 = nn.Sequential(nn.Linear(400, 200), nn.PReLU(),
+        #                          nn.Linear(200, 3))
+        #
+        # self.fc2 = nn.Sequential(nn.Linear(400, 200), nn.PReLU(),
+        #                          nn.Linear(200, 3))
+        #
+        # self.sig0 = Sigmoid(0.1, 10)
+        # self.sig1 = Sigmoid(0.1, 10)
 
     def initVelImu(self):
         pass
@@ -47,7 +47,7 @@ class Model_RNN_KF(nn.Module):
         vel = torch.cat((vel_imu, pr_dtr_gnd), dim=2)
         #vel = vel_imu + pr_dtr_gnd
         vel = self.vel_lstm(vel)
-        vel = self.fc2(vel)
+        vel = self.fc0(vel)
 
 
         #vel_input = torch.cat((vel_imu, vel_cnn), dim=2)
