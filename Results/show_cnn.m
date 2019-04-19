@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'kitti';
-subType = 'none';
-seq = 5;
+dsName = 'airsim';
+subType = 'mr';
+seq = 0;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq)
@@ -35,8 +35,8 @@ pr_dtr_gnd = importdata(pr_dtr_gndName);
 pr_du_cov = importdata(pr_duCovName);
 pr_dw_cov = importdata(pr_dwCovName);
 pr_dtr_cov = importdata(pr_dtrCovName);
-
 N = length(pr_du);
+
 [du_Q, du_cov3] = getCov(pr_du_cov);
 [dw_Q, dw_cov3] = getCov(pr_dw_cov);
 [dtr_Q, dtr_cov3] = getCov(pr_dtr_cov);
@@ -118,6 +118,7 @@ end
 for i=1:1:3
     subplot(subPlotRow, subPlotCol, index)
     plot(dw_std3(:,i), 'b.', 'MarkerSize',5);
+%     ylim([0.4, 0.6])
     grid on
     index = index + 1;
     if i==1 strYLabel = 'x';
@@ -161,7 +162,7 @@ err = abs(gt_du-pr_du);
 mae = mean(err)
 cov(err)
 
-figName = strcat('Figures\',getPRPath(dsName, subType, seq), '_results.png');
+figName = strcat('Figures\', getPRPath(dsName, subType, seq), '_results.png');
 saveas(fig, figName)
 
 err_dtr_gnd = gt_dtr_gnd- pr_dtr_gnd;
