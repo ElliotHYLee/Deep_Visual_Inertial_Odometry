@@ -30,6 +30,9 @@ class Model_CNN_0(nn.Module):
         self.fc_dw_preproc = nn.Sequential(nn.Linear(3, 100), nn.Tanh(),
                                            nn.Linear(100, 100, nn.Tanh()))
 
+        print(NN_size)
+        asd
+
         # fc_dw
         self.fc_dw = CNNFC(NN_size, 3)
 

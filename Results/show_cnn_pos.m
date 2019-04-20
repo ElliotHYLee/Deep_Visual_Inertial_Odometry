@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'kitti';
-subType = 'none';
-seq = 5;
+dsName = 'airsim';
+subType = 'mrseg';
+seq = 0;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
@@ -53,7 +53,6 @@ end
 
 dtr_gnd_std3 = sqrt(cov3);
 
-
 %%
 pos = [0 0 0];
 A = eye(3);
@@ -63,14 +62,6 @@ R = eye(3)*10
 for i=1:1:N
     pos(i+1,:) = pos(i,:) + pr_dtr_gnd(i,:);
     P{i+1} = A*P{i}*A' + dtr_Q_gnd{i};
-
-%     pos(i+1,:) = A*pos(i,:)';
-%     pp = A*P{i}*A' + R;
-%     mCov = dtr_Q_gnd{i}
-%     K = pp*H'*inv(H*pp*H'+mCov)
-%     z = pos(i,:)' + pr_dtr_gnd(i,:)';
-%     pos(i+1,:) = (pos(i,:)' + K*(z-H*pos(i,:)'))';
-%     P{i+1} = pp - K*H*pp;
 end
 
 pos_int = cumtrapz(pr_dtr_gnd);
@@ -113,12 +104,11 @@ else
     plot(pos_int(1:f,2), pos_int(1:f,1),'g')
     for i=1:50:f
         Q = P{i};
-       [x,y] = getELPS(Q([1,2],[1,2]), 0.1);
+       [x,y] = getELPS(Q([1,2],[1,2]), 1);
        x = x + pos(i,1);
        y = y + pos(i,2);
        plot(y,x, 'b')
     end
-    
 end
 axis equal
 
@@ -145,7 +135,7 @@ dPos_std = sqrt(posCov3);
 % % ylim([0 1])
 
 function[x,y] = getELPS(Q, s)
-[vec, val] = eig(Q);
+[vec, val] = eig(Q)
 val = diag(val);
 [v, idx] = max(val);
 V = vec(:,idx);
