@@ -22,16 +22,13 @@ class Model_CNN_0(nn.Module):
         self.init_w()
 
         NN_size = int(seq1.flattend_size)
-        sigmoidMax = np.sqrt(1)
+        sigmoidMax = 1
         sigmoidInclination = 0.1
 
         # fc_du
         self.fc_du = CNNFC(NN_size + 100, 3)
         self.fc_dw_preproc = nn.Sequential(nn.Linear(3, 100), nn.Tanh(),
                                            nn.Linear(100, 100, nn.Tanh()))
-
-        print(NN_size)
-        asd
 
         # fc_dw
         self.fc_dw = CNNFC(NN_size, 3)
@@ -41,25 +38,61 @@ class Model_CNN_0(nn.Module):
 
         # fc_du_cov
         self.fc_du_cov = nn.Sequential(
-                        CNNFC(NN_size, 6),
-                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+                        nn.Linear(NN_size, 512),
+                        nn.BatchNorm1d(512),
+                        nn.PReLU(),
+                        nn.Linear(512, 64),
+                        nn.BatchNorm1d(64),
+                        nn.PReLU(),
+                        nn.Linear(64, 64),
+                        nn.BatchNorm1d(64),
+                        Sigmoid(a=sigmoidInclination, max=sigmoidMax),
+                        nn.Linear(64, 6))
+                        #Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
         # fc_dw_cov
         self.fc_dw_cov = nn.Sequential(
-                        CNNFC(NN_size, 6),
-                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+                        nn.Linear(NN_size, 512),
+                        nn.BatchNorm1d(512),
+                        nn.PReLU(),
+                        nn.Linear(512, 64),
+                        nn.BatchNorm1d(64),
+                        nn.PReLU(),
+                        nn.Linear(64, 64),
+                        nn.BatchNorm1d(64),
+                        Sigmoid(a=sigmoidInclination, max=sigmoidMax),
+                        nn.Linear(64, 6))
+                        #Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
         # fc_dtr_cov
         self.fc_dtr_cov = nn.Sequential(
-                        CNNFC(NN_size, 6),
-                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+                        nn.Linear(NN_size, 512),
+                        nn.BatchNorm1d(512),
+                        nn.PReLU(),
+                        nn.Linear(512, 64),
+                        nn.BatchNorm1d(64),
+                        nn.PReLU(),
+                        nn.Linear(64, 64),
+                        nn.BatchNorm1d(64),
+                        Sigmoid(a=sigmoidInclination, max=sigmoidMax),
+                        nn.Linear(64, 6))
+                        #Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
         # fc_dtr_gnd
         self.fc_dtr_gnd = Batch33MatVec3Mul()
         self.getQ = GetCovMatFromChol()
         self.fc_dtr_gnd_cov = nn.Sequential(
-                        CNNFC(NN_size, 6),
-                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+                        nn.Linear(NN_size, 512),
+                        nn.BatchNorm1d(512),
+                        nn.PReLU(),
+                        nn.Linear(512, 64),
+                        nn.BatchNorm1d(64),
+                        nn.PReLU(),
+                        nn.Linear(64, 64),
+                        nn.BatchNorm1d(64),
+                        Sigmoid(a=sigmoidInclination, max=sigmoidMax),
+                        nn.Linear(64, 6))
+                        #Sigmoid(a=sigmoidInclination, max=sigmoidMax))
 
     def init_w(self):
         for m in self.modules():
