@@ -4,13 +4,16 @@ function[] = plotELPS(dsName, gt_pos, pr_pos, P)
         drawELPS(gt_pos, pr_pos, P, N, 1, 3, 10, 3);
     elseif strcmp(dsName,'euroc')
         N = length(gt_pos);
-        drawELPS(gt_pos, pr_pos, P, N, 1, 2, 100, 1);
+        drawELPS(gt_pos, pr_pos, P, N, 1, 2, 100, 3);
     elseif strcmp(dsName,'mycar')
         N = length(gt_pos);
         drawELPS(gt_pos, pr_pos, P, N, 1, 3, 50, 3);
+    elseif strcmp(dsName,'airsim')
+        N = length(gt_pos);
+        drawELPS(gt_pos, pr_pos, P, N, 2, 1, 100, 3);
     else
         N = length(gt_pos);
-        drawELPS(gt_pos, pr_pos, P, N, 2, 1, 10, 1);
+        drawELPS(gt_pos, pr_pos, P, N, 2, 1, 10, 3);
     end
 end
 
