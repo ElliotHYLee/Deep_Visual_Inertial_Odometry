@@ -10,10 +10,9 @@ class Model_RNN_KF(nn.Module):
     def __init__(self, dsName='airsim', delay=10):
         super(Model_RNN_KF, self).__init__()
 
-        self.acc_pattern = LSTM(3, 1, 200)
-        self.cnn_pattern = LSTM(3, 1, 200)
-        self.vel_lstm = LSTM(6, 1, 200)
-
+        # self.acc_pattern = LSTM(3, 1, 200)
+        # self.cnn_pattern = LSTM(3, 1, 200)
+        self.vel_lstm = LSTM(3, 2, 200)
         self.fc0 = nn.Sequential(nn.Linear(400, 200), nn.PReLU(),
                                  nn.Linear(200, 3))
 
@@ -22,28 +21,13 @@ class Model_RNN_KF(nn.Module):
 
     def forward(self, dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init):
         vel_imu = torch.mul(dt, acc)
-        vel_imu[:,0,:] = vel_imu[:,0,:] + gt_dtr_gnd_init
+        pr_dtr_gnd_zero = pr_dtr_gnd - gt_dtr_gnd_init.unsqueeze(1)
         vel_imu = vel_imu.cumsum(1)
-        # print(gt_dtr_gnd_init.shape)
-        #vel_imu = torch.add(vel_imu, gt_dtr_gnd_init)
 
-        # vel_imu_bais = self.acc_pattern(vel_imu)
-        # vel_imu_bais = self.fc0(vel_imu_bais)
-        # vel_imu = vel_imu - vel_imu_bais
-
-        # vel_cnn_err = self.cnn_pattern(pr_dtr_gnd)
-        # vel_cnn_err = self.fc1(vel_cnn_err)
-        # vel_cnn = pr_dtr_gnd - vel_cnn_err
-
-        vel = torch.cat((vel_imu, pr_dtr_gnd), dim=2)
-        #vel = vel_imu + pr_dtr_gnd
-        vel = self.vel_lstm(vel)
-        vel = self.fc0(vel)
-
-
-        #vel_input = torch.cat((vel_imu, vel_cnn), dim=2)
-        #vel_input = vel_imu + vel_cnn
-        #corr_vel = self.vel_lstm(vel_input)
+        #vel_z = torch.cat((vel_imu, pr_dtr_gnd_zero), dim=2)
+        vel_z = vel_imu + pr_dtr_gnd_zero
+        vel = self.vel_lstm(vel_z)
+        vel = self.fc0(vel) + gt_dtr_gnd_init.unsqueeze(1)
 
         return vel_imu, vel
 

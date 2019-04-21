@@ -73,21 +73,18 @@ A = eye(3);
 H = eye(3);
 P{1} = eye(3)*10^-10;
 % R = [1 0 0; 0 1 0; 0 0 10]*10^-5
-R = [1 0 0; 0 1 0; 0 0 1]*10^-4
+R = [1 0 0; 0 1 0; 0 0 1]*10^-5.5
 for i=1:1:N
     velKF(i+1,:) = A*velKF(i,:)' + dt(i)*acc_gnd(i,:)';
     pp = A*P{i}*A' + R;
-%     P{i+1} = pp;
+
     mCov = dtr_Q_gnd{i};
-    %mCov = eye(3)*10^-1;
-    if (mod(i, 100))
-        K = pp*H'*inv(H*pp*H' + mCov)
-        z = pr_dtr_gnd(i,:)';
-        velKF(i+1,:) = (velKF(i+1,:)' + K*(z-H*velKF(i+1,:)'))';
-        P{i+1} = pp - K*H*pp;
-    else
-        P{i+1} = pp;
-    end
+  
+    K = pp*H'*inv(H*pp*H' + mCov)
+    z = pr_dtr_gnd(i,:)';
+    velKF(i+1,:) = (velKF(i+1,:)' + K*(z-H*velKF(i+1,:)'))';
+    P{i+1} = pp - K*H*pp;
+
 end
 
 
