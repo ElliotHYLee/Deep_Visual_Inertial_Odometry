@@ -39,10 +39,10 @@ def shiftUp(states):
 #         var =
 
 
-def test(dsName, subType, seqList):
+def test(dsName, subType, seq):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
-    seq = 2#seqList[0]
+    #seq = 2#seqList[0]
     commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
 
     dm = VODataSetManager_RNN_KF(dsName=dsName, subType=subType, seq=[seq], isTrain=False, delay=delay)
@@ -78,7 +78,7 @@ def test(dsName, subType, seqList):
             states = shiftLeft(states)
             states[batch_idx, :, :] = velRNNKF.data
         else:
-            gt_dtr_gnd_init = torch.sum(states[:, 0, :], dim=0).unsqueeze(0)/delay
+            gt_dtr_gnd_init = torch.sum(states[:, 0, :], dim=0).unsqueeze(0)/(delay)
             states = shiftUp(states)
             states = shiftLeft(states)
             states[delay-1, :, :] = velRNNKF.data
@@ -104,27 +104,8 @@ def test(dsName, subType, seqList):
     gt_dtr_gnd = data.gt_dtr_gnd#np.concatenate(gt_dtr_gnd_list, axis = 0)
     print(gt_dtr_gnd.shape)
 
-    N = 3000
 
     velKF = pd.read_csv('velKF.txt', sep=',', header=None).values.astype(np.float32)
-    skip = 0.5
-    # plt.figure()
-    # plt.subplot(311)
-    # plt.plot(gt_dtr_gnd[:, 0], 'r.', markersize='5')
-    # #plt.plot(velKF[:,0], 'g.', markersize='2')
-    # for idx in range(0, N, int(delay*skip)):
-    #     plt.plot(np.arange(idx, idx + delay, 1), velRNNKF[idx, :, 0], 'b.', markersize='1')
-    # plt.subplot(312)
-    # plt.plot(gt_dtr_gnd[:, 1], 'r.', markersize='5')
-    # #plt.plot(velKF[:, 1], 'g.', markersize='2')
-    # for idx in range(0, N, int(delay*skip)):
-    #     plt.plot(np.arange(idx, idx + delay, 1), velRNNKF[idx, :, 1], 'b.', markersize='1')
-    #
-    # plt.subplot(313)
-    # plt.plot(gt_dtr_gnd[:, 2], 'r.', markersize='5')
-    # #plt.plot(velKF[:, 2], 'g.', markersize='2')
-    # for idx in range(0, N, int(delay*skip)):
-    #     plt.plot(np.arange(idx, idx + delay, 1), velRNNKF[idx, :, 2], 'b.', markersize='1')
 
     var = np.zeros((velRNNKF.shape[0]+delay, 3))
     for i in range(velRNNKF.shape[0]):
@@ -220,10 +201,11 @@ def test(dsName, subType, seqList):
 
 if __name__ == '__main__':
     dsName = 'airsim'
-    subType = 'mr'
+    subType = 'mrseg'
     seq = [0]
-    train(dsName, subType, seq)
-    test(dsName, subType, seq)
+
+    #train(dsName, subType, seq)
+    test(dsName, subType, seq=2)
 
 
 

@@ -12,7 +12,8 @@ class Model_RNN_KF(nn.Module):
         self.delay = delay
 
         self.acc_cov_chol_lstm = LSTM(3, 1, 20)
-        self.fc0 = nn.Sequential(nn.Linear(40, 40), nn.PReLU(),
+        self.fc0 = nn.Sequential(nn.Linear(40, 40),
+                                 Sigmoid(0.1, 1),
                                  nn.Linear(40, 6))
 
         self.get33Cov = GetCovMatFromChol_Sequence(self.delay)
@@ -51,17 +52,17 @@ class Model_RNN_KF(nn.Module):
             prCov = sysCov[:, i-1, :, :] + accCov[:, i, :, :]
 
             # KF correction step
-            mCov = dtr_cv_gnd[:, i, :]
-            z = pr_dtr_gnd[:, i, :]
-            temp = torch.inverse(prCov + mCov)
-            K = torch.bmm(prCov, temp)
-            innov = z - prVel
-            nextVel = prVel + self.mat33vec3(K, innov)
-            nextCov = prCov - torch.bmm(K, prCov)
+            # mCov = dtr_cv_gnd[:, i, :]
+            # z = pr_dtr_gnd[:, i, :]
+            # temp = torch.inverse(prCov + mCov)
+            # K = torch.bmm(prCov, temp)
+            # innov = z - prVel
+            # nextVel = prVel + self.mat33vec3(K, innov)
+            # nextCov = prCov - torch.bmm(K, prCov)
 
             # KF update
-            vel[:, i, :] = nextVel
-            sysCov[:, i, :, :] = nextCov
+            vel[:, i, :] = prVel
+            sysCov[:, i, :, :] = prCov
 
 
         return vel, accCov, sysCov

@@ -54,7 +54,7 @@ class ReadData():
         # print(self.pr_dtr_cov_gnd.shape)
 
 if __name__ == '__main__':
-    d = ReadData(dsName='airsim', subType='mr', seq=0)
+    d = ReadData(dsName='airsim', subType='mrseg', seq=2)
     print(d.accdt_gnd.shape)
     print(d.gt_dt.shape)
     # vel_imu = np.zeros((d.gt_dt.shape[0]+1, 3))
