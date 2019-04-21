@@ -22,7 +22,7 @@ class ModelContainer_CNN():
     def compile(self, loss=None, optimizer=None):
         self.loss = MahalanobisLoss(isSeries=False)#nn.modules.loss.L1Loss()
         #self.optimizer = optim.SGD(self.model.parameters(), lr=10**-2, weight_decay=0.01)
-        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-3, weight_decay=10**-2)
+        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-4, weight_decay=10**-4)
 
     def fit(self, train, validation=None, batch_size=1, epochs=1, shuffle=False, wName='weight.pt', checkPointFreq = 1):
         self.checkPointFreq = checkPointFreq
@@ -32,7 +32,7 @@ class ModelContainer_CNN():
 
         for epoch in range(0, epochs):
             if epoch == 5:
-                self.optimizer = optim.RMSprop(self.model.parameters(), lr=10 ** -4, weight_decay=10 ** -2)
+                self.optimizer = optim.RMSprop(self.model.parameters(), lr=10 ** -4, weight_decay=10 ** -4)
             train_loss, val_loss = self.runEpoch(epoch)
             self.current_val_loss = val_loss
             self.train_loss.append(train_loss)
@@ -77,11 +77,13 @@ class ModelContainer_CNN():
     def runEpoch(self, epoch):
         epoch_loss = 0
         self.model.train(True)
-        for batch_idx, (img0, img1, du, dw, dtr, dtr_gnd, rotM) in enumerate(self.train_loader):
+        for batch_idx, (img0, img1, du, dw, dw_gyro, dw_gyro_stand, dtr, dtr_gnd, rotM) in enumerate(self.train_loader):
             img0 = img0.to(self.device)
             img1 = img1.to(self.device)
             du = du.to(self.device)
             dw = dw.to(self.device)
+            dw_gyro = dw_gyro.to(self.device)
+            dw_gyro_stand = dw_gyro.to(self.device)
             dtr = dtr.to(self.device)
             dtr_gnd = dtr_gnd.to(self.device)
             rotM = rotM.to(self.device)
@@ -90,7 +92,7 @@ class ModelContainer_CNN():
             pr_du, pr_du_cov, \
             pr_dw, pr_dw_cov, \
             pr_dtr, pr_dtr_cov, \
-            pr_dtr_gnd = self.model(img0, img1, dw, rotM)
+            pr_dtr_gnd = self.model(img0, img1, dw_gyro, dw_gyro_stand, rotM)
 
 
             batch_loss = self.loss(pr_du, du, pr_du_cov) + \
@@ -133,11 +135,13 @@ class ModelContainer_CNN():
         du_list, dw_list, dtr_list, du_cov_list, dw_cov_list, dtr_cov_list = [], [], [], [], [], []
         dtr_gnd_list = []
         loss = 0
-        for batch_idx, (img0, img1, du, dw, dtr, dtr_gnd, rotM) in enumerate(data_loader):
+        for batch_idx, (img0, img1, du, dw, dw_gyro, dw_gyro_stand, dtr, dtr_gnd, rotM) in enumerate(data_loader):
             img0 = img0.to(self.device)
             img1 = img1.to(self.device)
             du = du.to(self.device)
             dw = dw.to(self.device)
+            dw_gyro = dw_gyro.to(self.device)
+            dw_gyro_stand = dw_gyro.to(self.device)
             dtr = dtr.to(self.device)
             dtr_gnd = dtr_gnd.to(self.device)
             rotM = rotM.to(self.device)
@@ -146,7 +150,7 @@ class ModelContainer_CNN():
                 pr_du, pr_du_cov, \
                 pr_dw, pr_dw_cov, \
                 pr_dtr, pr_dtr_cov, \
-                pr_dtr_gnd = self.model(img0, img1, dw, rotM)
+                pr_dtr_gnd = self.model(img0, img1, dw_gyro, dw_gyro_stand, rotM)
 
                 if not isValidation:
                     du_list.append(pr_du.cpu().data.numpy())

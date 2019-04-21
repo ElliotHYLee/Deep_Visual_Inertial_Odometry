@@ -17,6 +17,7 @@ class ReadData():
         self.dt = pd.read_csv(self.path + 'dt.txt', sep=',', header=None).values.astype(np.float32)
         self.du = pd.read_csv(self.path + 'du.txt', sep=',', header=None).values.astype(np.float32)
         self.dw = pd.read_csv(self.path + 'dw.txt', sep=',', header=None).values.astype(np.float32)
+        self.dw_gyro = pd.read_csv(self.path + 'dw_gyro.txt', sep=',', header=None).values.astype(np.float32)
         self.dtr = pd.read_csv(self.path + 'dtrans.txt', sep=',', header=None).values.astype(np.float32)
         self.dtr_gnd = pd.read_csv(self.path + 'dtrans_gnd.txt', sep=',', header=None).values.astype(np.float32)
         self.linR = pd.read_csv(self.path + 'linR.txt', sep=',', header=None).values.astype(np.float32)
@@ -74,7 +75,7 @@ class ReadData():
 
 if __name__ == '__main__':
     s = time.time()
-    d = ReadData(dsName='agz', subType='none', seq=0)
+    d = ReadData(dsName='airsim', subType='mr', seq=0)
     print(time.time() - s)
 
     for i in range(0, d.numImgs):

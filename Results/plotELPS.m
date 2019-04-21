@@ -10,7 +10,7 @@ function[] = plotELPS(dsName, gt_pos, pr_pos, P)
         drawELPS(gt_pos, pr_pos, P, N, 1, 3, 50, 3);
     elseif strcmp(dsName,'airsim')
         N = length(gt_pos);
-        drawELPS(gt_pos, pr_pos, P, N, 2, 1, 100, 3);
+        drawELPS(gt_pos, pr_pos, P, N, 2, 1, 500, 3);
     else
         N = length(gt_pos);
         drawELPS(gt_pos, pr_pos, P, N, 2, 1, 10, 3);

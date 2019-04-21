@@ -1,8 +1,9 @@
 clc, clear, close all
 dsName = 'airsim';
 subType = 'mrseg';
-seq = 1;
+seq = 2;
 loadData
+
 
 for i =1:1:N
    rotm = reshape(linR(i,:), 3,3)';
@@ -39,11 +40,10 @@ P{1} = eye(3)*10^-5;
 for i=1:1:N
     pos(i+1,:) = pos(i,:) + pr_dtr_gnd(i,:);
     P{i+1} = A*P{i}*A' + dtr_Q_gnd{i};%dtr_Q_gnd{i};
-    P{i+1}
-    xx = dtr_Q_gnd{i}
+    xx = dtr_Q_gnd{i};
     [vec, val] = eig(xx);
     
-    ang = rotm2eul(vec)*180/pi
+    ang = rotm2eul(vec)*180/pi;
     
 %     
 %     if i==10
