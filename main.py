@@ -48,6 +48,8 @@ def test(dsName, subType, seq):
 
     gt_dtr = np.zeros((N, 3))
     velOut = np.zeros((N, 3))
+    accStd = np.zeros((N,3))
+    sysStd = np.zeros((N,3))
 
 
     for batch_idx, (accdt_gnd, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(data_loader):
@@ -64,10 +66,16 @@ def test(dsName, subType, seq):
         else:
             gt_dtr_gnd_init_state = velRNNKF.data[:,1,:]
 
-        gt_dtr[batch_idx, :] = gt_dtr_gnd_init.data.numpy()
+        gt_dtr[batch_idx, :] = gt_dtr_gnd.data.numpy()[:,delay-1,:]
         with torch.no_grad():
             velRNNKF, accCov, sysCov = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init_state)
-        velOut[batch_idx] = velRNNKF.cpu().data.numpy()[:,0,:]
+        velOut[batch_idx] = velRNNKF.cpu().data.numpy()[:,delay-1,:]
+        accCov = accCov.cpu().data.numpy()[:,delay-1,:]
+        accStd[batch_idx] = np.sqrt(np.diag(np.reshape(accCov, (3,3))))
+
+    gt_pos = np.cumsum(gt_dtr, axis=0)
+    pr_pos = np.cumsum(velOut, axis=0)
+
 
     plt.figure()
     plt.subplot(311)
@@ -92,15 +100,42 @@ def test(dsName, subType, seq):
     #     x = np.arange(i, i+delay, 1)
     #     plt.plot(x, velOut[i,:,2], 'b')
 
+    plt.figure()
+    plt.subplot(311)
+    plt.plot(accStd[:, 0])
+
+    plt.subplot(312)
+    plt.plot(accStd[:, 1])
+
+    plt.subplot(313)
+    plt.plot(accStd[:, 2])
+
+    plt.figure()
+    plt.subplot(311)
+    plt.plot(gt_pos[:, 0], 'r')
+    plt.plot(pr_pos[:, 0], 'b')
+
+    plt.subplot(312)
+    plt.plot(gt_pos[:, 1], 'r')
+    plt.plot(pr_pos[:, 1], 'b')
+
+    plt.subplot(313)
+    plt.plot(gt_pos[:, 2], 'r')
+    plt.plot(pr_pos[:, 2], 'b')
+
+    plt.figure()
+    plt.plot(gt_pos[:, 0], gt_pos[:, 2], 'r')
+    plt.plot(pr_pos[:, 0], pr_pos[:, 2], 'b')
+
     plt.show()
 
 if __name__ == '__main__':
-    dsName = 'airsim'
-    subType = 'mrseg'
-    seq = [0]
+    dsName = 'kitti'
+    subType = 'none'
+    seq = [0,2,4,6]
 
-    train(dsName, subType, seq)
-    test(dsName, subType, seq=2)
+    #train(dsName, subType, seq)
+    test(dsName, subType, seq=5)
 
 
 

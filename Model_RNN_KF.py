@@ -14,7 +14,7 @@ class Model_RNN_KF(nn.Module):
         self.acc_cov_chol_lstm = LSTM(3, 1, 20)
         self.fc0 = nn.Sequential(nn.Linear(40, 40),
                                  Sigmoid(0.1, 1),
-                                 nn.Linear(40, 6))
+                                 nn.Linear(40, 6),)
 
         self.get33Cov = GetCovMatFromChol_Sequence(self.delay)
         self.mat33vec3 = Batch33MatVec3Mul()
@@ -41,7 +41,7 @@ class Model_RNN_KF(nn.Module):
         vel = self.initVelImu(bn, gt_dtr_gnd_init)
         sysCov = self.initSysCov(bn, sysCovInit)
 
-        acc_cov_chol = self.acc_cov_chol_lstm(acc_stand)
+        acc_cov_chol = self.acc_cov_chol_lstm(acc)
         acc_cov_chol = self.fc0(acc_cov_chol)
         accCov = self.get33Cov(acc_cov_chol)
 

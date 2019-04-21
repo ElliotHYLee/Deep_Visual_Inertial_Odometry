@@ -62,6 +62,25 @@ class DataManager(Singleton):
 
 if __name__ == '__main__':
     s = time.time()
-    m = DataManager()
-    m.initHelper(dsName='euroc', subType='none', seq=[1,2,3,5])
+    d = DataManager()
+    d.initHelper(dsName='airsim', subType='mrseg', seq=[0])
+    d.standardize(True)
+
+    plt.figure()
+    plt.subplot(311)
+    plt.plot(d.accdt_gnd[:, 0], 'r.', markersize=5)
+    plt.subplot(312)
+    plt.plot(d.accdt_gnd[:, 1], 'r.', markersize=5)
+    plt.subplot(313)
+    plt.plot(d.accdt_gnd[:, 2], 'r.', markersize=5)
+
+    plt.figure()
+    plt.subplot(311)
+    plt.plot(d.acc_gnd_standard[:, 0], 'r.', markersize=5)
+    plt.subplot(312)
+    plt.plot(d.acc_gnd_standard[:, 1], 'r.', markersize=5)
+    plt.subplot(313)
+    plt.plot(d.acc_gnd_standard[:, 2], 'r.', markersize=5)
+
+    plt.show()
 
