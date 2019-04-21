@@ -1,6 +1,6 @@
 clc, clear, close all
-dsName = 'airsim';
-subType = 'mr';
+dsName = 'kitti';
+subType = 'none';
 seq = 0;
 
 loadData

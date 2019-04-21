@@ -61,12 +61,12 @@ if __name__ == '__main__':
     # runTrainTest(dsName, 'bar', seq, seqRange)
     # runTrainTest(dsName, 'pin', seq, seqRange)
 
-    #runTrainTest('euroc', 'none', seq=[1, 2, 3, 5], seqRange=[1, 6])
+    runTrainTest('euroc', 'none', seq=[1, 2, 3, 5], seqRange=[1, 6])
     #runTrainTest('euroc', 'edge', seq=[1, 2, 3, 5], seqRange=[1, 6])
-    #runTrainTest('kitti', 'none', seq=[0, 1, 2, 8, 9], seqRange=[0, 11])
-    #runTrainTest('kitti', 'edge', seq=[0, 1, 2, 8, 9], seqRange=[0, 11])
+    runTrainTest('kitti', 'none', seq=[0, 2, 4, 6], seqRange=[0, 11])
+    #runTrainTest('kitti', 'edge', seq=[0, 2, 4, 6], seqRange=[0, 11])
 
-    #runTrainTest('mycar', 'none', seq=[0, 2], seqRange=[0,3])
+    runTrainTest('mycar', 'none', seq=[0, 2], seqRange=[0,3])
     #runTrainTest('agz', 'none', seq=[0], seqRange=[0,1])
 
 

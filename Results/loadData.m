@@ -57,35 +57,8 @@ for i =1:1:N
 end
 dtr_gnd_std3 = sqrt(cov3);
 
-%% Do se(3) -> SE(3)
-lie = Lie();
-se3 = LieSE3();
-so3 = LieSO3();
 
-gt_T{1} = eye(4);
-pr_T{1} = eye(4);
-
-for i = 1:1:N
-    pr_dT = se3.getExp(gt_dw_gyro(i,:)', pr_du(i,:)');
-    gt_dT = se3.getExp(gt_dw(i,:)', gt_du(i,:)');
-    gt_T{i+1} = gt_T{i}*gt_dT;
-    pr_T{i+1} = pr_T{i}*pr_dT;
-    %gt_pos(i,:) = gt_T{i}(1:3,4)';
-    pr_pos(i,:) = pr_T{i}(1:3,4)';
-end
-
-
-% pr_pos = cumtrapz(pr_dtr_gnd);
-
-% figure
-% plot(gt_pos(:,1), gt_pos(:,2), 'ko')
-% hold on
-% plot(gt_pos_recon(:,1), gt_pos_recon(:,2), 'r.')
-% plot(recon_pos(:,1), recon_pos(:,2), 'b.')
-
-
-
-
+pr_pos = cumtrapz(pr_dtr_gnd);
 
 
 
