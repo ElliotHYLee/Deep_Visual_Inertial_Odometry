@@ -63,24 +63,29 @@ def test(dsName, subType, seq):
 
         if batch_idx == 0:
             gt_dtr_gnd_init_state = gt_dtr_gnd_init.to(device)  # 1 by 3
+            sysCov_init = None
         else:
             gt_dtr_gnd_init_state = velRNNKF.data[:,1,:]
+            sysCov_init = sysCov.data[:,1]
 
         gt_dtr[batch_idx, :] = gt_dtr_gnd.data.numpy()[:,delay-1,:]
         with torch.no_grad():
-            velRNNKF, accCov, sysCov = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init_state)
+            velRNNKF, accCov, sysCov = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init_state, sysCov_init)
         velOut[batch_idx] = velRNNKF.cpu().data.numpy()[:,delay-1,:]
         accCov = accCov.cpu().data.numpy()[:,delay-1,:]
         accStd[batch_idx] = np.sqrt(np.diag(np.reshape(accCov, (3,3))))
 
+    velKF = pd.read_csv('velKF.txt', sep=',', header=None).values.astype(np.float32)
     gt_pos = np.cumsum(gt_dtr, axis=0)
     pr_pos = np.cumsum(velOut, axis=0)
+    kf_pos = np.cumsum(velKF, axis=0)
 
 
     plt.figure()
     plt.subplot(311)
     plt.plot(gt_dtr[:,0], 'r')
     plt.plot(velOut[:,0], 'b')
+    plt.plot(velKF[:, 0], 'g')
     # for i in range(0, N, 1):
     #     x = np.arange(i, i+delay, 1)
     #     plt.plot(i, velOut[i,0,0], 'go')
@@ -89,6 +94,7 @@ def test(dsName, subType, seq):
     plt.subplot(312)
     plt.plot(gt_dtr[:, 1], 'r')
     plt.plot(velOut[:, 1], 'b')
+    plt.plot(velKF[:, 1], 'g')
     # for i in range(0, N, 1):
     #     x = np.arange(i, i+delay, 1)
     #     plt.plot(x, velOut[i,:,1], 'b')
@@ -96,6 +102,7 @@ def test(dsName, subType, seq):
     plt.subplot(313)
     plt.plot(gt_dtr[:, 2], 'r')
     plt.plot(velOut[:, 2], 'b')
+    plt.plot(velKF[:, 2], 'g')
     # for i in range(0, N, 1):
     #     x = np.arange(i, i+delay, 1)
     #     plt.plot(x, velOut[i,:,2], 'b')
@@ -114,28 +121,32 @@ def test(dsName, subType, seq):
     plt.subplot(311)
     plt.plot(gt_pos[:, 0], 'r')
     plt.plot(pr_pos[:, 0], 'b')
+    plt.plot(kf_pos[:, 0], 'g')
 
     plt.subplot(312)
     plt.plot(gt_pos[:, 1], 'r')
     plt.plot(pr_pos[:, 1], 'b')
+    plt.plot(kf_pos[:, 1], 'g')
 
     plt.subplot(313)
     plt.plot(gt_pos[:, 2], 'r')
     plt.plot(pr_pos[:, 2], 'b')
+    plt.plot(kf_pos[:, 2], 'g')
 
     plt.figure()
     plt.plot(gt_pos[:, 0], gt_pos[:, 2], 'r')
     plt.plot(pr_pos[:, 0], pr_pos[:, 2], 'b')
+    plt.plot(kf_pos[:, 0], kf_pos[:, 2], 'g')
 
     plt.show()
 
 if __name__ == '__main__':
-    dsName = 'kitti'
+    dsName = 'mycar'
     subType = 'none'
-    seq = [0,2,4,6]
+    seq = [1, 2, 3, 5]
 
-    #train(dsName, subType, seq)
-    test(dsName, subType, seq=5)
+    train(dsName, subType, seq)
+    test(dsName, subType, seq=4)
 
 
 

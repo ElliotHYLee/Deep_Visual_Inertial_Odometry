@@ -11,9 +11,10 @@ class Model_RNN_KF(nn.Module):
         super(Model_RNN_KF, self).__init__()
         self.delay = delay
 
-        self.acc_cov_chol_lstm = LSTM(3, 1, 20)
-        self.fc0 = nn.Sequential(nn.Linear(40, 40),
-                                 Sigmoid(0.1, 1),
+        self.acc_cov_chol_lstm = LSTM(3, 2, 20)
+        self.fc0 = nn.Sequential(nn.Linear(40, 40), nn.PReLU(),
+                                 nn.Linear(40, 40), nn.PReLU(),
+                                 nn.Linear(40, 40), Sigmoid(0.1, 1),
                                  nn.Linear(40, 6),)
 
         self.get33Cov = GetCovMatFromChol_Sequence(self.delay)

@@ -16,6 +16,6 @@ class LSTM(torch.nn.Module):
     def forward(self, x):
         if torch.cuda.is_available():
             self.lstm.flatten_parameters()
-        x, (h, c) = self.lstm(x)
+        x, hidden = self.lstm(x)
         return x
 
