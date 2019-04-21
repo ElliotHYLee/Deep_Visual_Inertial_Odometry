@@ -94,7 +94,6 @@ class ModelContainer_CNN():
             pr_dtr, pr_dtr_cov, \
             pr_dtr_gnd = self.model(img0, img1, dw_gyro, dw_gyro_stand, rotM)
 
-
             batch_loss = self.loss(pr_du, du, pr_du_cov) + \
                          self.loss(pr_dw, dw, pr_dw_cov) + \
                          self.loss(pr_dtr, dtr, pr_dtr_cov) + \

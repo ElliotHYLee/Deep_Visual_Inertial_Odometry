@@ -50,6 +50,13 @@ du_std3 = sqrt(du_cov3);
 dw_std3 = sqrt(dw_cov3);
 dtr_std3 = sqrt(dtr_cov3);
 
+for i =1:1:N
+   rotm = reshape(linR(i,:), 3,3)';
+   dtr_Q_gnd{i} = rotm*dtr_Q{i}*rotm';
+   cov3(i,:) = diag(dtr_Q_gnd{i});
+end
+dtr_gnd_std3 = sqrt(cov3);
+
 %% Do se(3) -> SE(3)
 lie = Lie();
 se3 = LieSE3();

@@ -1,7 +1,7 @@
 clc, clear, close all
 dsName = 'airsim';
-subType = 'mrseg';
-seq = 2;
+subType = 'mr';
+seq = 0;
 
 loadData
 
@@ -16,7 +16,7 @@ fig = figure('Renderer', 'painters', 'Position', [600 100 w h]);
 axes( 'Position', [0, 0.95, 1, 0.05] ) ;
 set( gca, 'Color', 'None', 'XColor', 'None', 'YColor', 'None' ) ;
 figTitle = [dsName, ' ', subType, ' ', int2str(seq)];
-text( 0.5, 0, figTitle, 'FontSize', 20', 'FontWeight', 'Bold','HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
+% text( 0.5, 0, figTitle, 'FontSize', 20', 'FontWeight', 'Bold','HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
 
 text( 0.75, 0, '- Ground Truth', 'FontSize', 10', 'Color', 'red', 'FontWeight', 'Bold','HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
 text( 0.737, -0.3, '- Predicted', 'FontSize', 10', 'Color', 'blue', 'FontWeight', 'Bold','HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
@@ -73,110 +73,78 @@ for i=1:1:3
     xlabel(['\fontsize{14} Data Points'])
 end
 
-% plot position
+% plot dtr_gnd
 for i=1:1:3
     subplot(subPlotRow, subPlotCol, index)
-    index = mysubplot(gt_pos(:,i), pr_pos(:,i), index);
+    index = mysubplot(gt_dtr_gnd(:,i), pr_dtr_gnd(:,i), index);
+    grid on
+
     if i==1 strYLabel = 'x';
     elseif i==2 strYLabel = 'y';
     else strYLabel = 'z';
     end
-    ylabel([strcat('\fontsize{14} Position_', strYLabel, ', m')])
+    ylabel([strcat('\fontsize{14} {{\Delta}dtr ground_', strYLabel, '}, m')])
     xlabel(['\fontsize{14} Data Points'])
 end
 
-% plot position 2D
-subplot(subPlotRow, subPlotCol, index)
-index = mysubplot2D(gt_pos(:,2), gt_pos(:,1), pr_pos(:,2), pr_pos(:,1), index);
-ylabel(['\fontsize{14} Position_x, m'])
-xlabel(['\fontsize{14} Position_y, m'])
+% plot dtr_gnd_std
+for i=1:1:3
+    subplot(subPlotRow, subPlotCol, index)
+    plot(dtr_gnd_std3(:,i), 'b.', 'MarkerSize',5);
+    grid on
+    index = index + 1;
+    if i==1 strYLabel = 'x';
+    elseif i==2 strYLabel = 'y';
+    else strYLabel = 'z';
+    end
+    ylabel([strcat('\fontsize{14} 1{\sigma}_{{\Delta}dtr ground_', strYLabel, '}, m')])
+    xlabel(['\fontsize{14} Data Points'])
+end
 
-subplot(subPlotRow, subPlotCol, index)
-index = mysubplot2D(gt_pos(:,1), gt_pos(:,3), pr_pos(:,1), pr_pos(:,3), index);
-ylabel(['\fontsize{14} Position_z, m'])
-xlabel(['\fontsize{14} Position_x, m'])
-
-subplot(subPlotRow, subPlotCol, index)
-index = mysubplot2D(gt_pos(:,2), gt_pos(:,3), pr_pos(:,2), pr_pos(:,3), index);
-ylabel(['\fontsize{14} Position_z, m'])
-xlabel(['\fontsize{14} Position_x, m'])
-
-
-err = abs(gt_du-pr_du);
-mae = mean(err)
-cov(err)
 
 figName = strcat('Figures\', getPRPath(dsName, subType, seq), '_results.png');
 saveas(fig, figName)
 
-err_dtr_gnd = gt_dtr_gnd- pr_dtr_gnd;
+x = 1:1:N;
 
 figure
-subplot(4,3,1)
-plot(err_dtr_gnd(:,1))
-grid on 
-grid minor
-
-subplot(4,3,2)
-plot(err_dtr_gnd(:,2))
-grid on 
-grid minor
-
-subplot(4,3,3)
-plot(err_dtr_gnd(:,3))
-grid on 
-grid minor
-
-for i =1:1:N
-   rotm = reshape(linR(i,:), 3,3)';
-   dtr_Q_gnd{i} = rotm*dtr_Q{i}*rotm';
-   cov3(i,:) = diag(dtr_Q_gnd{i});
-end
-
-dtr_gnd_std3 = sqrt(cov3);
-subplot(4,3,4)
-plot(dtr_gnd_std3(:,1))
-grid on 
-grid minor
-
-subplot(4,3,5)
-plot(dtr_gnd_std3(:,2))
-grid on 
-grid minor
-
-subplot(4,3,6)
-plot(dtr_gnd_std3(:,3))
-grid on 
-grid minor
-
-subplot(4,3,7)
+subplot(3,1,1)
 hold on
-plot(gt_dtr_gnd(:,1),'r.')
-plot(pr_dtr_gnd(:,1), 'b-.')
+plot(gt_pos(:,1),'r', 'DisplayName', 'Ground Truth')
+plot(pr_pos(:,1), 'b', 'DisplayName', 'Predicted')
+xlim([0, N])
+ylabel(['\fontsize{14} Position_x, m'])
 grid on 
 grid minor
+legend('Location', 'best')
 
-subplot(4,3,8)
+subplot(3,1,2)
 hold on
-plot(gt_dtr_gnd(:,2),'r.')
-plot(pr_dtr_gnd(:,2), 'b-.')
+plot(gt_pos(:,2),'r', 'DisplayName', 'Ground Truth')
+plot(pr_pos(:,2), 'b', 'DisplayName', 'Predicted')
+xlim([0, N])
+ylabel(['\fontsize{14} Position_y, m'])
 grid on 
 grid minor
+legend('Location', 'best')
 
-subplot(4,3,9)
+subplot(3,1,3)
 hold on
-plot(gt_dtr_gnd(:,3),'r.')
-plot(pr_dtr_gnd(:,3), 'b-.')
+plot(gt_pos(:,3),'r', 'DisplayName', 'Ground Truth')
+plot(pr_pos(:,3), 'b', 'DisplayName', 'Predicted')
+xlim([0, N])
+ylabel(['\fontsize{14} Position_z, m'])
 grid on 
 grid minor
-
+legend('Location', 'best')
 
 figure
-plot(gt_pos(:,1), gt_pos(:,3), 'r')
+plot(gt_pos(:,2), gt_pos(:,1), 'r', 'DisplayName', 'Ground Truth')
 hold on
-plot(pr_pos(:,1), pr_pos(:,3), 'b');
-
-
+plot(pr_pos(:,2), pr_pos(:,1), 'b', 'DisplayName', 'Predicted');
+ylabel(['\fontsize{14} Position_x, m'])
+xlabel(['\fontsize{14} Position_y, m'])
+legend('Location', 'best')
 
 
 

@@ -15,19 +15,21 @@ def show(dsName, subType):
     train_line, =plt.plot(train_loss, 'r-o')
     val_line, =plt.plot(val_loss, 'b-o')
     plt.legend((train_line, val_line),('Train Loss', 'Validation Loss'))
-    if dsName.lower() == 'airsim':
-        plt.title('Mahalanobis Distance ' + dsName + ' Pincushion Distortion')
-    else:
-        plt.title('Mahalanobis Distance ' + dsName)
+    # if dsName.lower() == 'airsim':
+    #     plt.title('Mahalanobis Distance ' + dsName + ' Pincushion Distortion')
+    # else:
+    #     plt.title('Mahalanobis Distance ' + dsName)
     plt.grid(b=True, which='major', color='#666666', linestyle='-')
     plt.minorticks_on()
     plt.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
-    plt.ylim(bottom=0)
+    plt.ylim(bottom=0, top=5)
+    plt.ylabel('Mahalanobis Distance', fontsize=14)
+    plt.xlabel('Epochs', fontsize=14)
     plt.show()
 
 if __name__ == '__main__':
     dsName = 'AirSim'
-    subType='pin'
+    subType='mr'
     show(dsName, subType)
 
 
