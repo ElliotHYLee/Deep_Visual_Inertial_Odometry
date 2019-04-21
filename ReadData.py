@@ -91,7 +91,5 @@ if __name__ == '__main__':
     plt.subplot(313)
     plt.plot(d.acc_gnd[:, 2], 'r.', markersize=5)
 
-
-
     plt.show()
 

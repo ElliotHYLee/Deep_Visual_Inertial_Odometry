@@ -1,6 +1,6 @@
 clc, clear, close all
 dsName = 'airsim';
-subType = 'mr';
+subType = 'mrseg';
 seq = 2;
 
 %% Get Ground Truth Info.

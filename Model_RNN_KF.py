@@ -51,18 +51,18 @@ class Model_RNN_KF(nn.Module):
             prVel = vel[:, i-1, :] + accdt[:, i, :]
             prCov = sysCov[:, i-1, :, :] + accCov[:, i, :, :]
 
-            # KF correction step
-            # mCov = dtr_cv_gnd[:, i, :]
-            # z = pr_dtr_gnd[:, i, :]
-            # temp = torch.inverse(prCov + mCov)
-            # K = torch.bmm(prCov, temp)
-            # innov = z - prVel
-            # nextVel = prVel + self.mat33vec3(K, innov)
-            # nextCov = prCov - torch.bmm(K, prCov)
+            #KF correction step
+            mCov = dtr_cv_gnd[:, i, :]
+            z = pr_dtr_gnd[:, i, :]
+            temp = torch.inverse(prCov + mCov)
+            K = torch.bmm(prCov, temp)
+            innov = z - prVel
+            nextVel = prVel + self.mat33vec3(K, innov)
+            nextCov = prCov - torch.bmm(K, prCov)
 
             # KF update
-            vel[:, i, :] = prVel
-            sysCov[:, i, :, :] = prCov
+            vel[:, i, :] = nextVel
+            sysCov[:, i, :, :] = nextCov
 
 
         return vel, accCov, sysCov

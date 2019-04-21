@@ -31,22 +31,12 @@ def shiftUp(states):
     dummy[:-1, :, :] = states[1:, :, :]
     return dummy
 
-# def getStd(serCov, batch_idx):
-#     bn = serCov.shape[0]
-#     sig2 =
-#     if batch_idx == 0:
-#         var = np.zeros((delay, 3))
-#         var =
-
-
 def test(dsName, subType, seq):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
-    resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
-    #seq = 2#seqList[0]
-    commName = resName + subType + str(seq) if dsName == 'airsim' else resName + str(seq)
 
     dm = VODataSetManager_RNN_KF(dsName=dsName, subType=subType, seq=[seq], isTrain=False, delay=delay)
     dataset = dm.testSet
+    N = len(dataset)
     data_loader = DataLoader(dataset=dataset, batch_size=1, shuffle=False)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -56,146 +46,51 @@ def test(dsName, subType, seq):
     checkPoint = torch.load(wName + '_best' + '.pt')
     mc.load_state_dict(checkPoint['model_state_dict'])
 
-    corr_vel_list = []
-    acc_cov_list = []
-    sys_cov_list = []
-    states = torch.zeros((delay, delay, 3)).cuda()
-    for batch_idx, (acc, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(data_loader):
+    gt_dtr = np.zeros((N, 3))
+    velOut = np.zeros((N, 3))
+
+
+    for batch_idx, (accdt_gnd, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(data_loader):
         dt = dt.to(device)
-        acc = acc.to(device)
+        acc = accdt_gnd.to(device)
         acc_stand = acc_stand.to(device)
         pr_dtr_gnd = pr_dtr_gnd.to(device)
         dtr_cv_gnd = dtr_cv_gnd.to(device)
         #gt_dtr_gnd = gt_dtr_gnd.to(device)
         #gt_dtr_gnd_init = gt_dtr_gnd_init.to(device) # 1 by 3
 
-        if batch_idx == 0 :
-            gt_dtr_gnd_init = gt_dtr_gnd_init.to(device) # 1 by 3
-
-        elif batch_idx < delay - 1:
-            gt_dtr_gnd_init = torch.sum(states[:, 0, :], dim=0).unsqueeze(0)/batch_idx
-            #print(gt_dtr_gnd_init.shape)
-            states = shiftLeft(states)
-            states[batch_idx, :, :] = velRNNKF.data
-        else:
-            gt_dtr_gnd_init = torch.sum(states[:, 0, :], dim=0).unsqueeze(0)/(delay)
-            states = shiftUp(states)
-            states = shiftLeft(states)
-            states[delay-1, :, :] = velRNNKF.data
-
         if batch_idx == 0:
-            sysCovInit = None
+            gt_dtr_gnd_init_state = gt_dtr_gnd_init.to(device)  # 1 by 3
         else:
-            sysCovInit = sysCov[:, 0, :].data
+            gt_dtr_gnd_init_state = velRNNKF.data[:,1,:]
 
+        gt_dtr[batch_idx, :] = gt_dtr_gnd_init.data.numpy()
         with torch.no_grad():
-            velRNNKF, accCov, sysCov = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init, sysCovInit)
-
-        corr_vel_list.append(velRNNKF.cpu().data.numpy())
-        if batch_idx == 0:
-            sys_cov_list.append(np.reshape(sysCov.cpu().data.numpy()[:, :], (delay, 3, 3)))
-            acc_cov_list.append(np.reshape(accCov.cpu().data.numpy()[:, :], (delay, 3, 3)))
-        else:
-            sys_cov_list.append(sysCov.cpu().data.numpy()[:, -1])
-            acc_cov_list.append(accCov.cpu().data.numpy()[:, -1])
-
-    velRNNKF = np.concatenate(corr_vel_list, axis = 0)
-    data = DataManager()
-    gt_dtr_gnd = data.gt_dtr_gnd#np.concatenate(gt_dtr_gnd_list, axis = 0)
-    print(gt_dtr_gnd.shape)
-
-
-    velKF = pd.read_csv('velKF.txt', sep=',', header=None).values.astype(np.float32)
-
-    var = np.zeros((velRNNKF.shape[0]+delay, 3))
-    for i in range(velRNNKF.shape[0]):
-        if i == 0:
-            var[:delay, :] = velRNNKF[0,:,:]
-        else:
-            var[delay+i,:] = velRNNKF[i,delay-1, :]
-
-    sysCov = np.concatenate(sys_cov_list, axis=0)
-    sysStd = np.zeros((sysCov.shape[0], 3))
-
-    accCov = np.concatenate(acc_cov_list, axis=0)
-    accStd = np.zeros((accCov.shape[0], 3))
-
-    for i in range(0, sysCov.shape[0]):
-        sysStd[i,:] = np.sqrt(np.diag(sysCov[i]))
-        accStd[i, :] = np.sqrt(np.diag(accCov[i]))
-
-    velRNNKF = np.concatenate((np.zeros((delay, delay, 3)), velRNNKF), axis=0)
+            velRNNKF, accCov, sysCov = mc.forward(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init_state)
+        velOut[batch_idx] = velRNNKF.cpu().data.numpy()[:,0,:]
 
     plt.figure()
     plt.subplot(311)
-    plt.plot(gt_dtr_gnd[:, 0], 'r.', markersize='5')
-    plt.plot(velKF[:, 0], 'g.', markersize='2')
-    plt.plot(var[:, 0], 'b.', markersize='1')
+    plt.plot(gt_dtr[:,0], 'r')
+    plt.plot(velOut[:,0], 'b')
+    # for i in range(0, N, 1):
+    #     x = np.arange(i, i+delay, 1)
+    #     plt.plot(i, velOut[i,0,0], 'go')
+    #     plt.plot(x, velOut[i,:,0], 'b.-')
 
     plt.subplot(312)
-    plt.plot(gt_dtr_gnd[:, 1], 'r.', markersize='5')
-    plt.plot(velKF[:, 1], 'g.', markersize='2')
-    plt.plot(var[:, 1], 'b.', markersize='1')
+    plt.plot(gt_dtr[:, 1], 'r')
+    plt.plot(velOut[:, 1], 'b')
+    # for i in range(0, N, 1):
+    #     x = np.arange(i, i+delay, 1)
+    #     plt.plot(x, velOut[i,:,1], 'b')
 
     plt.subplot(313)
-    plt.plot(gt_dtr_gnd[:, 2], 'r.', markersize='5')
-    plt.plot(velKF[:, 2], 'g.', markersize='2')
-    plt.plot(var[:, 2], 'b.', markersize='1')
-
-    corr_pos = np.cumsum(var, axis=0)
-    gt_pos = np.cumsum(gt_dtr_gnd, axis=0)
-    gt_KF = np.cumsum(velKF, axis=0)
-
-    plt.figure()
-    plt.subplot(311)
-    plt.plot(gt_pos[:, 0], gt_pos[:, 1], 'r')
-    plt.plot(gt_KF[:, 0], gt_KF[:, 1], 'g')
-    plt.plot(corr_pos[:, 0], corr_pos[:, 1], 'b')
-
-    plt.subplot(312)
-    plt.plot(gt_pos[:, 0], gt_pos[:, 2], 'r')
-    plt.plot(gt_KF[:, 0], gt_KF[:, 2], 'g')
-    plt.plot(corr_pos[:, 0], corr_pos[:, 2], 'b')
-
-    plt.subplot(313)
-    plt.plot(gt_pos[:, 1], gt_pos[:, 2], 'r')
-    plt.plot(gt_KF[:, 1], gt_KF[:, 2], 'g')
-    plt.plot(corr_pos[:, 1], corr_pos[:, 2], 'b')
-
-    plt.figure()
-    plt.subplot(311)
-    plt.plot(gt_pos[:, 0], 'r')
-    plt.plot(gt_KF[:, 0], 'g')
-    plt.plot(corr_pos[:, 0], 'b')
-
-    plt.subplot(312)
-    plt.plot(gt_pos[:, 1], 'r')
-    plt.plot(gt_KF[:, 1], 'g')
-    plt.plot(corr_pos[:, 1], 'b')
-
-    plt.subplot(313)
-    plt.plot(gt_pos[:, 2], 'r')
-    plt.plot(gt_KF[:, 2], 'g')
-    plt.plot(corr_pos[:, 2], 'b')
-
-    plt.figure()
-    plt.title('KF Uncertainty')
-    plt.subplot(311)
-    plt.plot(sysStd[:, 0], 'b')
-    plt.subplot(312)
-    plt.plot(sysStd[:, 1], 'b')
-    plt.subplot(313)
-    plt.plot(sysStd[:, 2], 'b')
-
-
-    plt.figure()
-    plt.title('Estimated Acc Uncertainty')
-    plt.subplot(311)
-    plt.plot(accStd[:, 0], 'b')
-    plt.subplot(312)
-    plt.plot(accStd[:, 1], 'b')
-    plt.subplot(313)
-    plt.plot(accStd[:, 2], 'b')
+    plt.plot(gt_dtr[:, 2], 'r')
+    plt.plot(velOut[:, 2], 'b')
+    # for i in range(0, N, 1):
+    #     x = np.arange(i, i+delay, 1)
+    #     plt.plot(x, velOut[i,:,2], 'b')
 
     plt.show()
 
@@ -204,7 +99,7 @@ if __name__ == '__main__':
     subType = 'mrseg'
     seq = [0]
 
-    #train(dsName, subType, seq)
+    train(dsName, subType, seq)
     test(dsName, subType, seq=2)
 
 
