@@ -1,6 +1,6 @@
 clc, clear, close all
 dsName = 'airsim';
-subType = 'mr';
+subType = 'mrseg';
 seq = 2;
 
 %% Get Ground Truth Info.
@@ -259,8 +259,8 @@ legend('gt', 'cnn', 'imu', 'kf')
 
 figure
 hold on
-plot(gt_pos(:,1), gt_pos(:,3), 'ro')
-plot(pos_intKF(:,1), pos_intKF(:,3), 'b.')
+plot(gt_pos(:,1), gt_pos(:,2), 'ro')
+plot(pos_intKF(:,1), pos_intKF(:,2), 'b.')
 
 
 dlmwrite('../velKF.txt', velKF)
