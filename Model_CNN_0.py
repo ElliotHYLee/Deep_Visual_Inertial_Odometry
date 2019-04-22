@@ -4,7 +4,7 @@ from MyPyTorchAPI.CustomActivation import *
 from SE3Layer import GetTrans
 from CNNFC import CNNFC
 from MyPyTorchAPI.MatOp import Batch33MatVec3Mul, GetCovMatFromChol
-from FCCov import FCCOV
+from FCCov import FCCov
 
 class Model_CNN_0(nn.Module):
     def __init__(self, dsName='airsim'):
@@ -29,15 +29,15 @@ class Model_CNN_0(nn.Module):
 
         # fc_du
         self.fc_du = CNNFC(NN_size + 100, 3)
-        self.fc_du_cov = FCCOV(NN_size + 100)
+        self.fc_du_cov = FCCov(NN_size + 100)
 
         # fc_dw
-        self.fc_dw = CNNFC(NN_size + 100, 3)
-        self.fc_dw_cov = FCCOV(NN_size + 100)
+        self.fc_dw = CNNFC(NN_size+100, 3)
+        self.fc_dw_cov = FCCov(NN_size+100)
 
         # fc_dtr
         self.fc_dtr = GetTrans()
-        self.fc_dtr_cov = FCCOV(NN_size + 100)
+        self.fc_dtr_cov = FCCov(NN_size + 100)
 
         # fc_dtr_gnd
         self.fc_dtr_gnd = Batch33MatVec3Mul()

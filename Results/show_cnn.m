@@ -1,7 +1,7 @@
 clc, clear, close all
 dsName = 'kitti';
 subType = 'none';
-seq = 0;
+seq=5;
 
 loadData
 
@@ -13,13 +13,14 @@ w = 1000;
 h = 1200;
 fig = figure('Renderer', 'painters', 'Position', [600 100 w h]);
 
-axes( 'Position', [0, 0.95, 1, 0.05] ) ;
+axes( 'Position', [0, 0.95, 1, 0.05] );
 set( gca, 'Color', 'None', 'XColor', 'None', 'YColor', 'None' ) ;
 figTitle = [dsName, ' ', subType, ' ', int2str(seq)];
 % text( 0.5, 0, figTitle, 'FontSize', 20', 'FontWeight', 'Bold','HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
 
 text( 0.75, 0, '- Ground Truth', 'FontSize', 10', 'Color', 'red', 'FontWeight', 'Bold','HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
 text( 0.737, -0.3, '- Predicted', 'FontSize', 10', 'Color', 'blue', 'FontWeight', 'Bold','HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
+
 % plot du
 for i=1:1:3
     subplot(subPlotRow, subPlotCol, index)

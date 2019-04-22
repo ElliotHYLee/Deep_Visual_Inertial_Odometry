@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from MyPyTorchAPI.CustomActivation import *
 
-class FCCOV(torch.nn.Module):
+class FCCov(torch.nn.Module):
     def __init__(self, fc_input_size):
         super().__init__()
         self.fc = nn.Sequential(
