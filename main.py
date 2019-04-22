@@ -110,12 +110,16 @@ def test(dsName, subType, seq):
     plt.figure()
     plt.subplot(311)
     plt.plot(accStd[:, 0])
+    plt.ylim([0, 1])
 
     plt.subplot(312)
     plt.plot(accStd[:, 1])
+    plt.ylim([0, 1])
 
     plt.subplot(313)
     plt.plot(accStd[:, 2])
+    plt.ylim([0, 1])
+
 
     plt.figure()
     plt.subplot(311)
@@ -134,9 +138,9 @@ def test(dsName, subType, seq):
     plt.plot(kf_pos[:, 2], 'g')
 
     plt.figure()
-    plt.plot(gt_pos[:, 0], gt_pos[:, 2], 'r')
-    plt.plot(pr_pos[:, 0], pr_pos[:, 2], 'b')
-    plt.plot(kf_pos[:, 0], kf_pos[:, 2], 'g')
+    plt.plot(gt_pos[:, 0], gt_pos[:, 1], 'r')
+    plt.plot(pr_pos[:, 0], pr_pos[:, 1], 'b')
+    plt.plot(kf_pos[:, 0], kf_pos[:, 1], 'g')
 
     plt.show()
 
