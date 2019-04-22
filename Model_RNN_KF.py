@@ -65,7 +65,6 @@ class Model_RNN_KF(nn.Module):
             vel[:, i, :] = nextVel
             sysCov[:, i, :, :] = nextCov
 
-
         return vel, accCov, sysCov
 
 if __name__ == '__main__':
