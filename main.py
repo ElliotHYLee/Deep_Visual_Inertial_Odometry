@@ -141,20 +141,10 @@ def test(dsName, subType, seq):
     plt.show()
 
 if __name__ == '__main__':
-    dsName = 'mycar'
-    subType = 'none'
-    seq = [1, 2, 3, 5]
+    dsName = 'airsim'
+    subType = 'mr'
+    seq = [0]
 
     train(dsName, subType, seq)
-    test(dsName, subType, seq=4)
-
-
-
-
-
-
-
-
-
-
+    test(dsName, subType, seq=2)
 
