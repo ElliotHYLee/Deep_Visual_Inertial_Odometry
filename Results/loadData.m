@@ -13,6 +13,9 @@ gt_dtrName = strcat(gtPath, '\dtrans.txt');
 gt_dtr_gndName = strcat(gtPath, '\dtrans_gnd.txt');
 gt_pos_gndName = strcat(gtPath, '\pos.txt');
 linRName = strcat(gtPath, '\linR.txt');
+acc_gndName = strcat(gtPath, '\acc_gnd.txt');
+acc_gnd = importdata(acc_gndName);
+
 
 dt = importdata(gt_dtName);
 gt_du = importdata(gt_duName);

@@ -19,9 +19,9 @@ end
 
 function[] = drawELPS(gt_pos, pr_pos, P, lastPoint, ax1, ax2, skip, scale)
     figure
-    a = plot(gt_pos(1:end,ax1), gt_pos(1:end,ax2), 'r')
+    a = plot(gt_pos(1:end,ax1), gt_pos(1:end,ax2), 'r');
     hold on
-    b = plot(pr_pos(1:end,ax1), pr_pos(1:end,ax2),'b')
+    b = plot(pr_pos(1:end,ax1), pr_pos(1:end,ax2),'b');
     
     
     for i=1:skip:lastPoint
