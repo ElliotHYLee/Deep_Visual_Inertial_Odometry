@@ -25,9 +25,9 @@ class Model_RNN_KF(nn.Module):
         vel_imu = vel_imu.cumsum(1)
 
         #vel_z = torch.cat((vel_imu, pr_dtr_gnd_zero), dim=2)
-        vel_z = vel_imu + pr_dtr_gnd_zero
-        vel = self.vel_lstm(vel_z)
-        vel = self.fc0(vel) + gt_dtr_gnd_init.unsqueeze(1)
+        #vel_z = vel_imu + pr_dtr_gnd_zero
+        vel = self.vel_lstm(pr_dtr_gnd)
+        vel = self.fc0(vel) #+ gt_dtr_gnd_init.unsqueeze(1)
 
         return vel_imu, vel
 

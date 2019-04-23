@@ -50,6 +50,7 @@ def test(dsName, subType, seq):
 
     gt_dtr = np.zeros((N, 3))
     velOut = np.zeros((N,3))
+    input_dtr = np.zeros((N,3))
     for batch_idx, (acc, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(data_loader):
         dt = dt.to(device)
         acc = acc.to(device)
@@ -57,6 +58,7 @@ def test(dsName, subType, seq):
         pr_dtr_gnd = pr_dtr_gnd.to(device)
         dtr_cv_gnd = dtr_cv_gnd.to(device)
 
+        input_dtr[batch_idx] = pr_dtr_gnd.cpu().data.numpy()[:,0,:]
         gt_dtr[batch_idx] = gt_dtr_gnd_init.data.numpy()
         if batch_idx == 0:
             gtdtr_gnd_init_state =  gt_dtr_gnd_init.to(device)
@@ -76,14 +78,17 @@ def test(dsName, subType, seq):
     plt.plot(gt_dtr[:,0], 'r')
     plt.plot(velOut[:, 0], 'b')
     plt.plot(velKF[:, 0], 'g')
+    plt.plot(input_dtr[:, 0], 'k')
     plt.subplot(312)
     plt.plot(gt_dtr[:, 1], 'r')
     plt.plot(velOut[:, 1], 'b')
     plt.plot(velKF[:, 1], 'g')
+    plt.plot(input_dtr[:, 1], 'k')
     plt.subplot(313)
     plt.plot(gt_dtr[:, 2], 'r')
     plt.plot(velOut[:, 2], 'b')
     plt.plot(velKF[:, 2], 'g')
+    plt.plot(input_dtr[:, 2], 'k')
 
     plt.figure()
     plt.subplot(311)

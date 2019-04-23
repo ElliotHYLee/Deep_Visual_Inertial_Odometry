@@ -67,6 +67,12 @@ if __name__ == '__main__':
 
     print(vel_imu.shape)
 
+    pos_imu = np.cumsum(vel_imu, axis=0)
+    plt.figure()
+    plt.plot(pos_imu)
+
+
+
     plt.figure()
     plt.subplot(311)
     plt.plot(d.gt_dtr_gnd[:,0], 'r.', markersize=5)

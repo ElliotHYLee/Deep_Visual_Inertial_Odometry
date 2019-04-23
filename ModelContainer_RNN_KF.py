@@ -22,7 +22,7 @@ class ModelContainer_RNN_KF():
     def compile(self):
         self.loss = nn.modules.loss.L1Loss()
         #self.optimizer = optim.SGD(self.model.parameters(), lr=10**-2, weight_decay=0)
-        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-3, weight_decay=0)
+        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-4, weight_decay=0)
 
     def fit(self, train, validation=None, batch_size=1, epochs=1, shuffle=True, wName='weight.pt', checkPointFreq = 1):
         self.checkPointFreq = checkPointFreq
