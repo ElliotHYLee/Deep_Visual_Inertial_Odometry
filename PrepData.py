@@ -58,8 +58,6 @@ class DataManager(Singleton):
         self.acc_gnd_standard = np.divide(self.acc_gnd_standard, accStd).astype(np.float32)
 
 
-
-
 if __name__ == '__main__':
     s = time.time()
     d = DataManager()
