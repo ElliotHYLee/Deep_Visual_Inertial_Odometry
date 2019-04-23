@@ -22,7 +22,7 @@ class ModelContainer_CNN():
     def compile(self, loss=None, optimizer=None):
         self.loss = MahalanobisLoss(isSeries=False)#nn.modules.loss.L1Loss()
         #self.optimizer = optim.SGD(self.model.parameters(), lr=10**-2, weight_decay=0.01)
-        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-3, weight_decay=10**-2)
+        self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-4, weight_decay=10**-2)
 
     def fit(self, train, validation=None, batch_size=1, epochs=1, shuffle=False, wName='weight.pt', checkPointFreq = 1):
         self.checkPointFreq = checkPointFreq
@@ -31,8 +31,8 @@ class ModelContainer_CNN():
         self.valid_loader = DataLoader(dataset = validation, batch_size=batch_size, shuffle=shuffle)
 
         for epoch in range(0, epochs):
-            if epoch == 5:
-                self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-4, weight_decay=10**-2)
+            # if epoch == 5:
+            #     self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-4, weight_decay=10**-2)
             train_loss, val_loss = self.runEpoch(epoch)
             self.current_val_loss = val_loss
             self.train_loss.append(train_loss)
@@ -198,26 +198,3 @@ class ModelContainer_CNN():
 
 if __name__ == '__main__':
     pass
-    # from Model_CNN_0 import Model_CNN_0
-    # mc = ModelContainer_CNN(Model_CNN_0())
-    # from tkinter import *
-    #
-    #
-    # def show_entry_fields():
-    #     print("First Name: %s\nLast Name: %s" % (e1.get(), e2.get()))
-    #
-    #
-    # master = Tk()
-    # Label(master, text="First Name").grid(row=0)
-    # Label(master, text="Last Name").grid(row=1)
-    #
-    # e1 = Entry(master)
-    # e2 = Entry(master)
-    #
-    # e1.grid(row=0, column=1)
-    # e2.grid(row=1, column=1)
-    #
-    # Button(master, text='Quit', command=master.quit).grid(row=3, column=0, sticky=W, pady=4)
-    # Button(master, text='Show', command=show_entry_fields).grid(row=3, column=1, sticky=W, pady=4)
-    #
-    # mainloop()
