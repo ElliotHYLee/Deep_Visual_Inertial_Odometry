@@ -1,2 +1,2 @@
 def branchName():
-    return 'master'
+    return 'master_candidate'

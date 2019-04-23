@@ -16,6 +16,10 @@ function[path] = getGTPath(dsName, subType, seq)
         if strcmp(subType, 'none') || strcmp(subType, '')
             path = strcat('D:/DLData/MyCar/data', int2str(seq), '/');
         end
+    elseif strcmp(dsName,'agz')
+        if strcmp(subType, 'none') || strcmp(subType, '')
+            path = strcat('D:/DLData/AGZ/');
+        end
     elseif strcmp(dsName,'euroc')
        path = strcat('D:/DLData/EuRoc/mh_',  int2str(seq), '/'); 
     elseif strcmp(dsName, 'kitti')

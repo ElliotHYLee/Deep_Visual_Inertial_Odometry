@@ -10,9 +10,13 @@ class VODataSetManager_CNN():
         data = DataManager()
         data.initHelper(dsName, subType, seq)
         data.standardizeImgs(isTrain)
+        data.standardizeGyro(isTrain)
 
-        idx = np.arange(0, data.numTotalData, 1)
-        N = data.numTotalData
+        if dsName == 'agz' and isTrain:
+            idx = np.arange(0, 2000, 1)
+        else:
+            idx = np.arange(0, data.numTotalData, 1)
+        N = idx.shape[0]
         if isTrain:
             idx = shuffle(idx)
             valN = int(N * split)
@@ -33,8 +37,14 @@ class VODataSet_CNN(Dataset):
     def __getitem__(self, i):
         index = self.idxList[i]
         try:
-            return self.dm.imgs[index], self.dm.imgs[index+1], self.dm.du[index], self.dm.dw[index], self.dm.dtrans[index],\
-                   self.dm.dtr_gnd[index], self.dm.rotM_bdy2gnd[index]
+            return self.dm.imgs[index], self.dm.imgs[index+1], \
+                   self.dm.du[index], \
+                   self.dm.dw[index], \
+                   self.dm.dw_gyro[index], \
+                   self.dm.gyro_standard[index], \
+                   self.dm.dtrans[index],\
+                   self.dm.dtr_gnd[index],\
+                   self.dm.rotM_bdy2gnd[index]
         except:
             print('this is an error @ VODataSet_CNN of VODataSet.py')
             print(self.dm.imgs.shape)

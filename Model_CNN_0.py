@@ -4,6 +4,7 @@ from MyPyTorchAPI.CustomActivation import *
 from SE3Layer import GetTrans
 from CNNFC import CNNFC
 from MyPyTorchAPI.MatOp import Batch33MatVec3Mul, GetCovMatFromChol
+from FCCov import FCCov
 
 class Model_CNN_0(nn.Module):
     def __init__(self, dsName='airsim'):
@@ -22,39 +23,26 @@ class Model_CNN_0(nn.Module):
         self.init_w()
 
         NN_size = int(seq1.flattend_size)
-        sigmoidMax = np.sqrt(1)
-        sigmoidInclination = 0.1
+
+        self.fc_dw_preproc = nn.Sequential(nn.Linear(3, 100), nn.Tanh(),
+                                           nn.Linear(100, 100, nn.Tanh()))
 
         # fc_du
-        self.fc_du = CNNFC(NN_size, 3)
+        self.fc_du = CNNFC(NN_size + 100, 3)
+        self.fc_du_cov = FCCov(NN_size + 100)
 
         # fc_dw
-        self.fc_dw = CNNFC(NN_size, 3)
+        self.fc_dw = CNNFC(NN_size+100, 3)
+        self.fc_dw_cov = FCCov(NN_size+100)
 
-        #fc_dtr
+        # fc_dtr
         self.fc_dtr = GetTrans()
-
-        # fc_du_cov
-        self.fc_du_cov = nn.Sequential(
-                        CNNFC(NN_size, 6),
-                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
-
-        # fc_dw_cov
-        self.fc_dw_cov = nn.Sequential(
-                        CNNFC(NN_size, 6),
-                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
-
-        # fc_dtr_cov
-        self.fc_dtr_cov = nn.Sequential(
-                        CNNFC(NN_size, 6),
-                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+        self.fc_dtr_cov = FCCov(NN_size + 100)
 
         # fc_dtr_gnd
         self.fc_dtr_gnd = Batch33MatVec3Mul()
         self.getQ = GetCovMatFromChol()
-        self.fc_dtr_gnd_cov = nn.Sequential(
-                        CNNFC(NN_size, 6),
-                        Sigmoid(a=sigmoidInclination, max=sigmoidMax))
+
 
     def init_w(self):
         for m in self.modules():
@@ -68,22 +56,29 @@ class Model_CNN_0(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-    def forward(self, x1, x2, dw_gt, rotM):
+    def forward(self, x1, x2, dw_gyro, dw_gyro_stand, rotM):
         input = torch.cat((x1, x2), 1)
         x = self.encoder(input)
         x = x.view(x.size(0), -1)
 
-        pr_du = self.fc_du(x)
-        pr_du_cov = self.fc_du_cov(x)
+        # Preprocess dw_gyro
+        dw_gt_pre = self.fc_dw_preproc(dw_gyro_stand)
+        x_gyro = torch.cat((x, dw_gt_pre), dim=1)
 
-        pr_dw = self.fc_dw(x)
-        pr_dw_cov = self.fc_dw_cov(x)
+        # Get dw
+        pr_dw = self.fc_dw(x_gyro)
+        pr_dw_cov = self.fc_dw_cov(x_gyro)
 
-        pr_dtr = self.fc_dtr(pr_du, dw_gt)
-        pr_dtr_cov = self.fc_dtr_cov(x)
+        # Get du
+        pr_du = self.fc_du(x_gyro)
+        pr_du_cov = self.fc_du_cov(x_gyro)
 
+        # Calculate dtr
+        pr_dtr = self.fc_dtr(pr_du, dw_gyro)
+        pr_dtr_cov = self.fc_dtr_cov(x_gyro)
+
+        # Rotate dtr to dtr_gnd
         pr_dtr_gnd = self.fc_dtr_gnd(rotM, pr_dtr)
-
 
         return pr_du, pr_du_cov, \
                pr_dw, pr_dw_cov, \

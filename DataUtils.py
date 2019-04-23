@@ -29,21 +29,23 @@ def getPathWin(dsName = 'AirSim', seq = 0, subType='mr'):
     dsName = dsName.lower()
     if dsName == 'airsim':
         if subType == 'mr' or subType=='mrseg':
-            path = 'D:/DLData/Airsim/' + subType + str(seq) + '/'
+            path = 'F:/DLData/Airsim/' + subType + str(seq) + '/'
         elif subType == 'bar' or subType == 'pin':
-            path = 'D:/DLData/Airsim/mr' + str(seq) + '/'
+            path = 'F:/DLData/Airsim/mr' + str(seq) + '/'
     elif dsName == 'euroc':
-        path = 'D:/DLData/EuRoc/mh_' + str(seq) +'/'
+        path = 'F:/DLData/EuRoc/mh_' + str(seq) +'/'
     elif dsName == 'kitti':
-        path = 'D:/DLData/KITTI/odom/dataset/sequences/'
+        path = 'F:/DLData/KITTI/odom/dataset/sequences/'
         path += '0'+str(seq) if seq<10 else str(seq)
         path += '/'
     elif dsName == 'myroom':
         if subType == 'none':
-            path = 'D:/DLData/MyRoom/data' + str(seq) + '/'
+            path = 'F:/DLData/MyRoom/data' + str(seq) + '/'
     elif dsName == 'mycar':
         if subType == 'none':
-            path = 'D:/DLData/MyCar/data' + str(seq) + '/'
+            path = 'F:/DLData/MyCar/data' + str(seq) + '/'
+    elif dsName == 'agz':
+        path = 'F:/DLData/AGZ/'
     return path
 
 def getImgNames(path, dsName='AirSim', ts=None, subType=''):
@@ -84,6 +86,23 @@ def getImgNames(path, dsName='AirSim', ts=None, subType=''):
         if subType == 'none':
             for i in range(0, idx.shape[0]):
                 imgNames.append(path + 'images/' + str(ts[idx[i]]) + '.png')
+
+    elif dsName == 'agz':
+        idx = (pd.read_csv(path + 'imgid.txt', sep=' ', header=None)).iloc[:, 0].values
+        idx = idx[:-2]
+        if subType == 'none':
+            for i in range(0, idx.shape[0]):
+                if idx[i] < 10:
+                    name = '0000' + str(idx[i]) + '.jpg'
+                elif idx[i] < 100:
+                    name = '000' + str(idx[i]) + '.jpg'
+                elif idx[i] < 1000:
+                    name = '00' + str(idx[i]) + '.jpg'
+                elif idx[i] < 10000:
+                    name = '0' + str(idx[i]) + '.jpg'
+                elif idx[i] < 100000:
+                    name = str(idx[i]) + '.jpg'
+                imgNames.append(path + 'MAVImages/' + name)
 
     return imgNames
 

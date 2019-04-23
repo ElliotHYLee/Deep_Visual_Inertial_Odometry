@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'mycar';
+dsName = 'kitti';
 subType = 'none';
-seq = 1;
+seq = 7;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
@@ -54,6 +54,23 @@ for i =1:1:N
    cov3(i,:) = diag(dtr_Q_gnd{i});
 end
 
+%% Do se(3) -> SE(3)
+lie = Lie();
+se3 = LieSE3();
+so3 = LieSO3();
+
+gt_T{1} = eye(4);
+pr_T{1} = eye(4);
+
+for i = 1:1:N
+    pr_dT = se3.getExp(gt_dw(i,:)', pr_du(i,:)');
+    gt_dT = se3.getExp(gt_dw(i,:)', gt_du(i,:)');
+    gt_T{i+1} = gt_T{i}*gt_dT;
+    pr_T{i+1} = pr_T{i}*pr_dT;
+    gt_pos(i,:) = gt_T{i}(1:3,4)';
+    pr_pos(i,:) = pr_T{i}(1:3,4)';
+end
+
 dtr_gnd_std3 = sqrt(cov3);
 
 time = cumtrapz(dt);
@@ -64,7 +81,7 @@ time = cumtrapz(dt);
 %     acc_gnd = dt.*acc_gnd;
 % vel_imu = cumtrapz(time, acc_gnd);
 % end
-    acc_gnd = dt.*acc_gnd;
+acc_gnd = dt.*acc_gnd;
 vel_imu = cumtrapz(time, acc_gnd);
 
 % KF
@@ -72,7 +89,7 @@ velKF = [0 0 0];
 A = eye(3);
 H = eye(3);
 P{1} = eye(3)*10^-10;
-R = [1 0 0; 0 1 0; 0 0 1]*10^-1
+R = [1 0 0; 0 1 0; 0 0 1]*10^-5
 for i=1:1:N
     velKF(i+1,:) = A*velKF(i,:)' + dt(i)*acc_gnd(i,:)';
     pp = A*P{i}*A' + R;
@@ -253,8 +270,10 @@ legend('gt', 'cnn', 'imu', 'kf')
 
 figure
 hold on
-plot(-gt_pos(:,2), gt_pos(:,1), 'ro')
-plot(-pos_intKF(:,2), pos_intKF(:,1), 'b.')
+plot(gt_pos(:,1), gt_pos(:,3), 'r')
+plot(pr_pos(:,1), pr_pos(:,3), 'b')
+
+plot(pos_intKF(:,1), pos_intKF(:,3), 'g')
 
 function[pltIndex] = mysubplot(gt, pr, index)
     hold on

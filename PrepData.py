@@ -33,6 +33,7 @@ class DataManager(Singleton):
         self.dt = np.concatenate([dataObj[i].dt for i in range(0, self.numDataset)], axis=0)
         self.du = np.concatenate([dataObj[i].du for i in range(0, self.numDataset)], axis=0)
         self.dw = np.concatenate([dataObj[i].dw for i in range(0, self.numDataset)], axis=0)
+        self.dw_gyro = np.concatenate([dataObj[i].dw_gyro for i in range(0, self.numDataset)], axis=0)
         self.dtrans = np.concatenate([dataObj[i].dtr for i in range(0, self.numDataset)], axis=0)
         self.dtr_gnd = np.concatenate([dataObj[i].dtr_gnd for i in range(0, self.numDataset)], axis=0)
         self.pos_gnd = np.concatenate([dataObj[i].pos_gnd for i in range(0, self.numDataset)], axis=0)
@@ -53,6 +54,20 @@ class DataManager(Singleton):
             s = f
         dataObj = None
         print('done img data concat')
+
+    def standardizeGyro(self, isTrain):
+        print('standardizing gyro')
+        normPath = 'Norms/' + branchName() + '_' + self.dsName + '_' + self.subType
+        if isTrain:
+            gyroMean = np.mean(self.dw_gyro, axis=0)
+            gyroStd = np.std(self.dw_gyro, axis=0)
+            np.savetxt(normPath + 'gyroMean.txt', gyroMean)
+            np.savetxt(normPath + 'gyroStd.txt', gyroStd)
+        else:
+            gyroMean = np.loadtxt(normPath + 'gyroMean.txt')
+            gyroStd = np.loadtxt(normPath + 'gyroStd.txt')
+        self.gyro_standard = self.dw_gyro - gyroMean
+        self.gyro_standard = np.divide(self.gyro_standard, gyroStd).astype(np.float32)
 
     def standardizeImgs(self, isTrain):
         print('preparing to standardize imgs')
