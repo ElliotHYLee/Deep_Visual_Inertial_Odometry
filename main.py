@@ -47,7 +47,6 @@ def test(dsName, subType, seq):
     checkPoint = torch.load(wName + '_best' + '.pt')
     mc.load_state_dict(checkPoint['model_state_dict'])
 
-
     gt_dtr = np.zeros((N, 3))
     velOut = np.zeros((N,3))
     input_dtr = np.zeros((N,3))
