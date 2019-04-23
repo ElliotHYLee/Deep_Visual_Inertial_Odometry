@@ -23,85 +23,63 @@ class DataManager(Singleton):
 
         # get number of data points
         self.numDataList = [dataObj[i].numData for i in range(0, self.numDataset)]
+        self.numDataCum = np.cumsum(self.numDataList)
         self.numTotalData = np.sum(self.numDataList)
-        self.numTotalImgData = np.sum([dataObj[i].numImgs for i in range(0, self.numDataset)])
-        print(self.numDataList)
-        print(self.numTotalData)
+        # print(self.numDataList)
+        # print(self.numTotalData)
 
         # numeric data
         print('numeric data concat')
-        self.dt = np.concatenate([dataObj[i].dt for i in range(0, self.numDataset)], axis=0)
-        self.du = np.concatenate([dataObj[i].du for i in range(0, self.numDataset)], axis=0)
-        self.dw = np.concatenate([dataObj[i].dw for i in range(0, self.numDataset)], axis=0)
-        self.dw_gyro = np.concatenate([dataObj[i].dw_gyro for i in range(0, self.numDataset)], axis=0)
-        self.dtrans = np.concatenate([dataObj[i].dtr for i in range(0, self.numDataset)], axis=0)
-        self.dtr_gnd = np.concatenate([dataObj[i].dtr_gnd for i in range(0, self.numDataset)], axis=0)
-        self.pos_gnd = np.concatenate([dataObj[i].pos_gnd for i in range(0, self.numDataset)], axis=0)
-        self.rotM_bdy2gnd = np.concatenate([dataObj[i].rotM_bdy2gnd for i in range(0, self.numDataset)], axis=0)
-        self.acc_gnd = np.concatenate([dataObj[i].acc_gnd for i in range(0, self.numDataset)], axis=0)
+        self.dt = np.concatenate([dataObj[i].gt_dt for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.du = np.concatenate([dataObj[i].gt_du for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.dw = np.concatenate([dataObj[i].gt_dw for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.dtr = np.concatenate([dataObj[i].gt_dtr for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.gt_dtr_gnd = np.concatenate([dataObj[i].gt_dtr_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.pos_gnd = np.concatenate([dataObj[i].pos_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.rotM_bdy2gnd = np.concatenate([dataObj[i].gt_rotM_b2g for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.acc_gnd = np.concatenate([dataObj[i].acc_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.accdt_gnd = np.concatenate([dataObj[i].accdt_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.pr_dtr_gnd = np.concatenate([dataObj[i].pr_dtr_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.dtr_cov_gnd = np.concatenate([dataObj[i].pr_dtr_cov_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         print('done numeric data concat')
 
-        # img data
-        print('img data concat')
-        self.numTotalImgs = sum([dataObj[i].numImgs for i in range(0, self.numDataset)])
-        self.imgs = np.zeros((self.numTotalImgData, self.numChannel, 360, 720), dtype=np.float32)
-        s, f = 0, 0
-        for i in range(0, self.numDataset):
-            temp = dataObj[i].numImgs
-            f = s + temp
-            self.imgs[s:f, :] = dataObj[i].imgs
-            dataObj[i] = None
-            s = f
-        dataObj = None
-        print('done img data concat')
-
-    def standardizeGyro(self, isTrain):
-        print('standardizing gyro')
+    def standardize(self, isTrain):
+        print('standardizing acc')
         normPath = 'Norms/' + branchName() + '_' + self.dsName + '_' + self.subType
         if isTrain:
-            gyroMean = np.mean(self.dw_gyro, axis=0)
-            gyroStd = np.std(self.dw_gyro, axis=0)
-            np.savetxt(normPath + 'gyroMean.txt', gyroMean)
-            np.savetxt(normPath + 'gyroStd.txt', gyroStd)
+            accMean = np.mean(self.accdt_gnd, axis=0)
+            accStd = np.std(self.accdt_gnd, axis=0)
+            np.savetxt(normPath + '_img_accMean.txt', accMean)
+            np.savetxt(normPath + '_img_accStd.txt', accStd)
         else:
-            gyroMean = np.loadtxt(normPath + 'gyroMean.txt')
-            gyroStd = np.loadtxt(normPath + 'gyroStd.txt')
-        self.gyro_standard = self.dw_gyro - gyroMean
-        self.gyro_standard = np.divide(self.gyro_standard, gyroStd).astype(np.float32)
+            accMean = np.loadtxt(normPath + '_img_accMean.txt')
+            accStd = np.loadtxt(normPath + '_img_accStd.txt')
+        self.acc_gnd_standard = self.accdt_gnd - accMean
+        self.acc_gnd_standard = np.divide(self.acc_gnd_standard, accStd).astype(np.float32)
 
-    def standardizeImgs(self, isTrain):
-        print('preparing to standardize imgs')
-        mean = np.mean(self.imgs, axis=(0, 2, 3))
-        std = np.std(self.imgs, axis=(0, 2, 3))
-        normPath = 'Norms/' + branchName() + '_' + self.dsName + '_' + self.subType
-        if isTrain:
-            np.savetxt(normPath + '_img_mean.txt', mean)
-            np.savetxt(normPath + '_img_std.txt', std)
-        else:
-            mean = np.loadtxt(normPath + '_img_mean.txt')
-            std = np.loadtxt(normPath + '_img_std.txt')
-            if self.dsName == 'euroc':
-                mean = np.reshape(mean, (1,1))
-                std = np.reshape(std, (1,1))
 
-        # standardize imgs
-        print('standardizing imgs')
-        mean = mean.astype(np.float32)
-        std = std.astype(np.float32)
-        for i in range(0, self.imgs.shape[1]):
-            self.imgs[:, i, :, :] = (self.imgs[:, i, :, :] - mean[i])/std[i]
-        print('done standardizing imgs')
+
 
 if __name__ == '__main__':
     s = time.time()
-    m = DataManager()
-    m.initHelper(dsName='airsim', subType='mr', seq=[0])
-    print('wait 3 secs')
-    time.sleep(3)
-    m2 = DataManager()
-    print(time.time() - s)
-    for i in range(0, m2.numTotalImgData):
-        img = m2.imgs[i, :]
-        img = np.reshape(img, (360, 720, m2.numChannel))
-        cv2.imshow('asdf', img)
-        cv2.waitKey(1)
+    d = DataManager()
+    d.initHelper(dsName='airsim', subType='mrseg', seq=[0])
+    d.standardize(True)
+
+    plt.figure()
+    plt.subplot(311)
+    plt.plot(d.accdt_gnd[:, 0], 'r.', markersize=5)
+    plt.subplot(312)
+    plt.plot(d.accdt_gnd[:, 1], 'r.', markersize=5)
+    plt.subplot(313)
+    plt.plot(d.accdt_gnd[:, 2], 'r.', markersize=5)
+
+    plt.figure()
+    plt.subplot(311)
+    plt.plot(d.acc_gnd_standard[:, 0], 'r.', markersize=5)
+    plt.subplot(312)
+    plt.plot(d.acc_gnd_standard[:, 1], 'r.', markersize=5)
+    plt.subplot(313)
+    plt.plot(d.acc_gnd_standard[:, 2], 'r.', markersize=5)
+
+    plt.show()
