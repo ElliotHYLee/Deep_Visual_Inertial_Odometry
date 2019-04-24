@@ -43,11 +43,12 @@ class VODataSet_RNN(Dataset):
         try:
             return self.dm.accdt_gnd[index:index + self.delay], \
                    self.dm.acc_gnd_standard[index:index + self.delay], \
-                   self.dm.dt[index:index + self.delay], \
-                   self.dm.pr_dtr_gnd[index:index + self.delay], \
-                   self.dm.dtr_cov_gnd[index:index + self.delay], \
-                   self.dm.gt_dtr_gnd[index:index + self.delay], \
-                   self.dm.gt_dtr_gnd[index]
+                   self.dm.gt_accdt_gnd[index:index + self.delay], \
+                   self.dm.dt[index:index + self.delay]#, \
+                   # self.dm.pr_dtr_gnd[index:index + self.delay], \
+                   # self.dm.dtr_cov_gnd[index:index + self.delay], \
+                   # self.dm.gt_dtr_gnd[index:index + self.delay], \
+                   # self.dm.gt_dtr_gnd[index]
         except:
             print('this is an error @ VODataSet_CNN of VODataSet.py')
             print(i, index)

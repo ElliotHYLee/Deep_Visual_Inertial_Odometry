@@ -1,5 +1,5 @@
 def branchName():
-    return 'tf2_lstm'
+    return 'acc'
 
 def refBranchName():
-    return 'master_candidate'
+    return 'master'

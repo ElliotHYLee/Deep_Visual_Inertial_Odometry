@@ -20,20 +20,7 @@ class Model_RNN_KF(nn.Module):
         self.get33Cov = GetCovMatFromChol_Sequence(self.delay)
         self.mat33vec3 = Batch33MatVec3Mul()
 
-    def initVelImu(self, bn, init):
-        var = torch.zeros((bn, self.delay, 3))
-        var[:, 0, :] = init
-        if torch.cuda.is_available():
-            var = var.cuda()
-        return var
 
-    def initSysCov(self, bn, sysCovInit=None):
-        var = torch.zeros((bn, self.delay, 3, 3))
-        if sysCovInit is not None:
-            var[:, 0, :] = sysCovInit
-        if torch.cuda.is_available():
-            var = var.cuda()
-        return var
 
     def forward(self, dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init, sysCovInit=None):
         # init values
