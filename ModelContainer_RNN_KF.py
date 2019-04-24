@@ -81,9 +81,9 @@ class ModelContainer_RNN_KF():
             acc_stand = acc_stand.to(self.device)
             gt_acc = gt_acc.to(self.device)
             # forward pass and calc loss
-            acc_cov_chol = self.model(dt, acc, acc_stand)
+            acc_cov_chol, acc_cov = self.model(dt, acc, acc_stand)
 
-            batch_loss = self.loss(acc_cov_chol, gt_acc)
+            batch_loss = self.loss(acc, gt_acc, acc_cov_chol)
             epoch_loss += batch_loss.item()
 
             # update weights
@@ -114,33 +114,35 @@ class ModelContainer_RNN_KF():
         loss = self.predict(self.valid_loader, isValidation=True)
         return loss
 
-    def predict(self, data_incoming, isValidation=False, isTarget=True):
-        data_loader = data_incoming if isValidation else DataLoader(dataset=data_incoming, batch_size=1, shuffle=False)
-        acc_chol_list, corr_vel_list, imu_bias_list = [], [], []
+    def predict(self, data_incoming, isValidation=False, isTarget=True, batch_size=64):
+        data_loader = data_incoming if isValidation else DataLoader(dataset=data_incoming, batch_size=512, shuffle=False)
+        acc_cov_list, acc_cov_chol_list, imu_bias_list = [], [], []
         loss = 0
-        for batch_idx, (acc, acc_stand, gt_acc, dt) in enumerate(self.data_loader):
+        for batch_idx, (acc, acc_stand, gt_acc, dt) in enumerate(data_loader):
             dt = dt.to(self.device)
             acc = acc.to(self.device)
             acc_stand = acc_stand.to(self.device)
             gt_acc = gt_acc.to(self.device)
 
             with torch.no_grad():
-                acc_cov_chol = self.model(dt, acc, acc_stand)
+                acc_cov_chol, acc_cov = self.model(dt, acc, acc_stand)
 
                 if not isValidation:
-                    acc_chol_list.append(acc_cov_chol.cpu().data.numpy())
+                    acc_cov_list.append(acc_cov.cpu().data.numpy())
+                    acc_cov_chol_list.append(acc_cov_chol.cpu().data.numpy())
 
                 if isTarget:
-                    batch_loss = self.loss(acc_cov_chol, gt_acc)
+                    batch_loss = self.loss(acc, gt_acc, acc_cov_chol)
                     loss += batch_loss.item()
 
         mae = loss / len(data_loader)
         if isValidation:
             return mae
         else:
-            velRNNKF = np.concatenate(acc_chol_list, axis=0)
+            acc_cov = np.concatenate(acc_cov_list, axis=0)
+            acc_cov_chol = np.concatenate(acc_cov_chol_list, axis=0)
 
-            return velRNNKF, mae
+            return acc_cov_chol, acc_cov, mae
 
 if __name__ == '__main__':
     pass

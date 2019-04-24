@@ -34,7 +34,6 @@ def plotter(gt, input, output):
     plt.plot(pr_pos[:, 0], pr_pos[:, 1], 'g', markersize=2)
     plt.plot(co_pos[:, 0], co_pos[:, 1], 'b', markersize=2)
 
-
 def makeSeries(val):
     N = val.shape[0]
     result = np.zeros((N-delay,delay, 3))
@@ -44,11 +43,53 @@ def makeSeries(val):
 
 def main(dsName, subType, seq):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
+    mc = ModelContainer_RNN_KF(Model_RNN_KF(dsName))
+
     dm = VODataSetManager_RNN_KF(dsName=dsName, subType=subType, seq=seq, isTrain=True, split=0.2)
     train, val = dm.trainSet, dm.valSet
-    mc = ModelContainer_RNN_KF(Model_RNN_KF(dsName))
-    # mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=512, epochs=10, wName=wName, checkPointFreq=1)
+    mc.fit(train, val, batch_size=512, epochs=100, wName=wName, checkPointFreq=1)
+
+    mc.load_weights(wName, train=True)
+    dm = VODataSetManager_RNN_KF(dsName=dsName, subType=subType, seq=[2], isTrain=False)
+    test = dm.testSet
+    acc_cov_chol, acc_cov, mae = mc.predict(test, batch_size=512)
+    print(acc_cov.shape)
+    N = len(test) +delay
+    ucState = np.zeros((N,3,3))
+    std = np.zeros((N,3))
+    acc_covAll = np.zeros((N,6))
+    for i in range(0, N-delay):
+        if i==0:
+            ucState[i:i + delay, :] = acc_cov[i, :]
+            acc_covAll[i:i+delay,:] = acc_cov_chol[i,:]
+        else:
+            ucState[i + delay, :] = acc_cov[i, delay-1, :]
+            acc_covAll[i + delay, :] = acc_cov_chol[i, delay - 1, :]
+
+    for i in range(0, N - delay):
+        std[i, :] = np.sqrt(np.diag(ucState[i, :]))
+
+    print(std.shape)
+
+    # plt.figure()
+    # plt.subplot(311)
+    # plt.plot(std[:,0], 'b.')
+    # plt.subplot(312)
+    # plt.plot(std[:, 1], 'b.')
+    # plt.subplot(313)
+    # plt.plot(std[:, 2], 'b.')
+    # plt.show()
+    resName = 'Results/Data/' + refBranchName() + '_' + dsName + '_'
+    commName = resName + subType + str(2)
+    np.savetxt(commName + '_acc_cov.txt', acc_covAll)
+    print(commName + '_acc_cov.txt')
+
+
+
+
+
+
+
 
 
 if __name__ == '__main__':

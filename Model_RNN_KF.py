@@ -12,10 +12,10 @@ class Model_RNN_KF(nn.Module):
         self.acc_cov_chol_lstm = LSTM(3, 2, 20)
         self.fc0 = nn.Sequential(nn.Linear(40, 40), nn.PReLU(),
                                  nn.Linear(40, 40), nn.PReLU(),
-                                 nn.Linear(40, 40), Sigmoid(0.1, 1),
+                                 nn.Linear(40, 40), Sigmoid(0.1, 0.5),
                                  nn.Linear(40, 6),)
 
-        # self.get33Cov = GetCovMatFromChol_Sequence(self.delay)
+        self.get33Cov = GetCovMatFromChol_Sequence(self.delay)
         # self.mat33vec3 = Batch33MatVec3Mul()
         #
 
@@ -25,7 +25,10 @@ class Model_RNN_KF(nn.Module):
         bn = dt.shape[0]
         acc_cov_chol = self.acc_cov_chol_lstm(acc_stand)
         acc_cov_chol = self.fc0(acc_cov_chol)
-        return acc_cov_chol
+
+        acc_cov = self.get33Cov(acc_cov_chol)
+
+        return acc_cov_chol, acc_cov
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
