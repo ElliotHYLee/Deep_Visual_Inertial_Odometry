@@ -20,7 +20,7 @@ class ModelContainer_RNN_KF():
         self.min_val_loss = 10**5
 
     def compile(self):
-        self.loss = nn.modules.loss.L1Loss()
+        self.loss = MahalanobisLoss(isSeries=True)#nn.modules.loss.L1Loss()
         #self.optimizer = optim.SGD(self.model.parameters(), lr=10**-2, weight_decay=0)
         self.optimizer = optim.RMSprop(self.model.parameters(), lr=10**-4, weight_decay=0)
 
@@ -75,19 +75,15 @@ class ModelContainer_RNN_KF():
     def runEpoch(self, epoch):
         epoch_loss = 0
         self.model.train(True)
-        for batch_idx, (acc, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(self.train_loader):
+        for batch_idx, (acc, acc_stand, gt_acc, dt) in enumerate(self.train_loader):
             dt = dt.to(self.device)
             acc = acc.to(self.device)
             acc_stand = acc_stand.to(self.device)
-            pr_dtr_gnd = pr_dtr_gnd.to(self.device)
-            dtr_cv_gnd = dtr_cv_gnd.to(self.device)
-            gt_dtr_gnd = gt_dtr_gnd.to(self.device)
-            gt_dtr_gnd_init = gt_dtr_gnd_init.to(self.device)
-
+            gt_acc = gt_acc.to(self.device)
             # forward pass and calc loss
-            velRNNKF, acc_cov, sysCov = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
+            acc_cov_chol = self.model(dt, acc, acc_stand)
 
-            batch_loss = self.loss(velRNNKF, gt_dtr_gnd)
+            batch_loss = self.loss(acc_cov_chol, gt_acc)
             epoch_loss += batch_loss.item()
 
             # update weights
@@ -120,32 +116,29 @@ class ModelContainer_RNN_KF():
 
     def predict(self, data_incoming, isValidation=False, isTarget=True):
         data_loader = data_incoming if isValidation else DataLoader(dataset=data_incoming, batch_size=1, shuffle=False)
-        velRNNKF_list, corr_vel_list, imu_bias_list = [], [], []
+        acc_chol_list, corr_vel_list, imu_bias_list = [], [], []
         loss = 0
-        for batch_idx, (acc, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(data_loader):
+        for batch_idx, (acc, acc_stand, gt_acc, dt) in enumerate(self.data_loader):
             dt = dt.to(self.device)
             acc = acc.to(self.device)
             acc_stand = acc_stand.to(self.device)
-            pr_dtr_gnd = pr_dtr_gnd.to(self.device)
-            dtr_cv_gnd = dtr_cv_gnd.to(self.device)
-            gt_dtr_gnd = gt_dtr_gnd.to(self.device)
-            gt_dtr_gnd_init = gt_dtr_gnd_init.to(self.device)
+            gt_acc = gt_acc.to(self.device)
 
             with torch.no_grad():
-                velRNNKF, acc_cov, sysCov = self.model(dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init)
+                acc_cov_chol = self.model(dt, acc, acc_stand)
 
                 if not isValidation:
-                    velRNNKF_list.append(velRNNKF.cpu().data.numpy())
+                    acc_chol_list.append(acc_cov_chol.cpu().data.numpy())
 
                 if isTarget:
-                    batch_loss = self.loss(velRNNKF, gt_dtr_gnd)
+                    batch_loss = self.loss(acc_cov_chol, gt_acc)
                     loss += batch_loss.item()
 
         mae = loss / len(data_loader)
         if isValidation:
             return mae
         else:
-            velRNNKF = np.concatenate(velRNNKF_list, axis=0)
+            velRNNKF = np.concatenate(acc_chol_list, axis=0)
 
             return velRNNKF, mae
 

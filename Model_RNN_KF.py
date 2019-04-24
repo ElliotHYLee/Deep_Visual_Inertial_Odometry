@@ -1,8 +1,6 @@
 from MyPyTorchAPI.CNNUtils import *
 import numpy as np
 from MyPyTorchAPI.CustomActivation import *
-from SE3Layer import GetTrans
-from LSTMFC import LSTMFC
 from LSTM import LSTM
 from MyPyTorchAPI.MatOp import *
 
@@ -17,42 +15,17 @@ class Model_RNN_KF(nn.Module):
                                  nn.Linear(40, 40), Sigmoid(0.1, 1),
                                  nn.Linear(40, 6),)
 
-        self.get33Cov = GetCovMatFromChol_Sequence(self.delay)
-        self.mat33vec3 = Batch33MatVec3Mul()
+        # self.get33Cov = GetCovMatFromChol_Sequence(self.delay)
+        # self.mat33vec3 = Batch33MatVec3Mul()
+        #
 
 
-
-    def forward(self, dt, acc, acc_stand, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd_init, sysCovInit=None):
+    def forward(self, dt, acc, acc_stand):
         # init values
         bn = dt.shape[0]
-        delay = acc.shape[1]
-        vel = self.initVelImu(bn, gt_dtr_gnd_init)
-        sysCov = self.initSysCov(bn, sysCovInit)
-
-        acc_cov_chol = self.acc_cov_chol_lstm(acc)
+        acc_cov_chol = self.acc_cov_chol_lstm(acc_stand)
         acc_cov_chol = self.fc0(acc_cov_chol)
-        accCov = self.get33Cov(acc_cov_chol)
-
-        accdt = torch.mul(dt, acc)
-        for i in range(1, delay):
-            # KF prediction step
-            prVel = vel[:, i-1, :] + accdt[:, i, :]
-            prCov = sysCov[:, i-1, :, :] + accCov[:, i, :, :]
-
-            #KF correction step
-            mCov = dtr_cv_gnd[:, i, :]
-            z = pr_dtr_gnd[:, i, :]
-            temp = torch.inverse(prCov + mCov)
-            K = torch.bmm(prCov, temp)
-            innov = z - prVel
-            nextVel = prVel + self.mat33vec3(K, innov)
-            nextCov = prCov - torch.bmm(K, prCov)
-
-            # KF update
-            vel[:, i, :] = nextVel
-            sysCov[:, i, :, :] = nextCov
-
-        return vel, accCov, sysCov
+        return acc_cov_chol
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

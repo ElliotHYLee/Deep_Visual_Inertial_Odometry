@@ -1,7 +1,10 @@
-from PrepData import DataManager
-import numpy as np
+from VODataSet import VODataSetManager_RNN_KF
 import matplotlib.pyplot as plt
-from Model import rnnModel
+from Model_RNN_KF import Model_RNN_KF
+from ModelContainer_RNN_KF import ModelContainer_RNN_KF
+import numpy as np
+import time
+from git_branch_param import *
 
 delay = 10
 
@@ -39,50 +42,18 @@ def makeSeries(val):
         result[i,:,:] = val[None,i:i+delay,:]
     return result
 
-def main():
-    dm = DataManager()
-    dm.initHelper(dsName='airsim', subType='mr', seq=[0])
-
-    dt = dm.dt
-    acc = dm.accdt_gnd
-
-    dtr_gnd = dm.gt_dtr_gnd
-    vel_imu = np.cumsum(acc, axis=0)*dt
-    pr_dtr_gnd = dm.pr_dtr_gnd
-
-    plt.figure()
-    plt.plot(pr_dtr_gnd)
-    plt.plot(vel_imu)
-
-    # input1 = makeSeries(vel_imu)
-    # input2 = makeSeries(pr_dtr_gnd)
-    # input = np.concatenate((input1, input2), axis=2)
-    # target = dtr_gnd[delay:]
-    # m = rnnModel(delay)
-    # m.fit(x=[input], y=[target], epochs=100, verbose=2, batch_size=512, shuffle=True)
-    #
-    # dm = DataManager()
-    # dm.initHelper(dsName='airsim', subType='mr', seq=[2])
-    # dt = dm.dt
-    # acc = dm.accdt_gnd
-    # dtr_gnd = dm.gt_dtr_gnd
-    # vel_imu = np.cumsum(acc, axis=0)*dt
-    # pr_dtr_gnd = dm.pr_dtr_gnd
-    #
-    # input1 = makeSeries(vel_imu)
-    # input2 = makeSeries(pr_dtr_gnd)
-    # input = np.concatenate((input1, input2), axis=2)
-    # target = dtr_gnd[delay:]
-    #
-    # output = np.zeros((input.shape[0], 3))
-    # for i in range (input.shape[0]):
-    #     yyy = m.predict(input[None,i])
-    #     output[i] = yyy
-    #
-    # plotter(target, vel_imu, output)
-    # plotter(target, pr_dtr_gnd, output)
-    plt.show()
+def main(dsName, subType, seq):
+    wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
+    dm = VODataSetManager_RNN_KF(dsName=dsName, subType=subType, seq=seq, isTrain=True, split=0.2)
+    train, val = dm.trainSet, dm.valSet
+    mc = ModelContainer_RNN_KF(Model_RNN_KF(dsName))
+    # mc.load_weights(wName, train=True)
+    mc.fit(train, val, batch_size=512, epochs=10, wName=wName, checkPointFreq=1)
 
 
 if __name__ == '__main__':
-    main()
+    dsName = 'airsim'
+    subType = 'mr'
+    seq = [0]
+    seqRange = [0, 3]
+    main(dsName, subType, seq)
