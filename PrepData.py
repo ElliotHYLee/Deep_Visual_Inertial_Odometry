@@ -39,6 +39,7 @@ class DataManager(Singleton):
         self.rotM_bdy2gnd = np.concatenate([dataObj[i].gt_rotM_b2g for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         self.acc_gnd = np.concatenate([dataObj[i].acc_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         self.accdt_gnd = np.concatenate([dataObj[i].accdt_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.gt_accdt_gnd = np.concatenate([dataObj[i].gt_accdt_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         self.pr_dtr_gnd = np.concatenate([dataObj[i].pr_dtr_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         self.dtr_cov_gnd = np.concatenate([dataObj[i].pr_dtr_cov_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         print('done numeric data concat')

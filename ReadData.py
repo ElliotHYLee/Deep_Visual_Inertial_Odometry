@@ -20,7 +20,9 @@ class ReadData():
             self.gt_rotM_b2g[i, :, :] = np.reshape(self.gt_linR[i, :], (3, 3))
         self.pos_gnd = pd.read_csv(self.gt_path + 'pos.txt', sep=',', header=None).values.astype(np.float32)
         self.acc_gnd = pd.read_csv(self.gt_path + 'acc_gnd.txt', sep=',', header=None).values.astype(np.float32)
+        self.gt_acc_gnd = pd.read_csv(self.gt_path + 'gt_acc_gnd.txt', sep=',', header=None).values.astype(np.float32)
         self.accdt_gnd = np.multiply(self.acc_gnd, self.gt_dt)
+        self.gt_accdt_gnd = np.multiply(self.gt_acc_gnd, self.gt_dt)
         self.numData = self.gt_du.shape[0]
         # cnn outputs
         self.pr_path = getPrPath(dsName, seq, subType)
@@ -85,10 +87,13 @@ if __name__ == '__main__':
 
     plt.figure()
     plt.subplot(311)
-    plt.plot(d.accdt_gnd[:, 0], 'r.', markersize=5)
+    plt.plot(d.gt_accdt_gnd[:, 0], 'r.-', markersize=5)
+    plt.plot(d.accdt_gnd[:, 0], 'b.-', markersize=1)
     plt.subplot(312)
-    plt.plot(d.accdt_gnd[:, 1], 'r.', markersize=5)
+    plt.plot(d.gt_accdt_gnd[:, 1], 'r.-', markersize=5)
+    plt.plot(d.accdt_gnd[:, 1], 'b.-', markersize=1)
     plt.subplot(313)
-    plt.plot(d.accdt_gnd[:, 2], 'r.', markersize=5)
+    plt.plot(d.gt_accdt_gnd[:, 2], 'r.-', markersize=5)
+    plt.plot(d.accdt_gnd[:, 2], 'b.-', markersize=1)
 
     plt.show()
