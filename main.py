@@ -32,6 +32,14 @@ def plotter(gt, input, output):
     plt.plot(co_pos[:, 0], co_pos[:, 1], 'b', markersize=2)
 
 
+def reinitSeries(data, init):
+    N = data.shape[0]
+    for i in range(0, N):
+        series = data[i]
+        series = series - series[None,0]
+        series = series + init[None,i]
+        data[i] = series
+
 def makeSeries(val):
     N = val.shape[0]
     result = np.zeros((N-delay,delay, 3))
@@ -54,33 +62,33 @@ def main():
     plt.plot(pr_dtr_gnd)
     plt.plot(vel_imu)
 
-    # input1 = makeSeries(vel_imu)
-    # input2 = makeSeries(pr_dtr_gnd)
-    # input = np.concatenate((input1, input2), axis=2)
-    # target = dtr_gnd[delay:]
-    # m = rnnModel(delay)
-    # m.fit(x=[input], y=[target], epochs=100, verbose=2, batch_size=512, shuffle=True)
-    #
-    # dm = DataManager()
-    # dm.initHelper(dsName='airsim', subType='mr', seq=[2])
-    # dt = dm.dt
-    # acc = dm.accdt_gnd
-    # dtr_gnd = dm.gt_dtr_gnd
-    # vel_imu = np.cumsum(acc, axis=0)*dt
-    # pr_dtr_gnd = dm.pr_dtr_gnd
-    #
-    # input1 = makeSeries(vel_imu)
-    # input2 = makeSeries(pr_dtr_gnd)
-    # input = np.concatenate((input1, input2), axis=2)
-    # target = dtr_gnd[delay:]
-    #
-    # output = np.zeros((input.shape[0], 3))
-    # for i in range (input.shape[0]):
-    #     yyy = m.predict(input[None,i])
-    #     output[i] = yyy
-    #
-    # plotter(target, vel_imu, output)
-    # plotter(target, pr_dtr_gnd, output)
+    input1 = makeSeries(vel_imu)
+    input2 = makeSeries(pr_dtr_gnd)
+    input = np.concatenate((input1, input2), axis=2)
+    target = dtr_gnd[delay:]
+    m = rnnModel(delay)
+    m.fit(x=[input], y=[target], epochs=100, verbose=2, batch_size=512, shuffle=True)
+
+    dm = DataManager()
+    dm.initHelper(dsName='airsim', subType='mr', seq=[2])
+    dt = dm.dt
+    acc = dm.accdt_gnd
+    dtr_gnd = dm.gt_dtr_gnd
+    vel_imu = np.cumsum(acc, axis=0)*dt
+    pr_dtr_gnd = dm.pr_dtr_gnd
+
+    input1 = makeSeries(vel_imu)
+    input2 = makeSeries(pr_dtr_gnd)
+    input = np.concatenate((input1, input2), axis=2)
+    target = dtr_gnd[delay:]
+
+    output = np.zeros((input.shape[0], 3))
+    for i in range (input.shape[0]):
+        yyy = m.predict(input[None,i])
+        output[i] = yyy
+
+    plotter(target, vel_imu, output)
+    plotter(target, pr_dtr_gnd, output)
     plt.show()
 
 
