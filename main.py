@@ -27,10 +27,9 @@ def plotter(gt, input, output):
     co_pos = np.cumsum(output, axis=0)
 
     plt.figure()
-    plt.plot(gt_pos[:, 0], gt_pos[:, 1], 'r', markersize=3)
-    plt.plot(pr_pos[:, 0], pr_pos[:, 1], 'g', markersize=2)
-    plt.plot(co_pos[:, 0], co_pos[:, 1], 'b', markersize=2)
-
+    plt.plot(gt_pos[:, 0], gt_pos[:, 2], 'r', markersize=3)
+    plt.plot(pr_pos[:, 0], pr_pos[:, 2], 'g', markersize=2)
+    plt.plot(co_pos[:, 0], co_pos[:, 2], 'b', markersize=2)
 
 def reinitSeries(data, init):
     N = data.shape[0]
@@ -49,7 +48,7 @@ def makeSeries(val):
 
 def main():
     dm = DataManager()
-    dm.initHelper(dsName='airsim', subType='mr', seq=[0])
+    dm.initHelper(dsName='kitti', subType='none', seq=[0,2,4,6])
 
     dt = dm.dt
     acc = dm.accdt_gnd
@@ -70,7 +69,7 @@ def main():
     m.fit(x=[input], y=[target], epochs=100, verbose=2, batch_size=512, shuffle=True)
 
     dm = DataManager()
-    dm.initHelper(dsName='airsim', subType='mr', seq=[2])
+    dm.initHelper(dsName='kitti', subType='none', seq=[5])
     dt = dm.dt
     acc = dm.accdt_gnd
     dtr_gnd = dm.gt_dtr_gnd

@@ -39,30 +39,15 @@ def getPathWin(dsName = 'AirSim', seq = 0, subType='mr'):
         path = 'F:/DLData/KITTI/odom/dataset/sequences/'
         path += '0'+str(seq) if seq<10 else str(seq)
         path += '/'
+    elif dsName == 'myroom':
+        if subType == 'none':
+            path = 'F:/DLData/MyRoom/data' + str(seq) + '/'
+    elif dsName == 'mycar':
+        if subType == 'none':
+            path = 'F:/DLData/MyCar/data' + str(seq) + '/'
+    elif dsName == 'agz':
+        path = 'F:/DLData/AGZ/'
     return path
-
-def getImgNames(path, dsName='AirSim', ts=None, subType=''):
-    dsName = dsName.lower()
-    imgNames = []
-    if dsName == 'airsim':
-        if subType == 'mr' or subType=='mrseg':
-            for i in range(0, ts.shape[0]):
-                imgNames.append(path + 'images/img_' + str(ts[i]) + '.png')
-        elif subType == 'bar':
-            for i in range(0, ts.shape[0]):
-                imgNames.append(path + 'images_bar/img_' + str(ts[i]) + '.png')
-        elif subType == 'pin':
-            for i in range(0, ts.shape[0]):
-                imgNames.append(path + 'images_pin/img_' + str(ts[i]) + '.png')
-    elif dsName =='euroc':
-        imgNames = (pd.read_csv(path + 'fName.txt', sep=' ', header=None)).iloc[:, 0]
-        for i in range(0, len(imgNames)):
-            imgNames[i] = path + 'cam0/data/' + imgNames[i]
-    elif dsName =='kitti':
-        imgNames = (pd.read_csv(path + 'fNames.txt', sep=' ', header=None)).iloc[:, 0]
-        for i in range(0, len(imgNames)):
-            imgNames[i] = path + 'image_2/' + imgNames[i]
-    return imgNames
 
 def getEnd(start, N, totalN):
     end = start+N

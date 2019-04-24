@@ -11,8 +11,8 @@ from keras.utils.training_utils import multi_gpu_model
 def rnnModel(T):
     input_dim = (T, 6)
     input = Input(shape=input_dim)
-    h = LSTM(100, kernel_regularizer=regularizers.l2(10**-4),return_sequences = True, activation='linear')(input)
-    h = LSTM(100, kernel_regularizer=regularizers.l2(10**-4), return_sequences = False, activation='linear')(h)
+    h = LSTM(100, kernel_regularizer=regularizers.l2(10**-3),return_sequences = True, activation='linear')(input)
+    h = LSTM(100, kernel_regularizer=regularizers.l2(10**-3), return_sequences = False, activation='linear')(h)
     h = Dense(100, activation=PReLU())(h)
     output = Dense(3)(h)
 
