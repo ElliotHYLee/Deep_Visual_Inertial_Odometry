@@ -97,35 +97,9 @@ def main():
     kf = KFBlock()
     gtSignal, dt, pSignal, mSignal, mCov = prepData()
 
-    kfRes = None
-    agent = QAgent()
-    action = agent.getRandomAction()
-    state = np.array([0, 0, 0, -1, -1, -1], dtype=np.float32)
-    rm = RewardManager()
     for i in range(0, 3):
-        kf.setR(state)
         kfRes = kf.runKF(dt, pSignal, mSignal, mCov)
         velRMSE, posRMSE = CalcRMSE(kfRes, gtSignal)
-        prob = agent.predict(state)
-        action = agent.getAction3(prob)
-        R = rm.GetReward(posRMSE) * getSign(action)
-
-
-        prevState=state
-        state = updateState(state, posRMSE, action)
-
-        target = R + 0.1*prob
-        if i==0:
-            agent.train(prevState, target, 10)
-        else:
-            agent.train(prevState, target)
-
-        if np.mod(i, 10):
-            print('iteration %d' %i)
-            print('state: %.4f, %.4f, %.4f, %.4f, %.4f, %.4f '%(prevState[0], prevState[1], prevState[2], prevState[3], prevState[4], prevState[5]))
-            print('QProb: %.4f, %.4f, %.4f' % (prob[0], prob[1], prob[2]))
-            print('Action: %.4f, %.4f, %.4f' % (action[0], action[1], action[2]))
-            print('Rewards: %.4f, %.4f, %.4f'%  (R[0], R[1], R[2]))
 
 
     plotter(kfRes, gtSignal)
