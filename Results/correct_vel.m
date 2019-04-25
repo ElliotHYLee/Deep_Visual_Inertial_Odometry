@@ -14,7 +14,7 @@ velKF = [0 0 0];
 A = eye(3);
 H = eye(3);
 P{1} = eye(3)*10^-10;
-R = [1 0 0; 0 0.02 0; 0 0 1]*10^-3.5
+R = [0.1 0 0; 0 1 0; 0 0 1]*10^-4
 for i=1:1:N
     velKF(i+1,:) = A*velKF(i,:)' + dt(i)*acc_gnd(i,:)';
     %R = acc_Q{i};
@@ -195,9 +195,9 @@ legend('gt', 'cnn', 'imu', 'kf')
 
 figure
 hold on
-plot(gt_pos(:,2), gt_pos(:,1), 'r')
-plot(pr_pos(:,2), pr_pos(:,1), 'b')
-plot(pos_intKF(:,2), pos_intKF(:,1), 'g')
+plot(gt_pos(:,1), gt_pos(:,2), 'r')
+plot(pr_pos(:,1), pr_pos(:,2), 'b')
+plot(pos_intKF(:,1), pos_intKF(:,2), 'g')
 
 function[pltIndex] = mysubplot(gt, pr, index)
     hold on

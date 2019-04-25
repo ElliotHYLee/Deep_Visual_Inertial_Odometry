@@ -39,6 +39,14 @@ def getPathWin(dsName = 'AirSim', seq = 0, subType='mr'):
         path = 'F:/DLData/KITTI/odom/dataset/sequences/'
         path += '0'+str(seq) if seq<10 else str(seq)
         path += '/'
+    elif dsName == 'myroom':
+        if subType == 'none':
+            path = 'F:/DLData/MyRoom/data' + str(seq) + '/'
+    elif dsName == 'mycar':
+        if subType == 'none':
+            path = 'F:/DLData/MyCar/data' + str(seq) + '/'
+    elif dsName == 'agz':
+        path = 'F:/DLData/AGZ/'
     return path
 
 def getImgNames(path, dsName='AirSim', ts=None, subType=''):
