@@ -103,29 +103,29 @@ def main():
     kf = KFBlock()
     gtSignal, dt, pSignal, mSignal, mCov = prepData()
 
-    N=1000
-    params = np.random.rand(N,3)*-10
-    y=np.zeros((N,3))
-
-    for i in range(0, N):
-        kf.setR(params[i])
-        kfRes = kf.runKF(dt, pSignal, mSignal, mCov)
-        velRMSE, posRMSE = CalcRMSE(kfRes, gtSignal)
-        y[i] = posRMSE
-        if np.mod(i, 10)==0:
-            print(i)
-
-    idx = np.argsort(params[:,0])
-    testX = params[idx,0]
-    testY = y[idx,0]
-
-    np.save('testX.npy', params)
-    np.save('testY.npy', y)
+    # N=1000
+    # params = np.random.rand(N,3)*-10
+    # y=np.zeros((N,3))
+    #
+    # for i in range(0, N):
+    #     kf.setR(params[i])
+    #     kfRes = kf.runKF(dt, pSignal, mSignal, mCov)
+    #     velRMSE, posRMSE = CalcRMSE(kfRes, gtSignal)
+    #     y[i] = posRMSE
+    #     if np.mod(i, 10)==0:
+    #         print(i)
+    #
+    # idx = np.argsort(params[:,0])
+    # testX = params[idx,0]
+    # testY = y[idx,0]
+    #
+    # np.save('testX.npy', params)
+    # np.save('testY.npy', y)
 
 
     testX = np.load('testX.npy')
     testY = np.load('testY.npy')
-    testY = np.max(testY, axis=0)/testY
+    #testY = np.max(testY, axis=0)/testY
 
     mu = np.ones((3), dtype=np.float)*-7
     for i in range(0, 100):
