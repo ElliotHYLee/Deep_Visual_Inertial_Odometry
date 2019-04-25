@@ -5,7 +5,6 @@ class KFBlock():
         self.prParam = None
 
     def setR(self, state):
-        state = state[3:]
         self.R = np.eye(3, dtype=np.float32)
         self.R[0, 0] *= 10**state[0]
         self.R[1, 1] *= 10**state[1]

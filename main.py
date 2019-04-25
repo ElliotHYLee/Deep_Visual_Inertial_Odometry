@@ -8,7 +8,8 @@ import time
 from scipy import signal
 from git_branch_param import *
 from KFBLock import *
-from QAgent import QAgent
+from Model import MyModel
+from scipy.stats import multivariate_normal
 
 dsName, subType, seq = 'airsim', 'mr', [1]
 #dsName, subType, seq = 'kitti', 'none', [0, 2, 4, 6]
@@ -87,19 +88,83 @@ def updateState(state, RMSE, action):
     state[3:] = state[3:] + action
     return state
 
-def getSign(val):
-    res = np.zeros((3))
-    for i in range(0,3):
-        res[i] = -1 if val[i] < 0 else 1
-    return res
+def getShift(c, mu, eta=0.01):
+    N = c.shape[0]
+    error = c - mu
+    sig = np.array([[1, 0, 0], [0, 1, 0], [0,0,1]])*2
+    prob = multivariate_normal.pdf(c, mu, cov=sig)
+    prob = np.reshape(prob, (N, 1))
+    shift = np.multiply(error, prob) * eta
+    sumShift = np.sum(shift, axis=0)
+    return sumShift, np.dot(sumShift, sumShift)
+
 
 def main():
     kf = KFBlock()
     gtSignal, dt, pSignal, mSignal, mCov = prepData()
 
-    for i in range(0, 3):
+    N=1000
+    params = np.random.rand(N,3)*-10
+    y=np.zeros((N,3))
+
+    for i in range(0, N):
+        kf.setR(params[i])
         kfRes = kf.runKF(dt, pSignal, mSignal, mCov)
         velRMSE, posRMSE = CalcRMSE(kfRes, gtSignal)
+        y[i] = posRMSE
+        if np.mod(i, 10)==0:
+            print(i)
+
+    idx = np.argsort(params[:,0])
+    testX = params[idx,0]
+    testY = y[idx,0]
+
+    np.save('testX.npy', params)
+    np.save('testY.npy', y)
+
+
+    testX = np.load('testX.npy')
+    testY = np.load('testY.npy')
+    testY = np.max(testY, axis=0)/testY
+
+    mu = np.ones((3), dtype=np.float)*-7
+    for i in range(0, 100):
+        shift, mag = getShift(testX, mu, eta=20)
+        mu += shift
+        print(mu)
+
+
+
+
+
+
+
+
+
+
+
+
+
+    plt.figure()
+    plt.subplot(311)
+    plt.plot(testX[:,0], testY[:,0], '.')
+    #plt.ylim([0, 10])
+    plt.subplot(312)
+    plt.plot(testX[:, 1], testY[:, 1], '.')
+    #plt.ylim([0, 20])
+    plt.subplot(313)
+    plt.plot(testX[:, 2], testY[:, 2], '.')
+    #plt.ylim([0, 10])
+    plt.show()
+
+    # m = MyModel()
+    # m.fit(testY, testX, epochs=10**3, verbose=2, batch_size=100)
+    # param = m.predict(np.array([[0.1,0.1,0.1]]))
+    # print(param)
+    # #param = np.array([[-7.8, -6, -0.9]])
+    kf.setR(mu)
+    kfRes = kf.runKF(dt, pSignal, mSignal, mCov)
+
 
 
     plotter(kfRes, gtSignal)
