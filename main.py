@@ -127,15 +127,6 @@ def main():
     testY = np.load('testY.npy')
     #testY = np.max(testY, axis=0)/testY
 
-    mu = np.ones((3), dtype=np.float)*-7
-    for i in range(0, 100):
-        shift, mag = getShift(testX, mu, eta=20)
-        mu += shift
-        print(mu)
-
-
-
-
 
 
 
