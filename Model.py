@@ -1,26 +1,86 @@
-from keras.models import Model
-from keras.layers import *
-from keras.layers.advanced_activations import *
-from keras.losses import *
-import keras.backend as K
-from keras.optimizers import RMSprop, Adam
-import tensorflow as tf
-from keras.utils.training_utils import multi_gpu_model
+import numpy as np
+import matplotlib.pyplot as plt
+from torch.utils.data import Dataset, DataLoader
+import torch.nn as nn
+import torch.nn.functional as F
+import torch
+import torch.optim as optim
+from MyPyTorchAPI.CustomActivation import Sigmoid, TanH
+class GuessNet(nn.Module):
+    def __init__(self):
+        super(GuessNet, self).__init__()
+        self.net = nn.Sequential(nn.Linear(1, 100), nn.PReLU(),
+                                 nn.Linear(100, 100, nn.PReLU()),
+                                 nn.Linear(100, 6), Sigmoid(0.1, 10))
+        self.sign = nn.Sequential(nn.Linear(1, 100), nn.Sigmoid(),
+                                 nn.Linear(100, 100, nn.Sigmoid()),
+                                 nn.Linear(100, 3), TanH(0.1, 1))
 
+    def forward(self):
+        x = torch.ones(1,1)
+        guess = self.net(x)*-1
+        sign = self.sign(x)
+        return guess, sign
 
-def MyModel():
-    input = Input(shape=(3,))
-    h = Dense(100, activation=PReLU())(input)
-    h = Dense(100, activation=PReLU())(h)
-    h = Dense(100, activation=PReLU())(h)
-    output = Dense(3)(h)
+class TorchKFBLock(nn.Module):
+    def __init__(self, gt, dt, prSig, mSig, mCov):
+        super().__init__()
+        self.gt = torch.from_numpy(gt)
+        self.dt = torch.from_numpy(dt)
+        self.prSig = torch.from_numpy(prSig)
+        self.mSig = torch.from_numpy(mSig)
+        self.mCov = torch.from_numpy(mCov)
 
-    single_model = Model(inputs=[input], outputs=[output])
-    rms = RMSprop(lr=10**-4, rho=0.9, epsilon=10**-6, decay=0.0)
-    single_model.compile(loss=mae, optimizer=rms, loss_weights=[1])
-    single_model.summary()
-    return single_model
+    def forward(self, guess, sign):
 
+        R = torch.ones(3,3)
+        R[0, 0] *= 10 ** guess[0, 0]
+        R[1, 1] *= 10 ** guess[0, 1]
+        R[2, 2] *= 10 ** guess[0, 2]
+        R[1, 0] *= sign[0,0]*10 ** guess[0, 3]
+        R[2, 0] *= sign[0,1]*10 ** guess[0, 4]
+        R[2, 1] *= sign[0,2]*10 ** guess[0, 5]
+        R[0, 1] = R[1, 0]
+        R[0, 2] = R[2, 0]
+        R[1, 2] = R[2, 1]
 
-if __name__ =='__main__':
-    pass
+        N = self.prSig.shape[0]
+        state = torch.zeros(N, 3)
+        sysCov = torch.zeros(N,3,3)
+        for i in range(1, N):
+            # prediction
+            prX = state[i-1,:] + self.prSig[i]*self.dt[i]
+            prCov = sysCov[i-1,:] + R
+
+            # K gain
+            K = torch.inverse(prCov + self.mCov[i])
+            K = torch.matmul(prCov, K)
+
+            # correction
+            innov = self.mSig[i] - prX
+            corrX = prX + torch.matmul(K, innov)
+            corrCov = prCov - torch.matmul(K, prCov)
+
+            state[i] = corrX
+            sysCov[i] = corrCov
+
+        return state
+
+class GetRMSE(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def rmse(self, pr, gt):
+        e = pr - gt
+        se = e ** 2
+        mse = torch.mean(se, dim=0)
+        rmse = torch.sqrt(mse)
+        return rmse
+
+    def forward(self, kf, gt):
+        gt = torch.from_numpy(gt)
+        posKF = torch.cumsum(kf, dim=0)
+        posGT = torch.cumsum(gt, dim=0)
+        posRMSE = self.rmse(posKF, posGT)
+        velRMSE = None#self.rmse(kf, gt)
+        return velRMSE, posRMSE

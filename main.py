@@ -8,10 +8,10 @@ import time
 from scipy import signal
 from git_branch_param import *
 from KFBLock import *
-from Model import MyModel
+from Model import *
 from scipy.stats import multivariate_normal
 
-dsName, subType, seq = 'airsim', 'mr', [1]
+dsName, subType, seq = 'airsim', 'mr', [0]
 #dsName, subType, seq = 'kitti', 'none', [0, 2, 4, 6]
 #dsName, subType, seq = 'euroc', 'none', [1, 2, 3, 5]
 #dsName, subType, seq = 'mycar', 'none', [0, 2]
@@ -66,11 +66,9 @@ def plotter(filt, gt):
     plt.plot(posGT[:, 2], 'r')
     plt.plot(posFilt[:, 2], 'g')
 
-    plt.show()
-
-def prepData():
+def prepData(seqLocal = seq):
     dm = DataManager()
-    dm.initHelper(dsName, subType, seq)
+    dm.initHelper(dsName, subType, seqLocal)
     dt = dm.dt
 
     pSignal = dm.accdt_gnd
@@ -83,82 +81,65 @@ def prepData():
     gtSignal = filtfilt(gtSignal)
     return gtSignal, dt, pSignal, mSignal, mCov
 
-def updateState(state, RMSE, action):
-    state[0:3] = RMSE
-    state[3:] = state[3:] + action
-    return state
-
-def getShift(c, mu, eta=0.01):
-    N = c.shape[0]
-    error = c - mu
-    sig = np.array([[1, 0, 0], [0, 1, 0], [0,0,1]])*2
-    prob = multivariate_normal.pdf(c, mu, cov=sig)
-    prob = np.reshape(prob, (N, 1))
-    shift = np.multiply(error, prob) * eta
-    sumShift = np.sum(shift, axis=0)
-    return sumShift, np.dot(sumShift, sumShift)
-
 
 def main():
-    kf = KFBlock()
-    gtSignal, dt, pSignal, mSignal, mCov = prepData()
+    kfNumpy = KFBlock()
+    gtSignal, dt, pSignal, mSignal, mCov = prepData(seqLocal=seq)
+    posGT = np.cumsum(gtSignal, axis=0)
+    gnet = GuessNet()
+    kf = TorchKFBLock(gtSignal, dt, pSignal, mSignal, mCov)
+    rmser = GetRMSE()
+    optimizer = optim.RMSprop(gnet.parameters(), lr=10 ** -3)
 
-    # N=1000
-    # params = np.random.rand(N,3)*-10
-    # y=np.zeros((N,3))
-    #
-    # for i in range(0, N):
-    #     kf.setR(params[i])
-    #     kfRes = kf.runKF(dt, pSignal, mSignal, mCov)
-    #     velRMSE, posRMSE = CalcRMSE(kfRes, gtSignal)
-    #     y[i] = posRMSE
-    #     if np.mod(i, 10)==0:
-    #         print(i)
-    #
-    # idx = np.argsort(params[:,0])
-    # testX = params[idx,0]
-    # testY = y[idx,0]
-    #
-    # np.save('testX.npy', params)
-    # np.save('testY.npy', y)
+    fig = plt.gcf()
+    fig.show()
+    fig.canvas.draw()
 
+    for epoch in range(0, 30):
+        guess, sign = gnet()
+        filt = kf(guess, sign)
+        velRMSE, posRMSE = rmser(filt, gtSignal)
+        params = guess.data.numpy()
+        paramsSign = sign.data.numpy()
+        loss = posRMSE.data.numpy()
+        optimizer.zero_grad()
+        posRMSE.backward(torch.ones_like(posRMSE))
+        optimizer.step()
 
-    testX = np.load('testX.npy')
-    testY = np.load('testY.npy')
-    #testY = np.max(testY, axis=0)/testY
-
-
-
-
-
-
-
-
-
-
-    plt.figure()
-    plt.subplot(311)
-    plt.plot(testX[:,0], testY[:,0], '.')
-    #plt.ylim([0, 10])
-    plt.subplot(312)
-    plt.plot(testX[:, 1], testY[:, 1], '.')
-    #plt.ylim([0, 20])
-    plt.subplot(313)
-    plt.plot(testX[:, 2], testY[:, 2], '.')
-    #plt.ylim([0, 10])
-    plt.show()
-
-    # m = MyModel()
-    # m.fit(testY, testX, epochs=10**3, verbose=2, batch_size=100)
-    # param = m.predict(np.array([[0.1,0.1,0.1]]))
-    # print(param)
-    # #param = np.array([[-7.8, -6, -0.9]])
-    #kf.setR(mu)
-    kfRes = kf.runKF(dt, pSignal, mSignal, mCov)
+        temp = filt.data.numpy()
+        posKF = np.cumsum(temp, axis=0)
+        fig.clear()
+        plt.subplot(311)
+        plt.plot(posGT[:, 0], 'r')
+        plt.plot(posKF[:, 0], 'b')
+        plt.subplot(312)
+        plt.plot(posGT[:, 1], 'r')
+        plt.plot(posKF[:, 1], 'b')
+        plt.subplot(313)
+        plt.plot(posGT[:, 2], 'r')
+        plt.plot(posKF[:, 2], 'b')
+        plt.pause(0.01)
+        fig.canvas.draw()
 
 
 
+        #if np.mod(epoch, 10):
+        print('epoch: %d' % epoch)
+        print('params: ')
+        print(params)
+        print(paramsSign)
+        print('posRMSE: %.4f, %.4f, %.4f' %(loss[0], loss[1], loss[2]))
+
+
+    kfRes = filt.data.numpy()
     plotter(kfRes, gtSignal)
+
+    gtSignal, dt, pSignal, mSignal, mCov = prepData(seqLocal=[2])
+    kfNumpy.setR(params, paramsSign)
+    kfRes = kfNumpy.runKF(dt, pSignal, mSignal, mCov)
+    plotter(kfRes, gtSignal)
+
+    plt.show()
 
 
 if __name__ == '__main__':

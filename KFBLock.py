@@ -4,11 +4,19 @@ class KFBlock():
     def __init__(self):
         self.prParam = None
 
-    def setR(self, state):
-        self.R = np.eye(3, dtype=np.float32)
-        self.R[0, 0] *= 10**state[0]
-        self.R[1, 1] *= 10**state[1]
-        self.R[2, 2] *= 10**state[2]
+    def setR(self, guess, sign):
+        self.R = np.ones((3,3), dtype=np.float32)
+        self.R[0, 0] *= 10 ** guess[0, 0]
+        self.R[1, 1] *= 10 ** guess[0, 1]
+        self.R[2, 2] *= 10 ** guess[0, 2]
+        self.R[1, 0] *= sign[0, 0]  * 10 ** guess[0, 3]
+        self.R[2, 0] *= sign[0, 1]  * 10 ** guess[0, 4]
+        self.R[2, 1] *= sign[0, 2]  * 10 ** guess[0, 5]
+        self.R[0, 1] = self.R[1, 0]
+        self.R[0, 2] = self.R[2, 0]
+        self.R[1, 2] = self.R[2, 1]
+        np.set_printoptions(precision=16)
+        print(self.R)
 
     def runKF(self, dt, prSig, mSig, mCov):
         N = prSig.shape[0]
