@@ -153,7 +153,7 @@ def main():
     # param = m.predict(np.array([[0.1,0.1,0.1]]))
     # print(param)
     # #param = np.array([[-7.8, -6, -0.9]])
-    kf.setR(mu)
+    #kf.setR(mu)
     kfRes = kf.runKF(dt, pSignal, mSignal, mCov)
 
 
