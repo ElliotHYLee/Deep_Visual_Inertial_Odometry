@@ -12,6 +12,7 @@ class GuessNet(nn.Module):
         self.net = nn.Sequential(nn.Linear(1, 100), nn.PReLU(),
                                  nn.Linear(100, 100, nn.PReLU()),
                                  nn.Linear(100, 6), Sigmoid(0.1, 10))
+
         self.sign = nn.Sequential(nn.Linear(1, 100), nn.Sigmoid(),
                                  nn.Linear(100, 100, nn.Sigmoid()),
                                  nn.Linear(100, 3), TanH(0.1, 1))
@@ -32,7 +33,6 @@ class TorchKFBLock(nn.Module):
         self.mCov = torch.from_numpy(mCov)
 
     def forward(self, guess, sign):
-
         R = torch.ones(3,3)
         R[0, 0] *= 10 ** guess[0, 0]
         R[1, 1] *= 10 ** guess[0, 1]
@@ -82,5 +82,5 @@ class GetRMSE(nn.Module):
         posKF = torch.cumsum(kf, dim=0)
         posGT = torch.cumsum(gt, dim=0)
         posRMSE = self.rmse(posKF, posGT)
-        velRMSE = None#self.rmse(kf, gt)
+        velRMSE = self.rmse(kf, gt)
         return velRMSE, posRMSE
