@@ -3,7 +3,7 @@ function[path] = getGTPath(dsName, subType, seq)
     dsName = lower(dsName);
     subType = lower(subType);
     if strcmp(dsName,'airsim')
-        if strcmp(subType, 'mr') || strcmp(subType, 'bar') || strcmp(subType, 'pin')
+        if strcmp(subType, 'mr') || strcmp(subType, 'bar') || strcmp(subType, 'pin')|| strcmp(subType, 'edge')
             path = strcat('D:/DLData/Airsim/', 'mr', int2str(seq), '/');
         elseif strcmp(subType, 'mrseg')
             path = strcat('D:/DLData/Airsim/', 'mrseg', int2str(seq), '/');

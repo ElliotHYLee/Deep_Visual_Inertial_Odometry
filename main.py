@@ -58,8 +58,9 @@ if __name__ == '__main__':
     seqRange = [0, 3]
     #runTrainTest(dsName, 'mr', seq, seqRange)
     #runTrainTest(dsName, 'mrseg', seq, seqRange)
-    runTrainTest(dsName, 'bar', seq, seqRange)
-    runTrainTest(dsName, 'pin', seq, seqRange)
+    #runTrainTest(dsName, 'bar', seq, seqRange)
+    #runTrainTest(dsName, 'pin', seq, seqRange)
+    runTrainTest(dsName, 'edge', seq, seqRange)
 
     #runTrainTest('euroc', 'none', seq=[1, 2, 3, 5], seqRange=[1, 6])
     #runTrainTest('euroc', 'edge', seq=[1, 2, 3, 5], seqRange=[1, 6])

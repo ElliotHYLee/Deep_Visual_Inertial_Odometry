@@ -30,7 +30,7 @@ def getPathWin(dsName = 'AirSim', seq = 0, subType='mr'):
     if dsName == 'airsim':
         if subType == 'mr' or subType=='mrseg':
             path = 'F:/DLData/Airsim/' + subType + str(seq) + '/'
-        elif subType == 'bar' or subType == 'pin':
+        elif subType == 'bar' or subType == 'pin'  or subType == 'edge':
             path = 'F:/DLData/Airsim/mr' + str(seq) + '/'
     elif dsName == 'euroc':
         path = 'F:/DLData/EuRoc/mh_' + str(seq) +'/'
@@ -61,6 +61,9 @@ def getImgNames(path, dsName='AirSim', ts=None, subType=''):
         elif subType == 'pin':
             for i in range(0, ts.shape[0]):
                 imgNames.append(path + 'images_pin/img_' + str(ts[i]) + '.png')
+        elif subType == 'edge':
+            for i in range(0, ts.shape[0]):
+                imgNames.append(path + 'images_edge/img_' + str(ts[i]) + '.png')
     elif dsName =='euroc':
         imgNames = (pd.read_csv(path + 'fName.txt', sep=' ', header=None)).iloc[:, 0]
         idx = (pd.read_csv(path + 'idx.txt', sep=' ', header=None)).iloc[:, 0].values

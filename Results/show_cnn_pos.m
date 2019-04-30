@@ -1,6 +1,6 @@
 clc, clear, close all
 dsName = 'airsim';
-subType = 'pin';
+subType = 'mr';
 seq=2;
 
 plotResults;
