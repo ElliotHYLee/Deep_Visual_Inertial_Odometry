@@ -162,7 +162,7 @@ def main():
     kfRes = kfNumpy.runKF(dt, pSignal, mSignal, mCov)
     plotter(kfRes, gtSignal)
 
-    
+
 
     plt.show()
 
