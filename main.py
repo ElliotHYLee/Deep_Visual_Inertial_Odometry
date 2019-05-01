@@ -45,14 +45,14 @@ def filtfilt(data):
 def plotter(filt, gt):
     plt.figure()
     plt.subplot(311)
-    plt.plot(gt[:, 0], 'r')
-    plt.plot(filt[:, 0], 'g')
+    plt.plot(gt[:, 0], 'r.', markerSize=5)
+    plt.plot(filt[:, 0], 'b.', markerSize=1)
     plt.subplot(312)
     plt.plot(gt[:, 1], 'r')
-    plt.plot(filt[:, 1], 'g')
+    plt.plot(filt[:, 1], 'b.')
     plt.subplot(313)
     plt.plot(gt[:, 2], 'r')
-    plt.plot(filt[:, 2], 'g')
+    plt.plot(filt[:, 2], 'b.')
 
     posFilt = integrate(filt)
     posGT = integrate(gt)
@@ -162,7 +162,10 @@ def main():
     kfRes = kfNumpy.runKF(dt, pSignal, mSignal, mCov)
     plotter(kfRes, gtSignal)
 
+    
+
     plt.show()
+
 
 
 if __name__ == '__main__':
