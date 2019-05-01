@@ -26,15 +26,15 @@ def show(dsName, subType):
     plt.grid(b=True, which='major', color='#666666', linestyle='-')
     plt.minorticks_on()
     plt.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
-    plt.ylim(bottom=0, top=10)
+    plt.ylim(bottom=0, top=20)
     plt.ylabel('Mahalanobis Distance', fontsize=14)
     plt.xlabel('Epochs', fontsize=14)
     plt.savefig('trainResult.png')
     plt.show()
 
 if __name__ == '__main__':
-    dsName = 'airsim'
-    subType='mr'
+    dsName = 'euroc'
+    subType='none'
     show(dsName, subType)
 
 
