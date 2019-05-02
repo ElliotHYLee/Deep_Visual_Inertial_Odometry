@@ -41,6 +41,7 @@ R = [2.5540950e-05 -5.6698605e-05  1.3820625e-05;
 %  -3.2495232e-06  4.3885651e-05  3.6321462e-06;
 %  8.0977925e-06  3.6321462e-06  1.0538273e-05];
 
+acc_gnd = mylp(acc_gnd, 0.9);
 
 for i=1:1:N
     velKF(i+1,:) = A*velKF(i,:)' + dt(i)*acc_gnd(i,:)';
@@ -242,6 +243,16 @@ function[pltIndex] = mysubplot2D(gt1, gt2, pr1, pr2, index)
     plot(pr1,pr2, 'b.', 'MarkerSize',1)
     hold off
     pltIndex = index + 1;
+end
+
+
+
+
+function[res] = mylp(data, a)
+    res(1,:) = data(1,:);
+    for i =2:1:length(data)
+        res(i,:) = a*res(i-1,:) + (1-a)*data(i,:);
+    end
 end
 
 
