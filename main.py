@@ -14,7 +14,7 @@ from git_branch_param import *
 #dsName, subType, seq = 'euroc', 'none', [1, 2, 3, 5]
 dsName, subType, seq = 'mycar', 'none', [0, 2]
 testSeq = 1
-isTrain = False
+isTrain = True
 wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
 
 def preClamp(data):
@@ -111,7 +111,7 @@ def main():
     fig.canvas.draw()
 
     trainLoss = []
-    iterN = 30 if isTrain else 1
+    iterN = 60 if isTrain else 1
     for epoch in range(0, iterN):
         guess, sign = gnet()
         filt = kf(guess, sign)
@@ -119,7 +119,7 @@ def main():
         params = guess.data.numpy()
         paramsSign = sign.data.numpy()
         loss = posRMSE.data.numpy() + velRMSE.data.numpy()
-        theLoss = velRMSE + posRMSE
+        theLoss = posRMSE#velRMSE + posRMSE
         if isTrain:
             if epoch == 20:
                 optimizer = optim.RMSprop(gnet.parameters(), lr=10 ** -4)
