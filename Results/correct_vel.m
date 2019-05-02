@@ -1,7 +1,7 @@
 clc, clear, close all
 dsName = 'mycar';
 subType = 'none';
-seq = 2;
+seq = 1;
 
 loadData
 
@@ -50,9 +50,12 @@ P{1} = eye(3)*10^-10;
 R = [1.1310258e-04 -3.2495232e-06  8.0977925e-06;
  -3.2495232e-06  4.3885651e-05  3.6321462e-06;
  8.0977925e-06  3.6321462e-06  1.0538273e-05];
-% R = [1.2645427e-04 -1.9799431e-06  2.1238786e-05;
-%  -1.9799431e-06  5.4057953e-05  1.7248494e-05
-%   2.1238786e-05  1.7248494e-05  1.3005917e-05]
+
+R = [1.6841706e-04 -1.8978466e-05  2.5850550e-05;
+ -1.8978466e-05  7.4973286e-05  2.8508592e-05;
+  2.5850550e-05  2.8508592e-05  2.3566154e-05];
+
+acc_gnd = mylp(acc_gnd, 0.9);
 
 for i=1:1:N
     velKF(i+1,:) = A*velKF(i,:)' + dt(i)*acc_gnd(i,:)';
@@ -318,7 +321,12 @@ function[pltIndex] = mysubplot2D(gt1, gt2, pr1, pr2, index)
 end
 
 
-
+function[res] = mylp(data, a)
+    res(1,:) = data(1,:);
+    for i =2:1:length(data)
+        res(i,:) = a*res(i-1,:) + (1-a)*data(i,:);
+    end
+end
 
 
 
