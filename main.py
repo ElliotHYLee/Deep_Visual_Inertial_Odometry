@@ -11,12 +11,12 @@ from KFBLock import *
 from Model import *
 from scipy.stats import multivariate_normal
 
-dsName, subType, seq = 'airsim', 'mr', [0]
+dsName, subType, seq = 'airsim', 'pin', [0]
 #dsName, subType, seq = 'kitti', 'none', [0, 2, 4, 6]
 #dsName, subType, seq = 'euroc', 'none', [1, 2, 3, 5]
 #dsName, subType, seq = 'mycar', 'none', [0, 2]
 
-isTrain = False
+isTrain = True
 wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
 
 def preClamp(data):
@@ -104,13 +104,14 @@ def main():
 
     kf = TorchKFBLock(gtSignal, dt, pSignal, mSignal, mCov)
     rmser = GetRMSE()
-    optimizer = optim.RMSprop(gnet.parameters(), lr=10 ** -3.6)
+    optimizer = optim.RMSprop(gnet.parameters(), lr=10 ** -4)
 
     fig = plt.gcf()
     fig.show()
     fig.canvas.draw()
 
-    for epoch in range(0, 1):
+    iterN = 80 if isTrain else 1
+    for epoch in range(0, iterN):
         guess, sign = gnet()
         filt = kf(guess, sign)
         velRMSE, posRMSE = rmser(filt, gtSignal)

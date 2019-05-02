@@ -1,6 +1,6 @@
 clc, clear, close all
-dsName = 'airsim';
-subType = 'mr';
+dsName = 'mycar';
+subType = 'none';
 seq = 2;
 
 loadData
@@ -15,10 +15,26 @@ A = eye(3);
 H = eye(3);
 P{1} = eye(3)*10^-10;
 % R = [1 0 0; 0 1 0; 0 0 1]*10^-5
-% airsim
-R = [4.4016473e-04 -1.0391317e-04 -7.1615077e-06;
- -1.0391317e-04  3.8396441e-03  2.5702146e-05;
- -7.1615077e-06  2.5702146e-05  1.0527541e-04]
+% airsim mr
+% R = [4.4016473e-04 -1.0391317e-04 -7.1615077e-06;
+%  -1.0391317e-04  3.8396441e-03  2.5702146e-05;
+%  -7.1615077e-06  2.5702146e-05  1.0527541e-04]
+
+% airsim mrseg
+% R = [ 2.5137659e-05  1.9389690e-06 -7.5634234e-06;
+%   1.9389690e-06  4.9889759e-06 -1.6071081e-06;
+%  -7.5634234e-06 -1.6071081e-06  2.8633654e-06]
+
+% airsim bar
+% R = [3.98180091e-05 -5.07786399e-06 -7.15094484e-06;
+%  -5.07786399e-06  1.21690406e-04  1.15208632e-05;
+%  -7.15094484e-06  1.15208632e-05  3.84481609e-06]
+
+% airsim pin
+% R = [3.1410756e-05 -6.9592256e-06 -4.3311611e-06;
+%  -6.9592256e-06  1.2303056e-04  1.4642666e-05;
+%  -4.3311611e-06  1.4642666e-05  4.3329587e-06]
+
 
 
 % kitti
@@ -33,9 +49,9 @@ R = [4.4016473e-04 -1.0391317e-04 -7.1615077e-06;
 
 
 % mycar
-% R = [1.1310258e-04 -3.2495232e-06  8.0977925e-06;
-%  -3.2495232e-06  4.3885651e-05  3.6321462e-06;
-%  8.0977925e-06  3.6321462e-06  1.0538273e-05];
+R = [1.1310258e-04 -3.2495232e-06  8.0977925e-06;
+ -3.2495232e-06  4.3885651e-05  3.6321462e-06;
+ 8.0977925e-06  3.6321462e-06  1.0538273e-05];
 
 
 for i=1:1:N
@@ -198,28 +214,28 @@ h = 600;
 fig = figure('Renderer', 'painters', 'Position', [600 100 w h]);
 subplot(3,1, 1)
 hold on
-plot(gt_dtr_gnd(:,1),'r.', 'MarkerSize',5);
+plot(gt_dtr_gnd(:,1),'r.-', 'MarkerSize',5);
 plot(pr_dtr_gnd(:,1), 'b.-', 'MarkerSize',2);
 plot(vel_imu(:,1),'cyan.-', 'MarkerSize',2);
-plot(velKF(:,1), 'g.', 'MarkerSize',2);
+plot(velKF(:,1), 'g.-', 'MarkerSize',2);
 ylabel('X axis, m', 'fontsize', 14)
 legend('GT', 'CNN', 'IMU', 'KF')
 
 subplot(3,1, 2)
 hold on
-plot(gt_dtr_gnd(:,2),'r.', 'MarkerSize',5);
+plot(gt_dtr_gnd(:,2),'r.-', 'MarkerSize',5);
 plot(pr_dtr_gnd(:,2), 'b.-', 'MarkerSize',2);
 plot(vel_imu(:,2),'cyan.-', 'MarkerSize',2);
-plot(velKF(:,2), 'g.', 'MarkerSize',2);
+plot(velKF(:,2), 'g.-', 'MarkerSize',2);
 ylabel('Y axis, m', 'fontsize', 14)
 legend('GT', 'CNN', 'IMU', 'KF')
 
 subplot(3,1, 3)
 hold on
-plot(gt_dtr_gnd(:,3),'r.', 'MarkerSize',5);
+plot(gt_dtr_gnd(:,3),'r.-', 'MarkerSize',5);
 plot(pr_dtr_gnd(:,3), 'b.-', 'MarkerSize',2);
 plot(vel_imu(:,3),'cyan.-', 'MarkerSize',2);
-plot(velKF(:,3), 'g.', 'MarkerSize',2);
+plot(velKF(:,3), 'g.-', 'MarkerSize',2);
 ylabel('Z axis, m', 'fontsize', 14)
 legend('GT', 'CNN', 'IMU', 'KF')
 
@@ -246,35 +262,40 @@ ylabel('Z axis, m', 'fontsize', 14)
 figure
 subplot(3,1, 1)
 hold on
-plot(gt_pos(:,1),'r.', 'MarkerSize',5);
-plot(pr_pos(:,1),'b.', 'MarkerSize',1);
-plot(pos_intKF(:,1),'g.', 'MarkerSize',1);
+plot(gt_pos(:,1),'r.-', 'MarkerSize',5);
+plot(pr_pos(:,1),'b.-', 'MarkerSize',1);
+plot(pos_intKF(:,1),'g.-', 'MarkerSize',1);
 ylabel('X axis, m', 'fontsize', 14)
-
+legend('GT', 'CNN', 'KF');
 subplot(3,1, 2)
 hold on
-plot(gt_pos(:,2),'r.', 'MarkerSize',5);
-plot(pr_pos(:,2),'b.', 'MarkerSize',1);
-plot(pos_intKF(:,2),'g.', 'MarkerSize',1);
+plot(gt_pos(:,2),'r.-', 'MarkerSize',5);
+plot(pr_pos(:,2),'b.-', 'MarkerSize',1);
+plot(pos_intKF(:,2),'g.-', 'MarkerSize',1);
 ylabel('Y axis, m', 'fontsize', 14)
-
+legend('GT', 'CNN', 'KF');
 subplot(3,1, 3)
 hold on
-plot(gt_pos(:,3),'r.', 'MarkerSize',5);
-plot(pr_pos(:,3),'b.', 'MarkerSize',1);
-plot(pos_intKF(:,3),'g.', 'MarkerSize',1);
+plot(gt_pos(:,3),'r.-', 'MarkerSize',5);
+plot(pr_pos(:,3),'b.-', 'MarkerSize',1);
+plot(pos_intKF(:,3),'g.-', 'MarkerSize',1);
 ylabel('Z axis, m', 'fontsize', 14)
-
+legend('GT', 'CNN', 'KF');
 
 
 figure
 hold on
-plot(gt_pos(:,2), gt_pos(:,1), 'r')
-plot(pr_pos(:,2), pr_pos(:,1), 'b')
-plot(pos_intKF(:,2), pos_intKF(:,1), 'g')
+plot(gt_pos(:,1), gt_pos(:,3), 'r')
+plot(pr_pos(:,1), pr_pos(:,3), 'b')
+plot(pos_intKF(:,1), pos_intKF(:,3), 'g')
+xlabel('Position X, m', 'fontsize', 14)
+ylabel('Position Y, m', 'fontsize', 14)
 legend('GT', 'CNN', 'KF');
 
 
+prPath = ['Data\',getPRPath(dsName, subType, seq)];
+kfName = strcat(prPath, '_dtrKF.txt')
+dlmwrite(kfName, velKF(2:end,:))
 
 
 

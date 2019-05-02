@@ -7,7 +7,8 @@ for seq = 0:1:2
     duRMSE(seq+1, 1) = getRMSE(gt_du - pr_du);
     dwRMSE(seq+1, 1) = getRMSE(gt_dw - pr_dw);
     dtrRMSE(seq+1, 1) = getRMSE(pr_dtr - gt_dtr);
-
+    dtr_gndRMSE(seq+1, 1) = getRMSE(pr_dtr_gnd - gt_dtr_gnd);
+    velKFRMSE(seq+1, 1) = getRMSE(velKF - gt_dtr_gnd);
     %% Velocity RMSE;
     duRMSE;
     dwRMSE;
@@ -15,8 +16,18 @@ for seq = 0:1:2
 
     %% Position RMSE
     posRMSE(seq+1, 1) = getRMSE(gt_pos - pr_pos);
+    KFposRMSE(seq+1, 1) = getRMSE(gt_pos - posKF);
 
     %% Position RMSE per 100 iteration
+    seqRMSE(seq+1,:) = getRMSE100(pr_pos, gt_pos, N, seq)
+    kfseqRMSE(seq+1,:) = getRMSE100(posKF, gt_pos, N, seq)
+end
+
+allRMSE = [duRMSE, dwRMSE, dtrRMSE, dtr_gndRMSE, posRMSE, seqRMSE]
+acorrRMSE = [velKFRMSE, KFposRMSE, kfseqRMSE]
+
+
+function[result] = getRMSE100(pr_pos, gt_pos, N, seq)
     idx = 1:100:N;
     sumSeqRMSE = 0;
     for i =2:1:length(idx)
@@ -29,11 +40,8 @@ for seq = 0:1:2
         err = (seq_pr - seq_gt);
         sumSeqRMSE = sumSeqRMSE + getRMSE(err);
     end
-    seqRMSE(seq+1,:) = sumSeqRMSE/length(idx);
-    
+    result = sumSeqRMSE/length(idx);
 end
-
-allRMSE = [duRMSE, dwRMSE, dtrRMSE, posRMSE, seqRMSE]
 
 function[result] = getRMSE3(err)
     N = length(err);

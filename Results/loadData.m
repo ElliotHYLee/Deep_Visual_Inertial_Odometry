@@ -33,19 +33,29 @@ gt_pos = gt_pos - gt_pos(1,:);
 prPath = ['Data\',getPRPath(dsName, subType, seq)];
 pr_duName = strcat(prPath, '_du.txt');
 pr_dwName = strcat(prPath, '_dw.txt');
+pr_dtr_Name = strcat(prPath, '_dtr.txt');
 pr_dtr_gndName = strcat(prPath, '_dtr_gnd.txt');
 pr_duCovName = strcat(prPath, '_du_cov.txt');
 pr_dwCovName = strcat(prPath, '_dw_cov.txt');
 pr_dtrCovName = strcat(prPath, '_dtr_cov.txt');
 % pr_accCovName = strcat(prPath, '_acc_cov.txt');
+kfName = strcat(prPath, '_dtrKF.txt')
 
 pr_du = importdata(pr_duName);
 pr_dw = importdata(pr_dwName);
+pr_dtr = importdata(pr_dtr_Name);
 pr_dtr_gnd = importdata(pr_dtr_gndName);
 pr_du_cov = importdata(pr_duCovName);
 pr_dw_cov = importdata(pr_dwCovName);
 pr_dtr_cov = importdata(pr_dtrCovName);
 % pr_acc_cov = importdata(pr_accCovName);
+try
+    velKF = importdata(kfName);
+    posKF = cumtrapz(velKF);
+catch
+    
+end
+
 N = length(pr_du);
 
 [du_Q, du_cov3] = getCov(pr_du_cov);
