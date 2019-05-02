@@ -14,7 +14,7 @@ from git_branch_param import *
 #dsName, subType, seq = 'euroc', 'none', [1, 2, 3, 5]
 dsName, subType, seq = 'mycar', 'none', [0, 2]
 testSeq = 1
-isTrain = True
+isTrain = False
 wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
 
 def preClamp(data):
