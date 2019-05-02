@@ -39,7 +39,7 @@ class KFBlock():
             result[i] = corrX
             sysCov[i] = corrCov
 
-        return result
+        return result, sysCov
 
 
 def standardize(data):

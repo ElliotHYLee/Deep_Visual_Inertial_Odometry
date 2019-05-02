@@ -1,7 +1,5 @@
 from VODataSet import VODataSetManager_RNN_KF
 import matplotlib.pyplot as plt
-from Model_RNN_KF import Model_RNN_KF
-from ModelContainer_RNN_KF import ModelContainer_RNN_KF
 from PrepData import DataManager
 import numpy as np
 import time
@@ -10,13 +8,13 @@ from git_branch_param import *
 from KFBLock import *
 from Model import *
 from scipy.stats import multivariate_normal
-
-dsName, subType, seq = 'airsim', 'mrseg', [0]
+from git_branch_param import *
+dsName, subType, seq = 'airsim', 'mr', [0]
 #dsName, subType, seq = 'kitti', 'none', [0, 2, 4, 6]
 #dsName, subType, seq = 'euroc', 'none', [1, 2, 3, 5]
 #dsName, subType, seq = 'mycar', 'none', [0, 2]
-
-isTrain = False
+testSeq = 2
+isTrain = True
 wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
 
 def preClamp(data):
@@ -88,18 +86,18 @@ def prepData(seqLocal = seq):
     return gtSignal, dt, pSignal, mSignal, mCov
 
 def main():
-    kfNumpy = KFBlock()
+
     gtSignal, dt, pSignal, mSignal, mCov = prepData(seqLocal=seq)
     posGT = np.cumsum(gtSignal, axis=0)
     gnet = GuessNet()
 
-    if not isTrain:
+    if isTrain:
         gnet.train()
+    else:
+        gnet.eval()
         checkPoint = torch.load(wName + '.pt')
         gnet.load_state_dict(checkPoint['model_state_dict'])
         gnet.load_state_dict(checkPoint['optimizer_state_dict'])
-    else:
-        gnet.eval()
 
 
     kf = TorchKFBLock(gtSignal, dt, pSignal, mSignal, mCov)
@@ -110,19 +108,21 @@ def main():
     fig.show()
     fig.canvas.draw()
 
-    for epoch in range(0, 1):
+    trainLoss = []
+    iterN = 80 if isTrain else 1
+    for epoch in range(0, iterN):
         guess, sign = gnet()
         filt = kf(guess, sign)
         velRMSE, posRMSE = rmser(filt, gtSignal)
         params = guess.data.numpy()
         paramsSign = sign.data.numpy()
         loss = posRMSE.data.numpy() + velRMSE.data.numpy()
-        theLOss = velRMSE + posRMSE
+        theLoss = velRMSE + posRMSE
         if isTrain:
-            if epoch == 10:
+            if epoch == 30:
                 optimizer = optim.RMSprop(gnet.parameters(), lr=10 ** -4)
             optimizer.zero_grad()
-            theLOss.backward(torch.ones_like(posRMSE))
+            theLoss.backward(torch.ones_like(posRMSE))
             optimizer.step()
 
             temp = filt.data.numpy()
@@ -142,6 +142,13 @@ def main():
             fig.canvas.draw()
             plt.savefig('KFOptimHistory/'+dsName +' ' + subType + ' temp ' + str(epoch) + '.png')
 
+            trainLoss.append(theLoss.data.numpy())
+            torch.save({
+                'model_state_dict': gnet.state_dict(),
+                'optimizer_state_dict': gnet.state_dict(),
+                'RMSE': trainLoss,
+            }, wName + '.pt')
+
         #if np.mod(epoch, 10):
         print('epoch: %d' % epoch)
         print('params: ')
@@ -149,18 +156,26 @@ def main():
         print(paramsSign)
         print('posRMSE: %.4f, %.4f, %.4f' %(loss[0], loss[1], loss[2]))
 
-    torch.save({
-        'model_state_dict': gnet.state_dict(),
-        'optimizer_state_dict': gnet.state_dict(),
-    }, wName + '.pt')
-
     kfRes = filt.data.numpy()
     plotter(kfRes, gtSignal)
 
-    gtSignal, dt, pSignal, mSignal, mCov = prepData(seqLocal=[2])
+    kfNumpy = KFBlock()
+
+    gtSignal, dt, pSignal, mSignal, mCov = prepData(seqLocal=[testSeq])
     kfNumpy.setR(params, paramsSign)
-    kfRes = kfNumpy.runKF(dt, pSignal, mSignal, mCov)
+    kfRes, sysCov = kfNumpy.runKF(dt, pSignal, mSignal, mCov)
     plotter(kfRes, gtSignal)
+
+
+    print(kfRes.shape)
+    sysCovDiag = np.diagonal(sysCov, axis1=1, axis2 =2)
+    np.savetxt('Results/Data/' + branchName() + '_' + dsName + '_' + subType + '_' + str(testSeq) + '_kfRES.txt' ,kfRes)
+    np.savetxt('Results/Data/' + branchName() + '_' + dsName + '_' + subType + '_' + str(testSeq) + '_gtSignal.txt', gtSignal)
+    np.savetxt('Results/Data/' + branchName() + '_' + dsName + '_' + subType + '_' + str(testSeq) + '_sysCov.txt',sysCovDiag)
+    posFilt = integrate(kfRes)
+    posGT = integrate(gtSignal)
+    np.savetxt('Results/Data/' + branchName() + '_' + dsName + '_' + subType + '_' + str(testSeq) + '_kfRESPos.txt', posFilt)
+    np.savetxt('Results/Data/' + branchName() + '_' + dsName + '_' + subType + '_' + str(testSeq) + '_gtSignalPos.txt', posGT)
 
 
 

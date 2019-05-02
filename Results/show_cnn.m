@@ -1,7 +1,7 @@
 clc, clear, close all
 dsName = 'airsim';
 subType = 'mrseg';
-seq=2;
+seq=0;
 
 loadData
 
