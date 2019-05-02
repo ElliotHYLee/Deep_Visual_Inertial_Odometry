@@ -1,5 +1,5 @@
 import numpy as np
-
+import scipy.integrate as integral
 class KFBlock():
     def __init__(self):
         self.prParam = None
@@ -55,7 +55,7 @@ def ClacSTDRMSE(data, gt):
 
 
 def integrate(data):
-    return np.cumsum(data, axis=0)
+    return integral.cumtrapz(data, axis=0)
 
 def CalcRMSE(data, gt):
     velRMSE = RMSE(data, gt)

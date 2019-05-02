@@ -1,7 +1,7 @@
 clc, clear, close all
 dsName = 'airsim';
 subType = 'mr';
-seq=0;
+seq=1;
 
 plotResults;
 

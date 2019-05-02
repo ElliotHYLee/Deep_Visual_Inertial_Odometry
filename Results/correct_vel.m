@@ -1,7 +1,7 @@
 clc, clear, close all
 dsName = 'airsim';
 subType = 'mr';
-seq = 0;
+seq = 2;
 
 loadData
 
@@ -20,9 +20,9 @@ R =  [4.8029236e-05 -1.1876153e-06  1.7004173e-05;
  -1.1876153e-06  4.4199194e-05 -1.1921709e-05;
   1.7004173e-05 -1.1921709e-05  2.6304331e-05]
 
-R = [4.4016473e-04 -1.0391317e-04 -7.1615077e-06;
- -1.0391317e-04  3.8396441e-03  2.5702146e-05;
- -7.1615077e-06  2.5702146e-05  1.0527541e-04]
+% R = [1.5051098e-04 -7.6006989e-05 -2.8464988e-06;
+%  -7.6006989e-05  6.4350548e-04  6.9267517e-05
+%  -2.8464988e-06  6.9267517e-05  1.2026669e-05]
 
 
 % kitti
@@ -222,9 +222,9 @@ legend('gt', 'cnn', 'imu', 'kf')
 
 figure
 hold on
-plot(gt_pos(:,1), gt_pos(:,3), 'r')
-plot(pr_pos(:,1), pr_pos(:,3), 'b')
-plot(pos_intKF(:,1), pos_intKF(:,3), 'k')
+plot(gt_pos(:,2), gt_pos(:,1), 'r')
+plot(pr_pos(:,2), pr_pos(:,1), 'b')
+plot(pos_intKF(:,2), pos_intKF(:,1), 'k')
 
 function[pltIndex] = mysubplot(gt, pr, index)
     hold on

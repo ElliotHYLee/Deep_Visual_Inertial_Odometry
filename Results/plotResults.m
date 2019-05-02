@@ -16,7 +16,7 @@ text( 0.737, -0.3, '- Predicted', 'FontSize', 10', 'Color', 'blue', 'FontWeight'
 subplot(3,1,1)
 plot(gt_dtr_gnd(:,1), 'r')
 hold on
-plot(pr_dtr_gnd(:,1), 'b.', 'markersize', 1)
+plot(pr_dtr_gnd(:,1), 'bo', 'markersize', 1)
 xlim([0 N])
 ylabel('X axis, m', 'fontsize', 14)
 % ylim([-0.1, 2])

@@ -14,7 +14,7 @@ dsName, subType, seq = 'airsim', 'mr', [0]
 #dsName, subType, seq = 'euroc', 'none', [1, 2, 3, 5]
 #dsName, subType, seq = 'mycar', 'none', [0, 2]
 testSeq = 2
-isTrain = False
+isTrain = True
 wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
 
 def preClamp(data):
@@ -83,11 +83,13 @@ def prepData(seqLocal = seq):
 
     gtSignal = preClamp(dm.gt_dtr_gnd)
     gtSignal = filtfilt(gtSignal)
-    return gtSignal, dt, pSignal, mSignal, mCov
+
+    gtPos = dm.pos_gnd
+    return gtSignal, dt, pSignal, mSignal, mCov, gtPos
 
 def main():
 
-    gtSignal, dt, pSignal, mSignal, mCov = prepData(seqLocal=seq)
+    gtSignal, dt, pSignal, mSignal, mCov, gtPos = prepData(seqLocal=seq)
     posGT = np.cumsum(gtSignal, axis=0)
     gnet = GuessNet()
 
@@ -119,7 +121,7 @@ def main():
         loss = posRMSE.data.numpy() + velRMSE.data.numpy()
         theLoss = velRMSE + posRMSE
         if isTrain:
-            if epoch == 30:
+            if epoch == 20:
                 optimizer = optim.RMSprop(gnet.parameters(), lr=10 ** -4)
             optimizer.zero_grad()
             theLoss.backward(torch.ones_like(posRMSE))
@@ -161,7 +163,7 @@ def main():
 
     kfNumpy = KFBlock()
 
-    gtSignal, dt, pSignal, mSignal, mCov = prepData(seqLocal=[testSeq])
+    gtSignal, dt, pSignal, mSignal, mCov, gtPos = prepData(seqLocal=[testSeq])
     kfNumpy.setR(params, paramsSign)
     kfRes, sysCov = kfNumpy.runKF(dt, pSignal, mSignal, mCov)
     plotter(kfRes, gtSignal)
@@ -173,7 +175,7 @@ def main():
     np.savetxt('Results/Data/' + branchName() + '_' + dsName + '_' + subType + '_' + str(testSeq) + '_gtSignal.txt', gtSignal)
     np.savetxt('Results/Data/' + branchName() + '_' + dsName + '_' + subType + '_' + str(testSeq) + '_sysCov.txt',sysCovDiag)
     posFilt = integrate(kfRes)
-    posGT = integrate(gtSignal)
+    posGT = gtPos
     np.savetxt('Results/Data/' + branchName() + '_' + dsName + '_' + subType + '_' + str(testSeq) + '_kfRESPos.txt', posFilt)
     np.savetxt('Results/Data/' + branchName() + '_' + dsName + '_' + subType + '_' + str(testSeq) + '_gtSignalPos.txt', posGT)
 
