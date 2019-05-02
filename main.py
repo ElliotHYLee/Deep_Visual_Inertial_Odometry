@@ -14,7 +14,7 @@ dsName, subType, seq = 'airsim', 'mr', [0]
 #dsName, subType, seq = 'euroc', 'none', [1, 2, 3, 5]
 #dsName, subType, seq = 'mycar', 'none', [0, 2]
 testSeq = 2
-isTrain = True
+isTrain = False
 wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
 
 def preClamp(data):
