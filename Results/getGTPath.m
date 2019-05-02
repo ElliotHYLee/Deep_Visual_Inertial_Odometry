@@ -4,24 +4,24 @@ function[path] = getGTPath(dsName, subType, seq)
     subType = lower(subType);
     if strcmp(dsName,'airsim')
         if strcmp(subType, 'mr') || strcmp(subType, 'bar') || strcmp(subType, 'pin')|| strcmp(subType, 'edge')
-            path = strcat('D:/DLData/Airsim/', 'mr', int2str(seq), '/');
+            path = strcat('F:/DLData/Airsim/', 'mr', int2str(seq), '/');
         elseif strcmp(subType, 'mrseg')
-            path = strcat('D:/DLData/Airsim/', 'mrseg', int2str(seq), '/');
+            path = strcat('F:/DLData/Airsim/', 'mrseg', int2str(seq), '/');
         end
     elseif strcmp(dsName,'myroom')
         if strcmp(subType, 'none') || strcmp(subType, '')
-            path = strcat('D:/DLData/MyRoom/data', int2str(seq), '/');
+            path = strcat('F:/DLData/MyRoom/data', int2str(seq), '/');
         end
     elseif strcmp(dsName,'mycar')
         if strcmp(subType, 'none') || strcmp(subType, '')
-            path = strcat('D:/DLData/MyCar/data', int2str(seq), '/');
+            path = strcat('F:/DLData/MyCar/data', int2str(seq), '/');
         end
     elseif strcmp(dsName,'agz')
         if strcmp(subType, 'none') || strcmp(subType, '')
-            path = strcat('D:/DLData/AGZ/');
+            path = strcat('F:/DLData/AGZ/');
         end
     elseif strcmp(dsName,'euroc')
-       path = strcat('D:/DLData/EuRoc/mh_',  int2str(seq), '/'); 
+       path = strcat('F:/DLData/EuRoc/mh_',  int2str(seq), '/'); 
     elseif strcmp(dsName, 'kitti')
         subType='';
         if seq < 10

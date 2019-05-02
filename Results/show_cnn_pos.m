@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'kitti';
-subType = 'none';
-seq=0;
+dsName = 'airsim';
+subType = 'pin';
+seq=2;
 
 plotResults;
 
