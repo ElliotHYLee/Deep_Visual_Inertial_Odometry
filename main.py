@@ -121,7 +121,7 @@ def main():
         params = guess.data.numpy()
         paramsSign = sign.data.numpy()
         loss = posRMSE.data.numpy() + velRMSE.data.numpy()
-        theLoss = posRMSE#velRMSE + posRMSE
+        theLoss = velRMSE + posRMSE
         if isTrain:
             if epoch == 20:
                 optimizer = optim.RMSprop(gnet.parameters(), lr=10 ** -4)
