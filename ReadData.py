@@ -33,7 +33,6 @@ class ReadData():
         print(self.acc_gnd.shape)
         print(self.du.shape)
 
-
         # images
         self.imgNames = getImgNames(self.path, dsName, ts = self.time_stamp, subType=subType)
         print(len(self.imgNames))
@@ -41,6 +40,31 @@ class ReadData():
         self.numChannel = 3 if self.dsName is not 'euroc' else 1
         self.imgs = np.zeros((self.numImgs, self.numChannel, 360, 720), dtype=np.float32)
         self.getImages()
+
+        # special case
+        s = None
+        if dsName == 'euroc' and subType == 'none2':
+            s = 2
+        if dsName == 'euroc' and subType == 'none3':
+            s = 3
+
+        if s is not None:
+            idx = np.arange(0, self.numData - s, s)
+            last = np.reshape(np.max(idx), (1,))
+            imgIdx = np.concatenate((idx, last + s))
+            self.dt = self.dt[idx]
+            self.du = self.du[idx]
+            self.dw = self.dw[idx]
+            self.dw_gyro = self.dw_gyro[idx]
+            self.dtr = self.dtr[idx]
+            self.dtr_gnd = self.dtr_gnd[idx]
+            self.linR = self.linR[idx]
+            self.rotM_bdy2gnd = self.rotM_bdy2gnd[idx]
+            self.pos_gnd = self.pos_gnd[idx]
+            self.acc_gnd = self.acc_gnd[idx]
+            self.imgs = self.imgs[imgIdx]
+            self.numData = idx.shape[0]
+            self.numImgs = self.imgs.shape[0]
 
     def getImgsFromTo(self, start, N):
         if start>self.numImgs:

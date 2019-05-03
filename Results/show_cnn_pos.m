@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'mycar';
+dsName = 'euroc';
 subType = 'none';
-seq=1;
+seq=4;
 
 plotResults;
 
