@@ -9,9 +9,9 @@ from KFBLock import *
 from Model import *
 from scipy.stats import multivariate_normal
 from git_branch_param import *
-dsName, subType, seq = 'airsim', 'mr', [0]
+#dsName, subType, seq = 'airsim', 'mr', [0]
 #dsName, subType, seq = 'kitti', 'none', [0, 2, 4, 6]
-#dsName, subType, seq = 'euroc', 'none', [1, 2, 3, 5]
+dsName, subType, seq = 'euroc', 'none', [1, 2, 3, 5]
 #dsName, subType, seq = 'mycar', 'none', [0, 2]
 testSeq = 2
 isTrain = True
@@ -76,15 +76,15 @@ def prepData(seqLocal = seq):
 
     pSignal = dm.accdt_gnd
     pSignal = preClamp(pSignal)
-    pSignal = filtfilt(pSignal)
+    #pSignal = filtfilt(pSignal)
 
     mSignal = dm.pr_dtr_gnd
     mSignal = preClamp((mSignal))
-    mSignal = filtfilt(mSignal)
+    #mSignal = filtfilt(mSignal)
     mCov = dm.dtr_cov_gnd
 
     gtSignal = preClamp(dm.gt_dtr_gnd)
-    gtSignal = filtfilt(gtSignal)
+    #gtSignal = filtfilt(gtSignal)
 
     gtPos = dm.pos_gnd
     return gtSignal, dt, pSignal, mSignal, mCov, gtPos
