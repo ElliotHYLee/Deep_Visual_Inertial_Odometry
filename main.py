@@ -9,11 +9,11 @@ from git_branch_param import *
 
 def train(dsName, subType, seq):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
-    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=seq, isTrain=True, split=0.01)
+    dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=seq, isTrain=True, split=0.2)
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
     #mc.load_weights(wName, train=True)
-    mc.fit(train, val, batch_size=64, epochs=40, wName=wName, checkPointFreq=1)
+    mc.fit(train, val, batch_size=94, epochs=40, wName=wName, checkPointFreq=1)
 
 def test(dsName, subType, seqRange):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
@@ -56,15 +56,15 @@ if __name__ == '__main__':
     dsName = 'airsim'
     seq = [0]
     seqRange = [0, 3]
-    #runTrainTest(dsName, 'mr', seq, seqRange)
+    runTrainTest(dsName, 'mr', seq, seqRange)
     #runTrainTest(dsName, 'mrseg', seq, seqRange)
     #runTrainTest(dsName, 'bar', seq, seqRange)
     #runTrainTest(dsName, 'pin', seq, seqRange)
     #runTrainTest(dsName, 'edge', seq, seqRange)
 
     #runTrainTest('euroc', 'none', seq=[1, 2, 3, 5], seqRange=[1, 6])
-    runTrainTest('euroc', 'none2', seq=[1, 2, 3, 5], seqRange=[1, 6])
-    runTrainTest('euroc', 'none3', seq=[1, 2, 3, 5], seqRange=[1, 6])
+    #runTrainTest('euroc', 'none2', seq=[1, 2, 3, 5], seqRange=[1, 6])
+    #runTrainTest('euroc', 'none3', seq=[1, 2, 3, 5], seqRange=[1, 6])
     #runTrainTest('euroc', 'edge', seq=[1, 2, 3, 5], seqRange=[1, 6])
     #runTrainTest('kitti', 'none', seq=[0, 2, 4, 6], seqRange=[0, 11])
     #runTrainTest('kitti', 'edge', seq=[0, 2, 4, 6], seqRange=[0, 11])
