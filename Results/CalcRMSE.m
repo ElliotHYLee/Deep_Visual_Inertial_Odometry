@@ -1,8 +1,8 @@
 clc, clear, close all
-dsName = 'mycar';
+dsName = 'euroc';
 subType = 'none';
 
-for seq = 0:1:2
+for seq = 1:1:5
     loadData;
     duRMSE(seq+1, 1) = getRMSE(gt_du - pr_du);
     dwRMSE(seq+1, 1) = getRMSE(gt_dw - pr_dw);
