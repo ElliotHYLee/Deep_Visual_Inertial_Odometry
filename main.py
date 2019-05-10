@@ -11,9 +11,9 @@ from KFBLock import *
 from Model import *
 from scipy.stats import multivariate_normal
 
-dsName, subType, seq = 'airsim', 'mr', [0]
-#dsName, subType, seq = 'kitti', 'none', [0, 2, 4, 6]
-dsName, subType, seq = 'euroc', 'none', [1, 2, 3, 5]
+#dsName, subType, seq = 'airsim', 'mr', [0]
+dsName, subType, seq = 'kitti', 'none', [0, 2, 4, 6]
+#dsName, subType, seq = 'euroc', 'none', [1, 2, 3, 5]
 #dsName, subType, seq = 'mycar', 'none', [0, 2]
 
 isTrain = True
