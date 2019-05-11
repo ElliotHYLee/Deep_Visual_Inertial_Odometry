@@ -22,6 +22,8 @@ function[path] = getGTPath(dsName, subType, seq)
         end
     elseif strcmp(dsName,'euroc')
        path = strcat('F:/DLData/EuRoc/mh_',  int2str(seq), '/'); 
+    elseif strcmp(dsName,'euroc_')
+       path = strcat('F:/DLData/EuRoc_/mh_',  int2str(seq), '/'); 
     elseif strcmp(dsName, 'kitti')
         subType='';
         if seq < 10
