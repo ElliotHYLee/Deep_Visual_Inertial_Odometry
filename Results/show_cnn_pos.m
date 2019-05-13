@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'euroc_';
-subType = 'none';
-seq=4;
+dsName = 'airsim';
+subType = 'bar';
+seq=2;
 
 plotResults;
 

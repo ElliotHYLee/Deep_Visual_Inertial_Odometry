@@ -40,8 +40,7 @@ h = 600;
 fig = figure('Renderer', 'painters', 'Position', [600 100 w h]);
 axes('Position', [0, 0.95, 1, 0.05] ) ;
 set( gca, 'Color', 'None', 'XColor', 'None', 'YColor', 'None' ) ;
-text( 0.75, 0, '- Ground Truth', 'FontSize', 10', 'Color', 'red', 'FontWeight', 'Bold','HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
-text( 0.737, -0.3, '- Predicted', 'FontSize', 10', 'Color', 'blue', 'FontWeight', 'Bold','HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
+
 subplot(3,1,1)
 plot(dtr_gnd_std3(:,1), 'b.', 'markersize', 1)
 xlim([0 N])

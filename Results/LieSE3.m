@@ -19,7 +19,7 @@ classdef LieSE3 < Lie
            th = sqrt(w'*w);
            skew = obj.make_skew(w);
            if th==0
-               V = eye(3);
+               V = eye(3) ;%+ 1/2*skew + 1/6*skew*skew;
            else
                V = eye(3) + (1-cos(th))/th^2*skew +(th-sin(th))/th^3*skew*skew;
            end
@@ -27,9 +27,9 @@ classdef LieSE3 < Lie
        
        function[w, u] = getLog(obj, T)
            [R,t] = obj.getRt(T);
-           skew = obj.SO3.getLog(R);
+           skew = obj.SO3.getLog(R)
            w = obj.get_w(skew)';
-           V = obj.get_V(w);
+           V = obj.get_V(w)
            u = V^-1*t;
        end
    end
