@@ -1,6 +1,6 @@
 clc, clear, close all
 dsName = 'airsim';
-subType = 'bar';
+subType = 'mrseg';
 seq=2;
 
 plotResults;
@@ -79,7 +79,13 @@ grid minor
 
 
 
+for i=1:1:N
+    std3 = P{i};
+    std3 = sqrt(diag(std3));
+    dummy(i,:) = std3;
+end
 
-
+figure
+plot(dummy)
 
 

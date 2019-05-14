@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'kitti';
-subType = 'none';
-seq = 7;
+dsName = 'airsim';
+subType = 'mrseg';
+seq = 2;
 loadData;
 
 time = cumtrapz(dt);

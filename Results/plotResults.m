@@ -42,15 +42,15 @@ axes('Position', [0, 0.95, 1, 0.05] ) ;
 set( gca, 'Color', 'None', 'XColor', 'None', 'YColor', 'None' ) ;
 
 subplot(3,1,1)
-plot(dtr_gnd_std3(:,1), 'b.', 'markersize', 1)
+plot(dtr_gnd_std3(:,1), 'bo', 'markersize', 1)
 xlim([0 N])
 ylabel('X axis, m', 'fontsize', 14)
 subplot(3,1,2)
-plot(dtr_gnd_std3(:,2), 'b.', 'markersize', 1)
+plot(dtr_gnd_std3(:,2), 'bo', 'markersize', 1)
 xlim([0 N])
 ylabel('Y axis, m', 'fontsize', 14)
 subplot(3,1,3)
-plot(dtr_gnd_std3(:,3), 'b.', 'markersize', 1)
+plot(dtr_gnd_std3(:,3), 'bo', 'markersize', 1)
 xlim([0 N])
 ylabel('Z axis, m', 'fontsize', 14)
 
