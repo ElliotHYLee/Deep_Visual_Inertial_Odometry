@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'airsim';
-subType = 'mr';
-seq=2;
+dsName = 'mycar';
+subType = 'none';
+seq=1;
 
 
 plotResults;
