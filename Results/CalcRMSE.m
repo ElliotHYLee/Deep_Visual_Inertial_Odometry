@@ -1,8 +1,8 @@
 clc, clear, close all
-dsName = 'euroc';
+dsName = 'kitti';
 subType = 'none';
 
-for seq = 1:1:5
+for seq = 0:1:10
     loadData;
     duRMSE(seq+1, 1) = getRMSE(gt_du - pr_du);
     dwRMSE(seq+1, 1) = getRMSE(gt_dw - pr_dw);
@@ -19,16 +19,19 @@ for seq = 1:1:5
     KFposRMSE(seq+1, 1) = getRMSE(gt_pos - posKF);
 
     %% Position RMSE per 100 iteration
-    seqRMSE(seq+1,:) = getRMSE100(pr_pos, gt_pos, N, seq)
-    kfseqRMSE(seq+1,:) = getRMSE100(posKF, gt_pos, N, seq)
+    cutN = 500;
+    seqRMSE(seq+1,:) = getRMSEN(pr_pos, gt_pos, N, seq, cutN)
+    kfseqRMSE(seq+1,:) = getRMSEN(posKF, gt_pos, N, seq, cutN)
 end
 
 allRMSE = [duRMSE, dwRMSE, dtrRMSE, dtr_gndRMSE, posRMSE, seqRMSE]
 acorrRMSE = [velKFRMSE, KFposRMSE, kfseqRMSE]
 
+mean(seqRMSE([1,3,7,8,9,10],1))
+mean(kfseqRMSE([1,3,7,8,9,10],1))
 
-function[result] = getRMSE100(pr_pos, gt_pos, N, seq)
-    idx = 1:100:N;
+function[result] = getRMSEN(pr_pos, gt_pos, N, seq, cutN)
+    idx = 1:cutN:N;
     sumSeqRMSE = 0;
     for i =2:1:length(idx)
         s = idx(i-1);
