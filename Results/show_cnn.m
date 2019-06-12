@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'euroc_';
-subType = 'none';
-seq=5;
+dsName = 'airsim';
+subType = 'edge';
+seq=2;
 
 loadData
 

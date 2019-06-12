@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'kitti';
-subType = 'none';
-seq = 5;
+dsName = 'airsim';
+subType = 'edge';
+seq = 2;
 loadData;
 
 time = cumtrapz(dt);
@@ -13,7 +13,7 @@ velKF = [0 0 0];
 A = eye(3);
 H = eye(3);
 P{1} = eye(3)*10^-10;
-R = [1 0 0; 0 1 0; 0 0 1]*10^-5
+R = [10^1 0 0; 0 10^-2 0; 0 0 1]*10^-5
 for i=1:1:N
     velKF(i+1,:) = A*velKF(i,:)' + dt(i)*acc_gnd(i,:)';
     pp = A*P{i}*A' + R;
@@ -194,10 +194,10 @@ legend('gt', 'cnn', 'imu', 'kf')
 
 figure
 hold on
-plot(gt_pos(:,1), gt_pos(:,3), 'r')
-plot(pr_pos(:,1), pr_pos(:,3), 'b')
+plot(gt_pos(:,1), gt_pos(:,2), 'r')
+plot(pr_pos(:,1), pr_pos(:,2), 'b')
 
-plot(pos_intKF(:,1), pos_intKF(:,3), 'g')
+plot(pos_intKF(:,1), pos_intKF(:,2), 'g')
 
 function[pltIndex] = mysubplot(gt, pr, index)
     hold on
