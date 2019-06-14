@@ -1,8 +1,8 @@
 clc, clear, close all
-dsName = 'kitti';
-subType = 'none';
+dsName = 'airsim';
+subType = 'edge';
 
-for seq = 0:1:10
+for seq = 0:1:2
     loadData;
     duRMSE(seq+1, 1) = getRMSE(gt_du - pr_du);
     dwRMSE(seq+1, 1) = getRMSE(gt_dw - pr_dw);
@@ -19,7 +19,7 @@ for seq = 0:1:10
     KFposRMSE(seq+1, 1) = getRMSE(gt_pos - posKF);
 
     %% Position RMSE per 100 iteration
-    cutN = 500;
+    cutN = 100;
     seqRMSE(seq+1,:) = getRMSEN(pr_pos, gt_pos, N, seq, cutN)
     kfseqRMSE(seq+1,:) = getRMSEN(posKF, gt_pos, N, seq, cutN)
 end
