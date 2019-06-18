@@ -4,9 +4,6 @@
 Using convolutional neural network, the velocity of the camera is estimated. 
 After predicting the velocity, 3D transformation matrices are concanated to estimate the position. Yet, the rotation information is coming from gyro scope. The correction is also done with accelerometer
 
-[Click for Youtube video:
-<img src="https://github.com/ElliotHYLee/OpticalFlow2VelocityEstimation/blob/master/Images/Capture.JPG">](https://youtu.be/-t8VCICzGD0)
-
 ## Please Cite:
 Hongyun Lee, Matthew McCrink, and James W. Gregory. "Visual-Inertial Odometry for Unmanned Aerial Vehicle using Deep Leering", 2019 Intelligent/Autonomous Guidance and Navigation, AIAA SciTech Conference, accepted for publication
 
