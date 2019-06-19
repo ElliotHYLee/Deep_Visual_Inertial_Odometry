@@ -1,3 +1,5 @@
+Massive clean-up is scheduled Jul-Aug.
+
 # Deep Visual Inertial Odometry
 
 
