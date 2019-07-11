@@ -1,6 +1,6 @@
 clc, clear, close all
 dsName = 'airsim';
-subType = 'edge';
+subType = 'mr';
 
 for seq = 0:1:2
     loadData;
@@ -27,8 +27,10 @@ end
 allRMSE = [duRMSE, dwRMSE, dtrRMSE, dtr_gndRMSE, posRMSE, seqRMSE]
 acorrRMSE = [velKFRMSE, KFposRMSE, kfseqRMSE]
 
-mean(seqRMSE([1,3,7,8,9,10],1))
-mean(kfseqRMSE([1,3,7,8,9,10],1))
+% mean(seqRMSE([1,3,7,8,9,10],1))
+% mean(kfseqRMSE([1,3,7,8,9,10],1))
+mean(seqRMSE([1,2,3],1))
+mean(kfseqRMSE([1,2,3],1))
 
 function[result] = getRMSEN(pr_pos, gt_pos, N, seq, cutN)
     idx = 1:cutN:N;
