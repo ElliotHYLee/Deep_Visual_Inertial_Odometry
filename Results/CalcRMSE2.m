@@ -1,6 +1,6 @@
 clc, clear, close all
 dsName = 'airsim';
-subType = 'edge';
+subType = 'pin';
 
 for seq = 0:1:2
     loadData;

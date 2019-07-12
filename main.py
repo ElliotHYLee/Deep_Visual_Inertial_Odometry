@@ -112,7 +112,7 @@ def main():
     fig.show()
     fig.canvas.draw()
 
-    iterN = 80 if isTrain else 1
+    iterN = 160 if isTrain else 1
     for epoch in range(0, iterN):
         guess, sign = gnet()
         filt = kf(guess, sign)

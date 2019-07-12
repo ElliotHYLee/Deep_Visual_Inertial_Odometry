@@ -31,7 +31,7 @@ def getPathWin(dsName = 'AirSim', seq = 0, subType='mr'):
     if dsName == 'airsim':
         if subType == 'mr' or subType=='mrseg':
             path = 'F:/DLData/Airsim/' + subType + str(seq) + '/'
-        elif subType == 'bar' or subType == 'pin':
+        elif subType == 'bar' or subType == 'pin' or subType == 'edge':
             path = 'F:/DLData/Airsim/mr' + str(seq) + '/'
     elif dsName == 'euroc':
         path = 'F:/DLData/EuRoc/mh_' + str(seq) +'/'
