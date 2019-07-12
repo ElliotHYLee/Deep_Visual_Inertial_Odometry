@@ -1,6 +1,6 @@
 clc, clear, close all
-dsName = 'mycar';
-subType = 'none';
+dsName = 'airsim';
+subType = 'edge';
 
 for seq = 0:1:2
     loadData;
