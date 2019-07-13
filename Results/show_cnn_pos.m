@@ -1,7 +1,7 @@
 clc, clear, close all
 dsName = 'airsim';
-subType = 'mrseg';
-seq=2;
+subType = 'mr';
+seq=0;
 
 plotResults;
 
@@ -27,7 +27,12 @@ end
 
 plotELPS(dsName, gt_pos, pr_pos, P)
 
-figure
+fig = figure('Renderer', 'painters', 'Position', [600 100 560 430]);
+axes('Position', [0, 0.95, 1, 0.05] ) ;
+set( gca, 'Color', 'None', 'XColor', 'None', 'YColor', 'None' ) ;
+text( 0.6, 0, '- Ground Truth', 'FontSize', 10', 'Color', 'red', 'FontWeight', 'Bold','HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
+text( 0.58, -0.5, '- Predicted', 'FontSize', 10', 'Color', 'blue', 'FontWeight', 'Bold','HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
+text( 0.8, 0, '- Uncertainty', 'FontSize', 10', 'Color', 'green', 'FontWeight', 'Bold','HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
 subplot(3,1,1)
 plot(gt_pos(:,1), 'r')
 xlim([0 N])
@@ -39,7 +44,7 @@ for i =1:100:N
     plot([i, i], [pr_pos(i,1)  pr_pos(i,1) + 3*std3(1)], 'g', 'linewidth', 1)
     plot([i, i], [pr_pos(i,1)  pr_pos(i,1) - 3*std3(1)], 'g', 'linewidth', 1)
 end
-ylabel('Position_X, m', 'fontsize', 14)
+ylabel('Position_X, m', 'fontsize', 16)
 grid on
 grid minor
 
@@ -55,7 +60,8 @@ for i =1:100:N
     plot([i, i], [pr_pos(i,2)  pr_pos(i,2) - 3*std3(2)], 'g', 'linewidth', 1)
 end
 
-ylabel('Position_Y, m', 'fontsize', 14)
+ylabel('Position_Y, m', 'fontsize', 16)
+
 grid on
 grid minor
 
@@ -71,7 +77,8 @@ for i =1:100:N
     plot([i, i], [pr_pos(i,3)  pr_pos(i,3) + 3*std3(3)], 'g', 'linewidth', 1)
     plot([i, i], [pr_pos(i,3)  pr_pos(i,3) - 3*std3(3)], 'g', 'linewidth', 1)
 end
-ylabel('Position_Z, m', 'fontsize', 14)
+ylabel('Position_Z, m', 'fontsize', 16)
+xlabel('Data Points', 'fontsize', 16)
 grid on
 grid minor
 
