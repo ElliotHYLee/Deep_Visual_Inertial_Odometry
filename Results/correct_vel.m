@@ -1,7 +1,7 @@
 clc, clear, close all
 dsName = 'airsim';
-subType = 'pin';
-seq = 2;
+subType = 'mr';
+seq = 0;
 
 loadData
 
@@ -16,9 +16,9 @@ H = eye(3);
 P{1} = eye(3)*10^-10;
 R = [1 0 0; 0 1 0; 0 0 1]*10^-5
 %airsim mr
-% R = [4.4016473e-04 -1.0391317e-04 -7.1615077e-06;
-%  -1.0391317e-04  3.8396441e-04  2.5702146e-05;
-%  -7.1615077e-06  2.5702146e-05  1.0527541e-04]
+R = [4.4016473e-04 -1.0391317e-04 -7.1615077e-06;
+ -1.0391317e-04  3.8396441e-04  2.5702146e-05;
+ -7.1615077e-06  2.5702146e-05  1.0527541e-04]
 
 % airsim edge
 % R = [4.4269957e-05 -4.4235094e-06 -6.6785510e-06;
@@ -32,9 +32,9 @@ R = [1 0 0; 0 1 0; 0 0 1]*10^-5
 %  -7.5634234e-06 -1.6071081e-06  2.8633654e-06]
 
 % airsim bar
-R = [3.98180091e-05 -5.07786399e-06 -7.15094484e-06;
- -5.07786399e-06  1.21690406e-04  1.15208632e-05;
- -7.15094484e-06  1.15208632e-05  3.84481609e-06]
+% R = [3.98180091e-05 -5.07786399e-06 -7.15094484e-06;
+%  -5.07786399e-06  1.21690406e-04  1.15208632e-05;
+%  -7.15094484e-06  1.15208632e-05  3.84481609e-06]
 
 % airsim pin
 % R = [3.1410756e-05 -6.9592256e-06 -4.3311611e-06;
@@ -227,7 +227,7 @@ plot(pr_dtr_gnd(:,1), 'b.-', 'MarkerSize',2);
 plot(vel_imu(:,1),'cyan.-', 'MarkerSize',2);
 plot(velKF(:,1), 'g.-', 'MarkerSize',2);
 ylabel('X axis, m', 'fontsize', 14)
-legend('GT', 'CNN', 'IMU', 'KF')
+legend('GT', 'CNN', 'ACC', 'KF')
 
 subplot(3,1, 2)
 hold on
@@ -236,7 +236,7 @@ plot(pr_dtr_gnd(:,2), 'b.-', 'MarkerSize',2);
 plot(vel_imu(:,2),'cyan.-', 'MarkerSize',2);
 plot(velKF(:,2), 'g.-', 'MarkerSize',2);
 ylabel('Y axis, m', 'fontsize', 14)
-legend('GT', 'CNN', 'IMU', 'KF')
+legend('GT', 'CNN', 'ACC', 'KF')
 
 subplot(3,1, 3)
 hold on
@@ -244,9 +244,9 @@ plot(gt_dtr_gnd(:,3),'r.-', 'MarkerSize',5);
 plot(pr_dtr_gnd(:,3), 'b.-', 'MarkerSize',2);
 plot(vel_imu(:,3),'cyan.-', 'MarkerSize',2);
 plot(velKF(:,3), 'g.-', 'MarkerSize',2);
-ylabel('Z axis, m', 'fontsize', 14)
-legend('GT', 'CNN', 'IMU', 'KF')
-
+ylabel('Z axis, m', 'fontsize', 16)
+legend('GT', 'CNN', 'ACC', 'KF')
+xlabel('Data Points', 'fontsize', 16)
 
 w = 500;
 h = 600;
@@ -254,18 +254,18 @@ fig = figure('Renderer', 'painters', 'Position', [600 100 w h]);
 subplot(3,1, 1)
 hold on
 plot(kfstd3(:,1),'b.', 'MarkerSize',1);
-ylabel('X axis, m', 'fontsize', 14)
+ylabel('X axis, m', 'fontsize', 16)
 
 subplot(3,1, 2)
 hold on
 plot(kfstd3(:,2),'b.', 'MarkerSize',1);
-ylabel('Y axis, m', 'fontsize', 14)
+ylabel('Y axis, m', 'fontsize', 16)
 
 subplot(3,1, 3)
 hold on
 plot(kfstd3(:,3),'b.', 'MarkerSize',1);
-ylabel('Z axis, m', 'fontsize', 14)
-
+ylabel('Z axis, m', 'fontsize', 16)
+xlabel('Data Points', 'fontsize', 16)
 
 figure
 subplot(3,1, 1)
@@ -273,31 +273,31 @@ hold on
 plot(gt_pos(:,1),'r.-', 'MarkerSize',5);
 plot(pr_pos(:,1),'b.-', 'MarkerSize',1);
 plot(pos_intKF(:,1),'g.-', 'MarkerSize',1);
-ylabel('X axis, m', 'fontsize', 14)
+ylabel('X axis, m', 'fontsize', 16)
 legend('GT', 'CNN', 'KF');
 subplot(3,1, 2)
 hold on
 plot(gt_pos(:,2),'r.-', 'MarkerSize',5);
 plot(pr_pos(:,2),'b.-', 'MarkerSize',1);
 plot(pos_intKF(:,2),'g.-', 'MarkerSize',1);
-ylabel('Y axis, m', 'fontsize', 14)
+ylabel('Y axis, m', 'fontsize', 16)
 legend('GT', 'CNN', 'KF');
 subplot(3,1, 3)
 hold on
 plot(gt_pos(:,3),'r.-', 'MarkerSize',5);
 plot(pr_pos(:,3),'b.-', 'MarkerSize',1);
 plot(pos_intKF(:,3),'g.-', 'MarkerSize',1);
-ylabel('Z axis, m', 'fontsize', 14)
+ylabel('Z axis, m', 'fontsize', 16)
 legend('GT', 'CNN', 'KF');
-
+xlabel('Data Points', 'fontsize', 16)
 
 figure
 hold on
 plot(gt_pos(:,1), gt_pos(:,2), 'r')
 plot(pr_pos(:,1), pr_pos(:,2), 'b')
 plot(pos_intKF(:,1), pos_intKF(:,2), 'g')
-xlabel('Position X, m', 'fontsize', 14)
-ylabel('Position Y, m', 'fontsize', 14)
+xlabel('Position X, m', 'fontsize', 16)
+ylabel('Position Y, m', 'fontsize', 16)
 legend('GT', 'CNN', 'KF');
 
 
