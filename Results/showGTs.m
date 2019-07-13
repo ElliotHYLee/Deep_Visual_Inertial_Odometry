@@ -1,7 +1,7 @@
 clc, clear, close all
-dsName = 'airsim';
-subType = 'mr';
-seq = 0;
+dsName = 'mycar';
+subType = 'none';
+seq = 1;
 
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq)
@@ -28,9 +28,9 @@ plot3(gt_pos(:,1), gt_pos(:,2), gt_pos(:,3), 'r')
 grid on
 view(45,30)
 title('Position')
-xlabel('Position_X', 'fontsize', 14)
-ylabel('Position_Y', 'fontsize', 14)
-zlabel('Position_Z', 'fontsize', 14)
+xlabel('Position_X, m', 'fontsize', 16)
+ylabel('Position_Y, m', 'fontsize', 16)
+zlabel('Position_Z, m', 'fontsize', 16)
 % zlim([-100 100])
 
 
@@ -48,47 +48,55 @@ plot3(gt_pos(:,1), gt_pos(:,2), gt_pos(:,3), 'r')
 grid on
 view(45,30)
 title('Position')
-xlabel('Position_X', 'fontsize', 14)
-ylabel('Position_Y', 'fontsize', 14)
-zlabel('Position_Z', 'fontsize', 14)
+xlabel('Position_X, m', 'fontsize', 16)
+ylabel('Position_Y, m', 'fontsize', 16)
+zlabel('Position_Z, m', 'fontsize', 16)
 zlim([-100 100])
 
 subplot(6,2,2)
 plot(gt_du(:,1), 'r.')
 % ylim([-0.1, 2])
-ylabel('dU_X, m', 'fontsize', 14)
+ylabel('dU_X, m', 'fontsize', 16)
+xlabel('Data Points', 'fontsize', 16)
 title('Tranlational Movement')
 subplot(6,2,4)
 plot(gt_du(:,2), 'r.')
-ylabel('dU_Y, m', 'fontsize', 14)
+ylabel('dU_Y, m', 'fontsize', 16)
+xlabel('Data Points', 'fontsize', 16)
 subplot(6,2,6)
 plot(gt_du(:,3), 'r.')
-ylabel('dU_Z, m', 'fontsize', 14)
-
+ylabel('dU_Z, m', 'fontsize', 16)
+xlabel('Data Points', 'fontsize', 16)
 
 subplot(6,2,7)
 plot(gt_dw(:,1), 'r.')
-ylabel('dW_X, rad', 'fontsize', 14)
+ylabel('dW_X, rad', 'fontsize', 16)
+xlabel('Data Points', 'fontsize', 16)
 title('Angular Displacement')
 subplot(6,2,9)
 plot(gt_dw(:,2), 'r.')
-ylabel('dW_Y, rad', 'fontsize', 14)
+ylabel('dW_Y, rad', 'fontsize', 16)
+xlabel('Data Points', 'fontsize', 16)
 subplot(6,2,11)
 plot(gt_dw(:,3), 'r.')
-ylabel('dW_Z, rad', 'fontsize', 14)
+ylabel('dW_Z, rad', 'fontsize', 16)
+xlabel('Data Points', 'fontsize', 16)
 
  
 subplot(6,2,8)
 plot(gt_dtr(:,1), 'r.')
-ylabel('dtr_X, rad', 'fontsize', 14)
+ylabel('dtr_X, rad', 'fontsize', 16)
+xlabel('Data Points', 'fontsize', 16)
 % ylim([-0.1, 2])
 title('Overall Displacement')
 subplot(6,2,10)
 plot(gt_dtr(:,2), 'r.')
-ylabel('dtr_Y, rad', 'fontsize', 14)
+ylabel('dtr_Y, rad', 'fontsize', 16)
+xlabel('Data Points', 'fontsize', 16)
 subplot(6,2,12)
 plot(gt_dtr(:,3), 'r.')
-ylabel('dtr_Z, rad', 'fontsize', 14)
+ylabel('dtr_Z, rad', 'fontsize', 16)
+xlabel('Data Points', 'fontsize', 16)
 
 
 
