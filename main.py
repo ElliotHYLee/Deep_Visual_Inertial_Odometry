@@ -56,6 +56,7 @@ if __name__ == '__main__':
     dsName = 'airsim'
     seq = [0]
     seqRange = [0, 3]
+    #test
     #runTrainTest(dsName, 'mr', seq, seqRange)
     #runTrainTest(dsName, 'mrseg', seq, seqRange)
     #runTrainTest(dsName, 'bar', seq, seqRange)
