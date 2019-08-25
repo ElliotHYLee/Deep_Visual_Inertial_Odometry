@@ -1,3 +1,3 @@
 function[branchName] = getBranchName()
-    branchName = 'master';
+    branchName = 'cnn_img';
 end

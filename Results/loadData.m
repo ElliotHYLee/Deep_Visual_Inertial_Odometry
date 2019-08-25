@@ -3,6 +3,7 @@
 % subType = 'mrseg';
 % seq = 0;
 
+
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
 gt_dtName = strcat(gtPath, 'dt.txt');
@@ -62,6 +63,21 @@ for i =1:1:N
 end
 dtr_gnd_std3 = sqrt(cov3);
 
+
+
+lie = Lie();
+se3 = LieSE3();
+so3 = LieSO3();
+time(1) = 0;
+recon_T{1} = eye(4);
+for i =1:1:length(gt_pos) - 1
+
+    % recompose T using w,u
+    recon_pos(i,:) = recon_T{i}(1:3,4);
+    dT = se3.getExp(pr_dw(i,:)', pr_du(i,:)');
+    recon_T{i+1,:} = recon_T{i}*dT;
+
+end
 
 pr_pos = cumtrapz(pr_dtr_gnd);
 

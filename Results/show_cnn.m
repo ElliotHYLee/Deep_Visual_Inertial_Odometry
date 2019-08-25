@@ -1,6 +1,6 @@
 clc, clear, close all
-dsName = 'airsim';
-subType = 'edge';
+dsName = 'kitti';
+subType = 'none';
 seq=2;
 
 loadData
@@ -140,9 +140,9 @@ grid minor
 legend('Location', 'best')
 
 figure
-plot(gt_pos(:,2), gt_pos(:,1), 'r', 'DisplayName', 'Ground Truth')
+plot(gt_pos(:,1), gt_pos(:,3), 'r', 'DisplayName', 'Ground Truth')
 hold on
-plot(pr_pos(:,2), pr_pos(:,1), 'b', 'DisplayName', 'Predicted');
+plot(pr_pos(:,1), pr_pos(:,3), 'b', 'DisplayName', 'Predicted');
 ylabel(['\fontsize{14} Position_x, m'])
 xlabel(['\fontsize{14} Position_y, m'])
 legend('Location', 'best')

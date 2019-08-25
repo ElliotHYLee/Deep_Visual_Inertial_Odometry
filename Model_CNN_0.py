@@ -28,16 +28,16 @@ class Model_CNN_0(nn.Module):
                                            nn.Linear(100, 100, nn.Tanh()))
 
         # fc_du
-        self.fc_du = CNNFC(NN_size + 100, 3)
-        self.fc_du_cov = FCCov(NN_size + 100)
+        self.fc_du = CNNFC(NN_size, 3)
+        self.fc_du_cov = FCCov(NN_size)
 
         # fc_dw
-        self.fc_dw = CNNFC(NN_size+100, 3)
-        self.fc_dw_cov = FCCov(NN_size+100)
+        self.fc_dw = CNNFC(NN_size, 3)
+        self.fc_dw_cov = FCCov(NN_size)
 
         # fc_dtr
         self.fc_dtr = GetTrans()
-        self.fc_dtr_cov = FCCov(NN_size + 100)
+        self.fc_dtr_cov = FCCov(NN_size)
 
         # fc_dtr_gnd
         self.fc_dtr_gnd = Batch33MatVec3Mul()
@@ -66,16 +66,16 @@ class Model_CNN_0(nn.Module):
         x_gyro = torch.cat((x, dw_gt_pre), dim=1)
 
         # Get dw
-        pr_dw = self.fc_dw(x_gyro)
-        pr_dw_cov = self.fc_dw_cov(x_gyro)
+        pr_dw = self.fc_dw(x)
+        pr_dw_cov = self.fc_dw_cov(x)
 
         # Get du
-        pr_du = self.fc_du(x_gyro)
-        pr_du_cov = self.fc_du_cov(x_gyro)
+        pr_du = self.fc_du(x)
+        pr_du_cov = self.fc_du_cov(x)
 
         # Calculate dtr
-        pr_dtr = self.fc_dtr(pr_du, dw_gyro)
-        pr_dtr_cov = self.fc_dtr_cov(x_gyro)
+        pr_dtr = self.fc_dtr(pr_du, pr_dw)
+        pr_dtr_cov = self.fc_dtr_cov(x)
 
         # Rotate dtr to dtr_gnd
         pr_dtr_gnd = self.fc_dtr_gnd(rotM, pr_dtr)
