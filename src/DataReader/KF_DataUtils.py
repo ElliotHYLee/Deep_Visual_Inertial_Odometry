@@ -1,7 +1,6 @@
-import numpy as np
 import pandas as pd
 from sys import platform
-from git_branch_param import *
+from src.git_branch_param import *
 # this is a mess. Hope I could fix it sometime.
 def getPath(dsName='Airsim', seq=0, subType='mr'):
     if platform == "linux" or platform == "linux2":

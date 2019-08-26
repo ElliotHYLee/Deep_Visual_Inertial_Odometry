@@ -1,11 +1,9 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
-import torch.nn.functional as F
 import torch
-import torch.optim as optim
-from MyPyTorchAPI.CustomActivation import Sigmoid, TanH
+from src.MyPyTorchAPI.CustomActivation import Sigmoid, TanH
+
+
+
 class GuessNet(nn.Module):
     def __init__(self):
         super(GuessNet, self).__init__()

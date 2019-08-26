@@ -1,8 +1,6 @@
 from torch.utils.data import Dataset, DataLoader
-from PrepData import DataManager
+from src.DataReader.KF_PrepData import DataManager
 import numpy as np
-import cv2
-import time
 from sklearn.utils import shuffle
 
 class VODataSetManager_RNN_KF():
@@ -50,22 +48,23 @@ class VODataSet_RNN(Dataset):
                    # self.dm.gt_dtr_gnd[index:index + self.delay], \
                    # self.dm.gt_dtr_gnd[index]
         except:
-            print('this is an error @ VODataSet_CNN of VODataSet.py')
+            print('this is an error @ VODataSet_CNN of KF_VODataSet.py')
             print(i, index)
 
     def __len__(self):
         return self.N
 
 if __name__ == '__main__':
-    dm = VODataSetManager_RNN_KF(dsName='euroc', subType='none', seq=[1, 2, 3, 5], isTrain=True)
-    trainSet, valSet = dm.trainSet, dm.valSet
-    dataSet = dm.valSet
-    trainLoader = DataLoader(dataset = dataSet, batch_size=64)
-    for batch_idx, (acc, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(trainLoader):
-        print(acc.shape)
-        print(pr_dtr_gnd.shape)
-        print(dtr_cv_gnd.shape)
-        print(gt_dtr_gnd.shape)
-        print(gt_dtr_gnd_init.shape)
+    pass
+    # dm = VODataSetManager_RNN_KF(dsName='euroc', subType='none', seq=[1, 2, 3, 5], isTrain=True)
+    # trainSet, valSet = dm.trainSet, dm.valSet
+    # dataSet = dm.valSet
+    # trainLoader = DataLoader(dataset = dataSet, batch_size=64)
+    # for batch_idx, (acc, acc_stand, dt, pr_dtr_gnd, dtr_cv_gnd, gt_dtr_gnd, gt_dtr_gnd_init) in enumerate(trainLoader):
+    #     print(acc.shape)
+    #     print(pr_dtr_gnd.shape)
+    #     print(dtr_cv_gnd.shape)
+    #     print(gt_dtr_gnd.shape)
+    #     print(gt_dtr_gnd_init.shape)
 
 

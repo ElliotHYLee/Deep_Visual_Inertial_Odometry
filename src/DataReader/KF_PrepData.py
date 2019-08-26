@@ -1,7 +1,7 @@
-from ReadData import *
+from src.DataReader.KF_ReadData import *
 import time
 
-from git_branch_param import branchName
+from src.git_branch_param import branchName
 ##############################################################################################
 ## Rule of thumb: don't call any other function to reduce lines of code with the img data in np.
 ## Otherwise, it could cause memeory dupilication.
