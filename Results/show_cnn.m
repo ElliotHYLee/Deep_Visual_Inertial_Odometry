@@ -1,7 +1,7 @@
 clc, clear, close all
 dsName = 'kitti';
 subType = 'none';
-seq=2;
+seq=5;
 
 loadData
 
