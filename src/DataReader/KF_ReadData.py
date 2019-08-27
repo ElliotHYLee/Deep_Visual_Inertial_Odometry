@@ -1,7 +1,7 @@
 from src.DataReader.KF_DataUtils import *
 import matplotlib.pyplot as plt
 import numpy as np
-
+from src.Params import getNoiseLevel
 class ReadData():
     def __init__(self, dsName='airsim', subType='mr', seq=0):
         self.dsName = dsName
@@ -25,9 +25,10 @@ class ReadData():
         self.gt_accdt_gnd = np.multiply(self.gt_acc_gnd, self.gt_dt)
         self.numData = self.gt_du.shape[0]
         # cnn outputs
+        noise = getNoiseLevel()
         self.pr_path = getPrPath(dsName, seq, subType)
-        self.pr_dtr_gnd = pd.read_csv(self.pr_path + '_dtr_gnd.txt', sep=' ', header=None).values.astype(np.float32)
-        self.pr_dtr_chol = pd.read_csv(self.pr_path + '_dtr_cov.txt', sep=' ', header=None).values.astype(np.float32)
+        self.pr_dtr_gnd = pd.read_csv(self.pr_path + '_dtr_gnd' + str(noise) + '.txt', sep=' ', header=None).values.astype(np.float32)
+        self.pr_dtr_chol = pd.read_csv(self.pr_path + '_dtr_cov' + str(noise) + '.txt', sep=' ', header=None).values.astype(np.float32)
 
         # make cov_matrix
         index = 0

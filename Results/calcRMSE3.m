@@ -1,7 +1,7 @@
 clc, clear, close all
 dsName = 'kitti';
 subType = 'none';
-
+noise=16;
 for seq = [0 1 2 5 6 7 8 9 10]
     loadData;
     duRMSE(seq+1, 1) = getRMSE(gt_du - pr_du);

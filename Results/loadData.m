@@ -7,6 +7,7 @@
 %% Get Ground Truth Info.
 gtPath = getGTPath(dsName,subType, seq);
 gt_dtName = strcat(gtPath, 'dt.txt');
+
 gt_duName = strcat(gtPath, '\du.txt');
 gt_dwName = strcat(gtPath, '\dw.txt');
 gt_dwGyroName = strcat(gtPath, '\dw_gyro.txt');
@@ -32,14 +33,15 @@ gt_pos = gt_pos - gt_pos(1,:);
 
 %% Get Prediction Info.
 prPath = ['Data\',getPRPath(dsName, subType, seq)];
-pr_duName = strcat(prPath, '_du.txt');
-pr_dwName = strcat(prPath, '_dw.txt');
-pr_dtr_gndName = strcat(prPath, '_dtr_gnd.txt');
-pr_dtrName = strcat(prPath, '_dtr.txt');
+pr_duName = strcat(prPath, '_du', int2str(noise), '.txt');
+pr_dwName = strcat(prPath, '_dw', int2str(noise), '.txt');
+pr_dtr_gndName = strcat(prPath, '_dtr_gnd', int2str(noise), '.txt');
+pr_dtrName = strcat(prPath, '_dtr', int2str(noise), '.txt');
 pr_duCovName = strcat(prPath, '_du_cov.txt');
 pr_dwCovName = strcat(prPath, '_dw_cov.txt');
 pr_dtrCovName = strcat(prPath, '_dtr_cov.txt');
 
+pr_duName
 pr_du = importdata(pr_duName);
 pr_dw = importdata(pr_dwName);
 pr_dtr = importdata(pr_dtrName);

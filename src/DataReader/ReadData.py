@@ -1,5 +1,6 @@
 from src.DataReader.DataUtils import *
 import threading, cv2, sys, time
+from src.Params import getNoiseLevel
 
 class ReadData():
     def __init__(self, dsName='airsim', subType='mr', seq=0):
@@ -20,7 +21,10 @@ class ReadData():
         self.dw_gyro = pd.read_csv(self.path + 'dw_gyro.txt', sep=',', header=None).values.astype(np.float32)
         self.dtr = pd.read_csv(self.path + 'dtrans.txt', sep=',', header=None).values.astype(np.float32)
         self.dtr_gnd = pd.read_csv(self.path + 'dtrans_gnd.txt', sep=',', header=None).values.astype(np.float32)
-        self.linR = pd.read_csv(self.path + 'linR30.txt', sep=',', header=None).values.astype(np.float32)
+        noise = getNoiseLevel()
+        fRName = 'linR' + str(noise) + '.txt'
+
+        self.linR = pd.read_csv(self.path + fRName, sep=',', header=None).values.astype(np.float32)
         self.rotM_bdy2gnd = np.zeros((self.linR.shape[0], 3, 3), dtype=np.float32)
         for i in range(0, self.linR.shape[0]):
             self.rotM_bdy2gnd[i, :, :] = np.reshape(self.linR[i, :], (3, 3))

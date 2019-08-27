@@ -6,6 +6,8 @@ from src.Models.KF_BLock import *
 from src.Models.KF_Model import *
 import torch.optim as optim
 import matplotlib.pyplot as plt
+from src.Params import getNoiseLevel
+
 
 #dsName, subType, seq = 'airsim', 'mr', [0]
 #dsName, subType, seq = 'airsim', 'edge', [0]
@@ -160,16 +162,16 @@ def main():
         kfRes = filt.data.numpy()
         _, _ = plotter(kfRes, gtSignal)
     else:
+        noise = getNoiseLevel()
         for ii in range(0, 11):
             gtSignal, dt, pSignal, mSignal, mCov = prepData(seqLocal=[ii])
             kfNumpy.setR(params, paramsSign)
             kfRes = kfNumpy.runKF(dt, pSignal, mSignal, mCov)
             posFilt, posGT = plotter(kfRes, gtSignal)
-            noise = 30
             np.savetxt('Results/Data/posFilt' + str(ii) + '_' + str(noise) + '.txt', posFilt)
             np.savetxt('Results/Data/posGT' + str(ii) + '_' + str(noise) +  '.txt', posGT)
 
-    #plt.show()
+    plt.show()
 
 
 if __name__ == '__main__':

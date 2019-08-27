@@ -4,9 +4,10 @@ from src.Models.ModelContainer_CNN import ModelContainer_CNN
 import numpy as np
 import time
 from src.git_branch_param import *
+from src.Params import getNoiseLevel
 
 def train(dsName, subType, seq):
-    wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
+    wName = '../Weights/' + branchName() + '_' + dsName + '_' + subType
     dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=seq, isTrain=True, split=0.2)
     train, val = dm.trainSet, dm.valSet
     mc = ModelContainer_CNN(Model_CNN_0(dsName))
@@ -14,10 +15,10 @@ def train(dsName, subType, seq):
     mc.fit(train, val, batch_size=64, epochs=20, wName=wName, checkPointFreq=1)
 
 def test(dsName, subType, seqRange):
-    wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
-    resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
+    wName = '../Weights/' + branchName() + '_' + dsName + '_' + subType
+    resName = '../Results/Data/' + branchName() + '_' + dsName + '_'
     for seq in range(seqRange[0], seqRange[1]):
-        commName = resName + subType + str(seq) #if dsName == 'airsim' else resName + str(seq)
+        commName = resName + subType + str(seq)  #if dsName == 'airsim' else resName + str(seq)
         dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
         dataset = dm.testSet
 
@@ -30,13 +31,15 @@ def test(dsName, subType, seqRange):
         pr_dtr_gnd, \
         mae = mc.predict(dataset)
 
-        np.savetxt(commName + '_du.txt', pr_du)
-        np.savetxt(commName + '_du_cov.txt', du_cov)
-        np.savetxt(commName + '_dw.txt', pr_dw)
-        np.savetxt(commName + '_dw_cov.txt', dw_cov)
-        np.savetxt(commName + '_dtr.txt', pr_dtr)
-        np.savetxt(commName + '_dtr_cov.txt', dtr_cov)
-        np.savetxt(commName + '_dtr_gnd.txt', pr_dtr_gnd)
+        noise = getNoiseLevel()
+
+        np.savetxt(commName + '_du' + str(noise) + '.txt', pr_du)
+        np.savetxt(commName + '_du_cov' + str(noise) + '.txt', du_cov)
+        np.savetxt(commName + '_dw' + str(noise) + '.txt', pr_dw)
+        np.savetxt(commName + '_dw_cov' + str(noise) + '.txt', dw_cov)
+        np.savetxt(commName + '_dtr' + str(noise) + '.txt', pr_dtr)
+        np.savetxt(commName + '_dtr_cov' + str(noise) + '.txt', dtr_cov)
+        np.savetxt(commName + '_dtr_gnd' + str(noise) + '.txt', pr_dtr_gnd)
 
 def runTrainTest(dsName, subType, seq, seqRange):
     runTrain(dsName, subType, seq, seqRange)
