@@ -9,7 +9,7 @@ class ReadData():
         self.gt_path = getPath(dsName, seq=seq, subType=subType)
 
         # ground truth data
-        self.gt_dt = pd.read_csv(self.gt_path + 'dt.txt', sep=',', header=None).values.astype(np.float32)
+        self.gt_dt = pd.read_csv(self.gt_path + 'dt.txt', sep=',', head  er=None).values.astype(np.float32)
         self.gt_du = pd.read_csv(self.gt_path + 'du.txt', sep=',', header=None).values.astype(np.float32)
         self.gt_dw = pd.read_csv(self.gt_path + 'dw.txt', sep=',', header=None).values.astype(np.float32)
         self.gt_dtr = pd.read_csv(self.gt_path + 'dtrans.txt', sep=',', header=None).values.astype(np.float32)
