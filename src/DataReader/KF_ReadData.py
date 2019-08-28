@@ -14,7 +14,11 @@ class ReadData():
         self.gt_dw = pd.read_csv(self.gt_path + 'dw.txt', sep=',', header=None).values.astype(np.float32)
         self.gt_dtr = pd.read_csv(self.gt_path + 'dtrans.txt', sep=',', header=None).values.astype(np.float32)
         self.gt_dtr_gnd = pd.read_csv(self.gt_path + 'dtrans_gnd.txt', sep=',', header=None).values.astype(np.float32)
-        self.gt_linR = pd.read_csv(self.gt_path + 'linR.txt', sep=',', header=None).values.astype(np.float32)
+
+        noise = getNoiseLevel()
+        fRName = 'linR' + str(noise) + '.txt'
+
+        self.gt_linR = pd.read_csv(self.gt_path + fRName, sep=',', header=None).values.astype(np.float32)
         self.gt_rotM_b2g = np.zeros((self.gt_linR.shape[0], 3, 3), dtype=np.float32)
         for i in range(0, self.gt_linR.shape[0]):
             self.gt_rotM_b2g[i, :, :] = np.reshape(self.gt_linR[i, :], (3, 3))
