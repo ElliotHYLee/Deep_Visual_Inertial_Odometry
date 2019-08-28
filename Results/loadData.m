@@ -13,8 +13,8 @@ gt_dwName = strcat(gtPath, '\dw.txt');
 gt_dwGyroName = strcat(gtPath, '\dw_gyro.txt');
 gt_dtrName = strcat(gtPath, '\dtrans.txt');
 gt_dtr_gndName = strcat(gtPath, '\dtrans_gnd.txt');
-gt_pos_gndName = strcat(gtPath, '\pos.txt');
-linRName = strcat(gtPath, '\linR.txt');
+gt_pos_gndName = strcat(gtPath, '\pos.txt')
+linRName = strcat(gtPath, '\linR', int2str(noise), '.txt');
 acc_gndName = strcat(gtPath, '\acc_gnd.txt');
 acc_gnd = importdata(acc_gndName);
 
@@ -37,11 +37,11 @@ pr_duName = strcat(prPath, '_du', int2str(noise), '.txt');
 pr_dwName = strcat(prPath, '_dw', int2str(noise), '.txt');
 pr_dtr_gndName = strcat(prPath, '_dtr_gnd', int2str(noise), '.txt');
 pr_dtrName = strcat(prPath, '_dtr', int2str(noise), '.txt');
-pr_duCovName = strcat(prPath, '_du_cov.txt');
-pr_dwCovName = strcat(prPath, '_dw_cov.txt');
-pr_dtrCovName = strcat(prPath, '_dtr_cov.txt');
+pr_duCovName = strcat(prPath, '_du_cov', int2str(noise), '.txt');
+pr_dwCovName = strcat(prPath, '_dw_cov', int2str(noise), '.txt');
+pr_dtrCovName = strcat(prPath, '_dtr_cov', int2str(noise), '.txt');
 
-pr_duName
+pr_duName;
 pr_du = importdata(pr_duName);
 pr_dw = importdata(pr_dwName);
 pr_dtr = importdata(pr_dtrName);

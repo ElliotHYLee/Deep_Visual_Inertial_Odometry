@@ -10,11 +10,8 @@ from src.Params import getNoiseLevel
 
 
 #dsName, subType, seq = 'airsim', 'mr', [0]
-#dsName, subType, seq = 'airsim', 'edge', [0]
 dsName, subType, seq = 'kitti', 'none', [0, 2, 4, 6]
 #dsName, subType, seq = 'kitti', 'none', [5]
-#dsName, subType, seq = 'euroc', 'none', [1, 2, 3, 5]
-#dsName, subType, seq = 'mycar', 'none', [0, 2]
 
 isTrain = False
 wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
@@ -163,7 +160,7 @@ def main():
         _, _ = plotter(kfRes, gtSignal)
     else:
         noise = getNoiseLevel()
-        for ii in range(0, 11):
+        for ii in range(5, 6):
             gtSignal, dt, pSignal, mSignal, mCov = prepData(seqLocal=[ii])
             kfNumpy.setR(params, paramsSign)
             kfRes = kfNumpy.runKF(dt, pSignal, mSignal, mCov)

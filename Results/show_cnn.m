@@ -2,7 +2,7 @@ clc, clear, close all
 dsName = 'kitti';
 subType = 'none';
 seq=5;
-noise = 2;
+noise = 0;
 loadData
 
 %% plot

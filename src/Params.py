@@ -1,5 +1,5 @@
 
 
 def getNoiseLevel():
-    noise = '2'
+    noise = '0'
     return noise
