@@ -1,6 +1,7 @@
 # Deep Visual Inertial Odometry
 
 Deep learning based visual-inertial odometry project.
+<br>
 pros:
 - Lighter CNN structure. No RNNs -> much lighter.
 - Training images together with inertial data using exponential mapping.
