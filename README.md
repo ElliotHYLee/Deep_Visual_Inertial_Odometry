@@ -19,8 +19,14 @@ Hongyun Lee, Matthew McCrink, and James W. Gregory. "Visual-Inertial Odometry fo
 ## References(current & future)
 Please see paper.
 
+## Usage:
+1. Put the .m (Matlab) files under KITTI/odom/dataset/
+2. run make_trainable_data.m
+3. In src/Parampy, change the path for KITTI.
+4. At Deep_Visual_Inertial_Odometry, "python main.py"
+
+
 ## ToDo
-- LSTM integration
 - upload weight.pt 
 - explain data set & location
 
