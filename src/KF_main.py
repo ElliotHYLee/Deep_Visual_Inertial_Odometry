@@ -10,11 +10,11 @@ from src.Params import getNoiseLevel
 
 
 #dsName, subType, seq = 'airsim', 'mr', [0]
-dsName, subType, seq = 'kitti', 'none', [0, 2, 4, 6]
+dsName, subType, seq = 'kitti', 'none', [0, 2, 7, 10]
 #dsName, subType, seq = 'kitti', 'none', [5]
 
-isTrain = False
-wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
+isTrain = True
+wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType + '_KF'
 
 def preClamp(data):
     if dsName=='kitti':
@@ -110,7 +110,7 @@ def main():
     fig.show()
     fig.canvas.draw()
 
-    iterN = 160 if isTrain else 1
+    iterN = 50 if isTrain else 1
     for epoch in range(0, iterN):
         guess, sign = gnet()
         filt = kf(guess, sign)

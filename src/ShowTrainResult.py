@@ -1,16 +1,29 @@
 import matplotlib.pyplot as plt
 from src.Models.Model_CNN_0 import Model_CNN_0
-
+import torch
 from src.Models.ModelContainer_CNN import ModelContainer_CNN
 from src.git_branch_param import *
+from src.Models.KF_BLock import *
+from src.Models.KF_Model import *
+
 
 def show(dsName, subType):
-    wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
-    resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
-    mc = ModelContainer_CNN(Model_CNN_0(dsName))
-    #mc.load_weights(wName+'_best', train=False)
-    mc.load_weights(wName , train=False)
-    train_loss, val_loss = mc.getLossHistory()
+    wName = '../Weights/' + branchName() + '_' + dsName + '_' + subType
+
+    cnn = 1
+    if cnn == 1:
+        mc = ModelContainer_CNN(Model_CNN_0(dsName))
+        mc.load_weights(wName + '_best', train=False)
+        train_loss, val_loss = mc.getLossHistory()
+    else:
+        mc = GuessNet()
+        checkPoint = torch.load(wName + '.pt')
+        mc.load_state_dict(checkPoint['model_state_dict'])
+        mc.load_state_dict(checkPoint['optimizer_state_dict'])
+        train_loss = checkPoint['train_loss']
+        val_loss = checkPoint['val_loss']
+
+
 
 
 
@@ -26,14 +39,14 @@ def show(dsName, subType):
     plt.minorticks_on()
     plt.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
     plt.ylim(bottom=0, top=10)
-    plt.ylabel('Mahalanobis Distance, m', fontsize=14)
-    plt.xlabel('Epochs', fontsize=14)
+    plt.ylabel('Mahalanobis Distance, m', fontsize=20)
+    plt.xlabel('Epochs', fontsize=20)
     plt.savefig('trainResult.png')
     plt.show()
 
 if __name__ == '__main__':
-    dsName = 'airsim'
-    subType='mr'
+    dsName = 'kitti'
+    subType='none'
     show(dsName, subType)
 
 
