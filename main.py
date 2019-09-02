@@ -42,10 +42,10 @@ def test(dsName, subType, seqRange):
         np.savetxt(commName + '_dtr_gnd' + str(noise) + '.txt', pr_dtr_gnd)
 
 def runTrainTest(dsName, subType, seq, seqRange):
-    runTrain(dsName, subType, seq, seqRange)
+    runTrain(dsName, subType, seq)
     runTest(dsName, subType, seqRange)
 
-def runTrain(dsName, subType, seq, seqRange=None):
+def runTrain(dsName, subType, seq):
     s = time.time()
     train(dsName, subType, seq)
     print(time.time() - s)
@@ -57,13 +57,5 @@ if __name__ == '__main__':
     dsName = 'airsim'
     seq = [0]
     seqRange = [0, 3]
-    #test
-    #runTrainTest(dsName, 'mr', seq, seqRange)
-    #runTrainTest(dsName, 'mrseg', seq, seqRange)
 
     runTrainTest('kitti', 'none', seq=[0, 2, 4, 6], seqRange=[0, 11])
-    #runTest('kitti', 'none', seqRange=[0, 1])
-    #runTrainTest('kitti', 'edge', seq=[0, 2, 4, 6], seqRange=[0, 11])
-    #runTrainTest('mycar', 'none', seq=[0, 2], seqRange=[0,3])
-
-

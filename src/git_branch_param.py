@@ -1,5 +1,5 @@
 def branchName():
-    return 'master_candidate'
+    return 'master'
 
 def refBranchName():
-    return 'master_candidate'
+    return 'master'

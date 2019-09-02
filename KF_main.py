@@ -1,4 +1,3 @@
-
 from src.DataReader.KF_PrepData import DataManager
 from scipy import signal
 from src.git_branch_param import *
