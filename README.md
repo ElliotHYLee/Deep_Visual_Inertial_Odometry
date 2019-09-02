@@ -1,18 +1,22 @@
-Massive clean-up is scheduled Jul-Aug.
-
 # Deep Visual Inertial Odometry
 
+Deep learning based visual-inertial odometry project.
+pros:
+- Lighter CNN structure. No RNNs -> much lighter.
+- Training images together with inertial data using exponential mapping.
+- No RNN but Kalman filter: robust rotational prediction.
+- Accleration and image fusion for frame-to-frame displacement.
 
-Using convolutional neural network, the velocity of the camera is estimated. 
-After predicting the velocity, 3D transformation matrices are concanated to estimate the position. Yet, the rotation information is coming from gyro scope. The correction is also done with accelerometer
+cons:
+- no position correction: drift in position: But SLAM can correct the position drfit.
+
 
 ## Please Cite:
 Hongyun Lee, Matthew McCrink, and James W. Gregory. "Visual-Inertial Odometry for Unmanned Aerial Vehicle using Deep Leering", 2019 Intelligent/Autonomous Guidance and Navigation, AIAA SciTech Conference, https://doi.org/10.2514/6.2019-1410
 
 
 ## References(current & future)
-- DeepVO: Towards End-to-End Visual Odometry with Deep Recurrent Convolutional Neural Networks(https://senwang.gitlab.io/DeepVO/files/wang2017DeepVO.pdf)
-
+Please see paper.
 
 ## ToDo
 - LSTM integration
@@ -48,7 +52,7 @@ MB: ROG STRIX x299-E Gaming
 - Software
 <pre>
 Windows10
-Python3 with native pip
+Python3
 PyTorch: v1
 CUDA: v9.0
 Cudnn: v7.1
