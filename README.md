@@ -5,8 +5,8 @@ Deep learning based visual-inertial odometry project.
 pros:
 - Lighter CNN structure. No RNNs -> much lighter.
 - Training images together with inertial data using exponential mapping.
-- No RNN but Kalman filter: robust rotational prediction.
-- Accleration and image fusion for frame-to-frame displacement.
+- Rotation is coming from external attitude estimation.
+- No RNN but Kalman filter: Accleration and image fusion for frame-to-frame displacement.
 
 cons:
 - no position correction: drift in position: But SLAM can correct the position drfit.
