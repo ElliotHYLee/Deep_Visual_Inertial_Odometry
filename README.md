@@ -28,7 +28,7 @@ Please see paper.
 
 ## ToDo
 - upload weight.pt
-- immigrate Matlab data get to python 
+- change Matlab data get to python 
 
 
 ## Prereq.s
