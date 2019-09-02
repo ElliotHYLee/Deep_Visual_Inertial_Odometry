@@ -1,19 +1,11 @@
 clc, clear, close all
-dsName = 'mycar';
+dsName = 'kitti';
 subType = 'none';
+noise = 16;
 
-for seq = 0:1:2
+for seq = 5:1:5
 
     loadData;
-    duRMSE(seq+1, 1) = getRMSE(gt_du - pr_du);
-    dwRMSE(seq+1, 1) = getRMSE(gt_dw - pr_dw);
-    dtrRMSE(seq+1, 1) = getRMSE(pr_dtr - gt_dtr);
-
-    %% Velocity RMSE;
-    duRMSE;
-    dwRMSE;
-    dtrRMSE;
-
     %% Position RMSE
     posRMSE(seq+1, 1) = getRMSE(gt_pos - pr_pos);
 
@@ -35,9 +27,9 @@ for seq = 0:1:2
 
 end
 
-allRMSE = [duRMSE, dwRMSE, dtrRMSE, posRMSE, seqRMSE]
-
-
+% allRMSE = [duRMSE, dwRMSE, dtrRMSE, posRMSE, seqRMSE]
+% 
+% 
 function[result] = getRMSE3(err)
     N = length(err);
     se = err.^2;

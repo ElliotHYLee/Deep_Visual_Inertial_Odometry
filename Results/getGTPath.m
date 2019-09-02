@@ -27,9 +27,9 @@ function[path] = getGTPath(dsName, subType, seq)
     elseif strcmp(dsName, 'kitti')
         subType='';
         if seq < 10
-            path = strcat('D:\DLData\KITTI\odom\dataset\sequences\0', subType, int2str(seq), '/'); 
+            path = strcat('F:\DLData\KITTI\odom\dataset\sequences\0', subType, int2str(seq), '/'); 
         else
-            path = strcat('D:\DLData\KITTI\odom\dataset\sequences\', subType, int2str(seq), '/'); 
+            path = strcat('F:\DLData\KITTI\odom\dataset\sequences\', subType, int2str(seq), '/'); 
         end
     end
     

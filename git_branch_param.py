@@ -1,2 +1,0 @@
-def branchName():
-    return 'master'
