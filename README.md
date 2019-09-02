@@ -28,9 +28,11 @@ Please see paper.
 
 ## ToDo
 - upload weight.pt 
-- explain data set & location
+
 
 ## Prereq.s
+1. Matlab
+2. Python 3.5
 <pre>
 pip install numpy
 pip install scipy
