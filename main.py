@@ -3,8 +3,7 @@ from src.Models.Model_CNN_0 import Model_CNN_0
 from src.Models.ModelContainer_CNN import ModelContainer_CNN
 import numpy as np
 import time
-from src.git_branch_param import *
-from src.Params import getNoiseLevel
+from src.Params import *
 
 def train(dsName, subType, seq):
     wName = '../Weights/' + branchName() + '_' + dsName + '_' + subType

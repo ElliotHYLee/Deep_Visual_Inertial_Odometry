@@ -1,7 +1,7 @@
 from src.DataReader.ReadData import *
 import time
 
-from src.git_branch_param import branchName
+from src.Params import branchName
 ##############################################################################################
 ## Rule of thumb: don't call any other function to reduce lines of code with the img data in np.
 ## Otherwise, it could cause memeory dupilication.
@@ -14,6 +14,7 @@ class Singleton:
         return cls.__instance
 
 class DataManager(Singleton):
+
     def initHelper(self, dsName='airsim', subType='mr', seq=[1, 3, 5]):
         self.dsName = dsName
         self.numChannel = 3 if self.dsName is not 'euroc' else 1

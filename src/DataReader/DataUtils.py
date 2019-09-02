@@ -1,4 +1,4 @@
-
+from src.Params import *
 import pandas as pd
 from sys import platform
 
@@ -12,7 +12,7 @@ def getPathAWS(dsName = 'AirSim', seq = 0, subType='mr'):
     path = None
     dsName = dsName.lower()
     if dsName == 'kitti':
-        path = '~/Data/KITTI/odom/dataset/sequences/'
+        path = getKITTIPath_AWS()
         path += '0'+str(seq) if seq<10 else str(seq)
         path += '/'
     return path
@@ -21,7 +21,7 @@ def getPathWin(dsName = 'kitti', seq = 0, subType='mr'):
     path = None
     dsName = dsName.lower()
     if dsName == 'kitti':
-        path = 'F:/DLData/KITTI/odom/dataset/sequences/'
+        path = getKITTIPath()
         path += '0'+str(seq) if seq<10 else str(seq)
         path += '/'
     return path
@@ -37,7 +37,6 @@ def getImgNames(path, dsName='kitti', ts=None, subType=''):
         elif subType == 'edge':
             for i in range(0, len(imgNames)):
                 imgNames[i] = path + 'edge/' + imgNames[i]
-
     return imgNames
 
 def getEnd(start, N, totalN):

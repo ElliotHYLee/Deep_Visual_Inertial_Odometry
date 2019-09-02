@@ -1,6 +1,6 @@
 from src.DataReader.KF_PrepData import DataManager
 from scipy import signal
-from src.git_branch_param import *
+from src.Params import *
 from src.Models.KF_BLock import *
 from src.Models.KF_Model import *
 import torch.optim as optim
