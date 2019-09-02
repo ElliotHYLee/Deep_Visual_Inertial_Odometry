@@ -1,9 +1,9 @@
-from src.MyPyTorchAPI.CNNUtils import *
+from MyPyTorchAPI.CNNUtils import *
 import numpy as np
-from src.MyPyTorchAPI.CustomActivation import *
+from MyPyTorchAPI.CustomActivation import *
 from src.Models.SE3Layer import GetTrans
 from src.Models.CNNFC import CNNFC
-from src.MyPyTorchAPI.MatOp import Batch33MatVec3Mul, GetCovMatFromChol
+from MyPyTorchAPI.MatOp import Batch33MatVec3Mul, GetCovMatFromChol
 from src.Models.FCCov import FCCov
 
 class Model_CNN_0(nn.Module):

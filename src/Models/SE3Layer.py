@@ -1,4 +1,4 @@
-from src.MyPyTorchAPI.MatOp import *
+from MyPyTorchAPI.MatOp import *
 
 class GetV(torch.nn.Module):
     def __init__(self, serLen = 0):

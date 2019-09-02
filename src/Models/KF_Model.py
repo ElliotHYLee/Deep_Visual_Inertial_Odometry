@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch
-from src.MyPyTorchAPI.CustomActivation import Sigmoid, TanH
+from MyPyTorchAPI.CustomActivation import Sigmoid, TanH
 
 
 

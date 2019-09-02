@@ -3,7 +3,7 @@ from src.DataReader.VODataSet import DataLoader
 import torch
 import torch.nn as nn
 import numpy as np
-from src.MyPyTorchAPI.CustomLoss import MahalanobisLoss
+from MyPyTorchAPI.CustomLoss import MahalanobisLoss
 #from tkinter import *
 import sys
 

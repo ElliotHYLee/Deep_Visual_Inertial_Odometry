@@ -1,5 +1,5 @@
 import torch.nn as nn
-from src.MyPyTorchAPI.CustomActivation import *
+from MyPyTorchAPI.CustomActivation import *
 
 class FCCov(torch.nn.Module):
     def __init__(self, fc_input_size):
