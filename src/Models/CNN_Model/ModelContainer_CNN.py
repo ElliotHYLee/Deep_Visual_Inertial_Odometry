@@ -4,7 +4,6 @@ import torch
 import torch.nn as nn
 import numpy as np
 from MyPyTorchAPI.CustomLoss import MahalanobisLoss
-#from tkinter import *
 import sys
 
 class ModelContainer_CNN():
