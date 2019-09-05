@@ -11,5 +11,5 @@ def refBranchName():
     return 'master'
 
 def getNoiseLevel():
-    noise = 16
+    noise = 0
     return noise

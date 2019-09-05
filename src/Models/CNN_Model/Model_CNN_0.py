@@ -1,10 +1,10 @@
 from MyPyTorchAPI.CNNUtils import *
 import numpy as np
 from MyPyTorchAPI.CustomActivation import *
-from src.Models.SE3Layer import GetTrans
-from src.Models.CNNFC import CNNFC
+from src.Models.CNN_Model.SE3Layer import GetTrans
+from src.Models.CNN_Model.CNNFC import CNNFC
 from MyPyTorchAPI.MatOp import Batch33MatVec3Mul, GetCovMatFromChol
-from src.Models.FCCov import FCCov
+from src.Models.CNN_Model.FCCov import FCCov
 
 class Model_CNN_0(nn.Module):
     def __init__(self, dsName='airsim'):

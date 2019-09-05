@@ -7,15 +7,10 @@ class ReadData():
     def __init__(self, dsName='airsim', subType='mr', seq=0):
         self.dsName = dsName
         self.subType = subType
+
         self.path = getPath(dsName, seq=seq, subType=subType)
 
-        # non images
-        if dsName == 'airsim' or dsName == 'myroom' or dsName=='mycar':
-            #print(self.path)
-            self.data = pd.read_csv(self.path + 'data.txt', sep=' ', header=None)
-            self.time_stamp = self.data.iloc[:, 0].values
-        else:
-            self.time_stamp = None
+        # ground truth data
         self.dt = pd.read_csv(self.path + 'dt.txt', sep=',', header=None).values.astype(np.float32)
         self.du = pd.read_csv(self.path + 'du.txt', sep=',', header=None).values.astype(np.float32)
         self.dw = pd.read_csv(self.path + 'dw.txt', sep=',', header=None).values.astype(np.float32)
@@ -34,9 +29,18 @@ class ReadData():
         self.pos_gnd = pd.read_csv(self.path + 'pos.txt', sep=',', header=None).values.astype(np.float32)
         self.acc_gnd = pd.read_csv(self.path + 'acc_gnd.txt', sep=',', header=None).values.astype(np.float32)
 
-        print(self.dtr_gnd.shape)
-        print(self.acc_gnd.shape)
-        print(self.du.shape)
+
+class ReadData_CNN(ReadData):
+    def __init__(self, dsName='airsim', subType='mr', seq=0):
+        super().__init__(dsName, subType, seq)
+
+
+        if dsName == 'airsim' or dsName == 'myroom' or dsName == 'mycar':
+            # print(self.path)
+            self.data = pd.read_csv(self.path + 'data.txt', sep=' ', header=None)
+            self.time_stamp = self.data.iloc[:, 0].values
+        else:
+            self.time_stamp = None
 
         # images
         self.imgNames = getImgNames(self.path, dsName, ts = self.time_stamp, subType=subType)
@@ -104,7 +108,7 @@ class ReadData():
 
 if __name__ == '__main__':
     s = time.time()
-    d = ReadData(dsName='airsim', subType='mr', seq=0)
+    d = ReadData_CNN(dsName='airsim', subType='mr', seq=0)
     print(time.time() - s)
 
     for i in range(0, d.numImgs):

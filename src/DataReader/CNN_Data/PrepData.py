@@ -1,4 +1,4 @@
-from src.DataReader.ReadData import *
+from src.DataReader.CNN_Data.ReadData_CNN import *
 import time
 
 from src.Params import branchName
@@ -20,7 +20,7 @@ class DataManager(Singleton):
         self.numChannel = 3 if self.dsName is not 'euroc' else 1
         self.subType = subType
         self.numDataset = len(seq)
-        dataObj = [ReadData(dsName, subType, seq[i]) for i in range(0, self.numDataset)]
+        dataObj = [ReadData_CNN(dsName, subType, seq[i]) for i in range(0, self.numDataset)]
 
         # get number of data points
         self.numDataList = [dataObj[i].numData for i in range(0, self.numDataset)]

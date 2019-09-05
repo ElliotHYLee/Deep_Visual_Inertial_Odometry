@@ -17,6 +17,11 @@ def getPathAWS(dsName = 'AirSim', seq = 0, subType='mr'):
         path += '/'
     return path
 
+def getPrPath(dsName, seq, subType):
+    resName = 'Results/Data/' + refBranchName() + '_' + dsName + '_'
+    path = resName + subType + str(seq) #if dsName == 'airsim' else resName + str(seq)
+    return path
+
 def getPathWin(dsName = 'kitti', seq = 0, subType='mr'):
     path = None
     dsName = dsName.lower()

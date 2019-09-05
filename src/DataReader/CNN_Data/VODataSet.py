@@ -1,5 +1,5 @@
 from torch.utils.data import Dataset, DataLoader
-from src.DataReader.PrepData import DataManager
+from src.DataReader.CNN_Data.PrepData import DataManager
 import numpy as np
 import cv2
 import time

@@ -1,6 +1,6 @@
-from src.DataReader.VODataSet import VODataSetManager_CNN
-from src.Models.Model_CNN_0 import Model_CNN_0
-from src.Models.ModelContainer_CNN import ModelContainer_CNN
+from src.DataReader.CNN_Data.VODataSet import VODataSetManager_CNN
+from src.Models.CNN_Model.Model_CNN_0 import Model_CNN_0
+from src.Models.CNN_Model.ModelContainer_CNN import ModelContainer_CNN
 import numpy as np
 import time
 from src.Params import *

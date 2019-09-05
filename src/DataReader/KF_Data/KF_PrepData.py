@@ -1,7 +1,7 @@
-from src.DataReader.KF_ReadData import *
+from src.DataReader.KF_Data.KF_ReadData import *
 import time
 
-from src.git_branch_param import branchName
+from src.Params import branchName
 ##############################################################################################
 ## Rule of thumb: don't call any other function to reduce lines of code with the img data in np.
 ## Otherwise, it could cause memeory dupilication.
@@ -19,7 +19,7 @@ class DataManager(Singleton):
         self.numChannel = 3 if self.dsName is not 'euroc' else 1
         self.subType = subType
         self.numDataset = len(seq)
-        dataObj = [ReadData(dsName, subType, seq[i]) for i in range(0, self.numDataset)]
+        dataObj = [ReadData_KF(dsName, subType, seq[i]) for i in range(0, self.numDataset)]
 
         # get number of data points
         self.numDataList = [dataObj[i].numData for i in range(0, self.numDataset)]
@@ -30,13 +30,13 @@ class DataManager(Singleton):
 
         # numeric data
         print('numeric data concat')
-        self.dt = np.concatenate([dataObj[i].gt_dt for i in range(0, self.numDataset)], axis=0).astype(np.float32)
-        self.du = np.concatenate([dataObj[i].gt_du for i in range(0, self.numDataset)], axis=0).astype(np.float32)
-        self.dw = np.concatenate([dataObj[i].gt_dw for i in range(0, self.numDataset)], axis=0).astype(np.float32)
-        self.dtr = np.concatenate([dataObj[i].gt_dtr for i in range(0, self.numDataset)], axis=0).astype(np.float32)
-        self.gt_dtr_gnd = np.concatenate([dataObj[i].gt_dtr_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.dt = np.concatenate([dataObj[i].dt for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.du = np.concatenate([dataObj[i].du for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.dw = np.concatenate([dataObj[i].dw for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.dtr = np.concatenate([dataObj[i].dtr for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.gt_dtr_gnd = np.concatenate([dataObj[i].dtr_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         self.pos_gnd = np.concatenate([dataObj[i].pos_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
-        self.rotM_bdy2gnd = np.concatenate([dataObj[i].gt_rotM_b2g for i in range(0, self.numDataset)], axis=0).astype(np.float32)
+        self.rotM_bdy2gnd = np.concatenate([dataObj[i].rotM_bdy2gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         self.acc_gnd = np.concatenate([dataObj[i].acc_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         self.accdt_gnd = np.concatenate([dataObj[i].accdt_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)
         self.gt_accdt_gnd = np.concatenate([dataObj[i].gt_accdt_gnd for i in range(0, self.numDataset)], axis=0).astype(np.float32)

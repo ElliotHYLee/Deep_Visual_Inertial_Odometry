@@ -1,5 +1,5 @@
-from torch.utils.data import Dataset, DataLoader
-from src.DataReader.KF_PrepData import DataManager
+from torch.utils.data import Dataset
+from src.DataReader.KF_Data.KF_PrepData import DataManager
 import numpy as np
 from sklearn.utils import shuffle
 

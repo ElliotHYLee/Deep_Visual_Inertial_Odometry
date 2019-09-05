@@ -1,5 +1,5 @@
 import torch.optim as optim
-from src.DataReader.VODataSet import DataLoader
+from src.DataReader.CNN_Data.VODataSet import DataLoader
 import torch
 import torch.nn as nn
 import numpy as np
