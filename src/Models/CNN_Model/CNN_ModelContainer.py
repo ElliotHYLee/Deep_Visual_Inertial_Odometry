@@ -38,9 +38,6 @@ class CNN_ModelContainer(AbsModelContainer):
         self.pr_dtr_gnd = self.model(img0, img1, dw_gyro, dw_gyro_stand, rotM)
 
     def getLoss(self):
-        #pass
-        # loss = self.loss(self.pr[:, 0, None], self.y[:, 0, None]) + \
-        # 1 * self.loss(self.pr[:, 1, None], self.y[:, 1, None])
         batch_loss = self.loss(self.pr_du, self.du, self.pr_du_cov) + \
                      self.loss(self.pr_dw, self.dw, self.pr_dw_cov) + \
                      self.loss(self.pr_dtr, self.dtr, self.pr_dtr_cov) + \
@@ -48,10 +45,6 @@ class CNN_ModelContainer(AbsModelContainer):
         return batch_loss
 
     def prepResults(self, N):
-        #pass
-        # self.result0 = np.zeros((N, 2))
-        # self.result1 = np.zeros((N, 2, 2))
-        # self.result2 = np.zeros((N, 2))
         self.result0 = np.zeros((N, self.pr_du.shape[1]))
         self.result1 = np.zeros((N, self.pr_du_cov.shape[1]))
         self.result2 = np.zeros((N, self.pr_dw.shape[1]))
@@ -60,12 +53,7 @@ class CNN_ModelContainer(AbsModelContainer):
         self.result5 = np.zeros((N, self.pr_dtr_cov.shape[1]))
         self.result6 = np.zeros((N, self.pr_dtr_gnd.shape[1]))
 
-
     def saveToResults(self, start, last):
-        #pass
-        # self.result0[start:last, :] = self.toCPUNumpy(self.pr)
-        # self.result1[start:last, :] = self.toCPUNumpy(self.A)
-        # self.result2[start:last, :] = self.toCPUNumpy(self.B)
         self.result0[start:last, :] = self.toCPUNumpy(self.pr_du)
         self.result1[start:last, :] = self.toCPUNumpy(self.pr_du_cov)
         self.result2[start:last, :] = self.toCPUNumpy(self.pr_dw)
@@ -74,11 +62,7 @@ class CNN_ModelContainer(AbsModelContainer):
         self.result5[start:last, :] = self.toCPUNumpy(self.pr_dtr_cov)
         self.result6[start:last, :] = self.toCPUNumpy(self.pr_dtr_gnd)
 
-
-
     def returnResults(self):
-        #pass
-        #return self.result0, self.result1, self.result2
         return self.result0, self.result1, \
                self.result2, self.result3, \
                self.result4, self.result5, \
