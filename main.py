@@ -1,6 +1,5 @@
 from src.DataReader.CNN_Data.VODataSet import VODataSetManager_CNN
 from src.Models.CNN_Model.Model_CNN_0 import Model_CNN_0
-from src.Models.CNN_Model.ModelContainer_CNN import ModelContainer_CNN
 from src.Models.CNN_Model.CNN_ModelContainer import CNN_ModelContainer
 import numpy as np
 import time
@@ -16,7 +15,7 @@ def test(dsName, subType, seqRange):
     wName = '../Weights/' + branchName() + '_' + dsName + '_' + subType
     resName = '../Results/Data/' + branchName() + '_' + dsName + '_'
     for seq in range(seqRange[0], seqRange[1]):
-        commName = resName + subType + str(seq)  #if dsName == 'airsim' else resName + str(seq)
+        commName = resName + subType + str(seq)
         dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
 
         mc = CNN_ModelContainer(Model_CNN_0(dsName), wName=wName)
