@@ -9,11 +9,6 @@ from src.Params import *
 def train(dsName, subType, seq):
     wName = '../Weights/' + branchName() + '_' + dsName + '_' + subType
     dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=seq, isTrain=True, split=0.2)
-    train, val = dm.trainSet, dm.valSet
-    mc = ModelContainer_CNN(Model_CNN_0(dsName))
-
-    #mc.fit(train, val, batch_size=64, epochs=20, wName=wName, checkPointFreq=1)
-
     mc = CNN_ModelContainer(Model_CNN_0(dsName), wName=wName)
     mc.regress(dm, epochs=20, batch_size=64, shuffle=False)
 
@@ -23,16 +18,14 @@ def test(dsName, subType, seqRange):
     for seq in range(seqRange[0], seqRange[1]):
         commName = resName + subType + str(seq)  #if dsName == 'airsim' else resName + str(seq)
         dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
-        dataset = dm.testSet
 
-        mc = ModelContainer_CNN(Model_CNN_0(dsName))
+        mc = CNN_ModelContainer(Model_CNN_0(dsName), wName=wName)
         mc.load_weights(wName +'_best', train=False)
 
         pr_du, du_cov, \
         pr_dw, dw_cov, \
         pr_dtr, dtr_cov, \
-        pr_dtr_gnd, \
-        mae = mc.predict(dataset)
+        pr_dtr_gnd = mc.predict(dm, batch_size=64)
 
         noise = getNoiseLevel()
 

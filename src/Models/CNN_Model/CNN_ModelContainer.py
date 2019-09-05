@@ -13,7 +13,6 @@ class CNN_ModelContainer(AbsModelContainer):
         if epoch == 3:
             self.optimizer = optim.RMSprop(self.model.parameters(), lr=10 ** -4, weight_decay=10 ** -4)
 
-
     def forwardProp(self, dataInTuple):
         #pass
         # (x, y, u) = dataInTuple
