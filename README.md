@@ -78,7 +78,7 @@ python main_cnn.py
 description
 
 <ul>
-<img src="https://github.com/ElliotHYLee/VisualOdometry3D/blob/master/Results/Figures/master_airsim_mr0_results.png" width="400">
+<img src="https://github.com/ElliotHYLee/Deep_Visual_Inertial_Odometry/master/Results/Figures/master_kitti_none0_results.png" width="400">
 </ul>
 
 ## Test Results
