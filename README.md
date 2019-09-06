@@ -90,5 +90,5 @@ description
 ## Correction Result
 
 <ul>
-<img src="https://github.com/ElliotHYLee/VisualOdometry/blob/master/Results/Images/seq_corr10.png" width="400">
+<img src="" width="400">
 </ul>
