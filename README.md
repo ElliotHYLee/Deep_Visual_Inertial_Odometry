@@ -83,7 +83,7 @@ description
 
 ## Test Results
 <ul>
-<img src="https://github.com/ElliotHYLee/VisualOdometry3D/blob/master/Results/Figures/master_airsim_mr1_results.png" width="400">
+<img src="https://github.com/ElliotHYLee/Deep_Visual_Inertial_Odometry/blob/master/Results/Figures/master_kitti_none5_results.png" width="400">
 <img src="https://github.com/ElliotHYLee/VisualOdometry3D/blob/master/Results/Figures/master_airsim_mr2_results.png" width="400">
 </ul>
 
