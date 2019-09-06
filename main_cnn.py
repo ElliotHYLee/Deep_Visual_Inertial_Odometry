@@ -37,7 +37,7 @@ def test(dsName, subType, seqRange):
         np.savetxt(commName + '_dtr_gnd' + str(noise) + '.txt', pr_dtr_gnd)
 
 def runTrainTest(dsName, subType, seq, seqRange):
-    runTrain(dsName, subType, seq)
+    #runTrain(dsName, subType, seq)
     runTest(dsName, subType, seqRange)
 
 def runTrain(dsName, subType, seq):

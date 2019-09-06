@@ -33,11 +33,11 @@ pr_pos = cumtrapz(pr_dtr_gnd);
 %% read KF position
 
 
-prPath = ['Data\',getPRPath(dsName, subType, seq)];
-kfName = strcat(prPath, 'KF_pos', int2str(noise) ,'.txt')
-kf_pos = importdata(kfName);
-
-
-prPath = ['Data\',getPRPath(dsName, subType, seq)];
-kfName = strcat(prPath, 'KF_vel', int2str(noise) ,'.txt')
-kf_vel = importdata(kfName);
+% prPath = ['Data\',getPRPath(dsName, subType, seq)];
+% kfName = strcat(prPath, 'KF_pos', int2str(noise) ,'.txt')
+% kf_pos = importdata(kfName);
+% 
+% 
+% prPath = ['Data\',getPRPath(dsName, subType, seq)];
+% kfName = strcat(prPath, 'KF_vel', int2str(noise) ,'.txt')
+% kf_vel = importdata(kfName);

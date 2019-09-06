@@ -8,7 +8,7 @@ pr_dwCovName = strcat(prPath, '_dw_cov', int2str(noise), '.txt');
 pr_dtrCovName = strcat(prPath, '_dtr_cov', int2str(noise), '.txt');
 
 
-pr_duName;
+pr_duName
 pr_du = importdata(pr_duName);
 pr_dw = importdata(pr_dwName);
 pr_dtr = importdata(pr_dtr_Name);
