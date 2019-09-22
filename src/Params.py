@@ -1,5 +1,5 @@
 def getKITTIPath():
-    return 'F:/DLData/KITTI/odom/dataset/sequences/'
+    return 'D:/DLData/KITTI/odom/dataset/sequences/'
 
 def getKITTIPath_AWS():
     return '~/KITTI/odom/dataset/sequences/'

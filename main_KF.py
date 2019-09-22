@@ -2,14 +2,13 @@ from src.DataReader.KF_Data.KF_PrepData import DataManager
 from scipy import signal
 from src.Params import *
 from src.Models.KF_Model.KF_BLock import *
+from src.Models.KF_Model.KF_Model import *
 import torch.optim as optim
 import matplotlib.pyplot as plt
 from src.Params import getNoiseLevel
 
 
-#dsName, subType, seq = 'airsim', 'mr', [0]
 dsName, subType, seq = 'kitti', 'none', [0, 2, 7, 10]
-#dsName, subType, seq = 'kitti', 'none', [5]
 
 isTrain = True
 wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType + '_KF'
