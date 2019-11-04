@@ -13,7 +13,7 @@ cons:
 
 
 ## Please Cite:
-Hongyun Lee, Matthew McCrink, and James W. Gregory. "Visual-Inertial Odometry for Unmanned Aerial Vehicle using Deep Leering", 2019 Intelligent/Autonomous Guidance and Navigation, AIAA SciTech Conference, https://doi.org/10.2514/6.2019-1410
+Hongyun Lee, Matthew McCrink, and James W. Gregory. "Deep Learning for Visual-Inertial Odometry: Estimation of Monocular Camera Ego-Motion and its Uncertainty" The Ohio State University, Master Thesis, https://etd.ohiolink.edu/pg_10?0::NO:10:P10_ACCESSION_NUM:osu156331321922759
 
 
 ## References(current & future)
