@@ -58,7 +58,7 @@ class DataManager(Singleton):
 
     def standardizeGyro(self, isTrain):
         print('standardizing gyro')
-        normPath = '../Norms/' + branchName() + '_' + self.dsName + '_' + self.subType
+        normPath = 'Norms/' + branchName() + '_' + self.dsName + '_' + self.subType
         if isTrain:
             gyroMean = np.mean(self.dw_gyro, axis=0)
             gyroStd = np.std(self.dw_gyro, axis=0)
@@ -74,7 +74,7 @@ class DataManager(Singleton):
         print('preparing to standardize imgs')
         mean = np.mean(self.imgs, axis=(0, 2, 3))
         std = np.std(self.imgs, axis=(0, 2, 3))
-        normPath = '../Norms/' + branchName() + '_' + self.dsName + '_' + self.subType
+        normPath = 'Norms/' + branchName() + '_' + self.dsName + '_' + self.subType
         if isTrain:
             np.savetxt(normPath + '_img_mean.txt', mean)
             np.savetxt(normPath + '_img_std.txt', std)

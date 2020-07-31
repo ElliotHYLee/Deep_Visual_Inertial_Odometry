@@ -6,14 +6,14 @@ import time
 from src.Params import *
 
 def train(dsName, subType, seq):
-    wName = '../Weights/' + branchName() + '_' + dsName + '_' + subType
+    wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
     dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=seq, isTrain=True, split=0.2)
     mc = CNN_ModelContainer(Model_CNN_0(dsName), wName=wName)
     mc.regress(dm, epochs=20, batch_size=64, shuffle=False)
 
 def test(dsName, subType, seqRange):
-    wName = '../Weights/' + branchName() + '_' + dsName + '_' + subType
-    resName = '../Results/Data/' + branchName() + '_' + dsName + '_'
+    wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
+    resName = 'Results/Data/' + branchName() + '_' + dsName + '_'
     for seq in range(seqRange[0], seqRange[1]):
         commName = resName + subType + str(seq)
         dm = VODataSetManager_CNN(dsName=dsName, subType=subType, seq=[seq], isTrain=False)
@@ -37,7 +37,7 @@ def test(dsName, subType, seqRange):
         np.savetxt(commName + '_dtr_gnd' + str(noise) + '.txt', pr_dtr_gnd)
 
 def runTrainTest(dsName, subType, seq, seqRange):
-    #runTrain(dsName, subType, seq)
+    runTrain(dsName, subType, seq)
     runTest(dsName, subType, seqRange)
 
 def runTrain(dsName, subType, seq):
