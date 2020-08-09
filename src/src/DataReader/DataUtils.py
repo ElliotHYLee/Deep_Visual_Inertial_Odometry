@@ -35,7 +35,17 @@ def getImgNames(path, dsName='kitti', ts=None, subType=''):
     dsName = dsName.lower()
     imgNames = []
     if dsName =='kitti':
-        imgNames = (pd.read_csv(path + 'fNames.txt', sep=' ', header=None)).iloc[:, 0]
+        import os
+        temp = []
+        print(path)
+        files = os.listdir(path + '/image_0/')
+        for i in range (0, len(files)):
+            f = files[i]
+            x = f.split('.')[0]
+            temp.append(int(x))
+        sortedIdx = sorted(range(len(temp)), key=lambda k: temp[k])
+        imgNames = [files[i] for i in sortedIdx]
+
         if subType == 'none':
             for i in range(0, len(imgNames)):
                 imgNames[i] = path + 'image_2/' + imgNames[i]
@@ -70,3 +80,4 @@ class ThreadManager():
             alive_list = [job for job in self.que if job.is_alive()]
             self.que = alive_list
             del(alive_list)
+

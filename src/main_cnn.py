@@ -1,9 +1,12 @@
+# %%
+
 from src.DataReader.CNN_Data.VODataSet import VODataSetManager_CNN
 from src.Models.CNN_Model.Model_CNN_0 import Model_CNN_0
 from src.Models.CNN_Model.CNN_ModelContainer import CNN_ModelContainer
 import numpy as np
 import time
 from src.Params import *
+
 
 def train(dsName, subType, seq):
     wName = 'Weights/' + branchName() + '_' + dsName + '_' + subType
@@ -53,4 +56,7 @@ if __name__ == '__main__':
     seq = [0]
     seqRange = [0, 3]
 
-    runTrainTest('kitti', 'none', seq=[0, 2, 4, 6], seqRange=[0, 11])
+    runTrainTest('kitti', 'none', seq=[0, 4], seqRange=[0, 11])
+
+
+# %%
